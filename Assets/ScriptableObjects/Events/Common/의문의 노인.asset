@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96a553c3b6b49274fb8ff74f7d46876b, type: 3}
+  m_Name: "\uC758\uBB38\uC758 \uB178\uC778"
+  m_EditorClassIdentifier: Assembly-CSharp::EventData
+  eventName: "\uC758\uBB38\uC758 \uB178\uC778"
+  description: "\uAE38\uAC00\uC5D0 \uC4F0\uB7EC\uC838 \uC788\uB294 \uB178\uC778\uC744
+    \uBC1C\uACAC\uD588\uC2B5\uB2C8\uB2E4. \uB9E5\uC774 \uB9E4\uC6B0 \uD76C\uBBF8\uD569\uB2C8\uB2E4.
+    \uADF8\uB97C \uB3D5\uACA0\uC2B5\uB2C8\uAE4C?"
+  rarity: 0
+  choices:
+  - choiceText: "[\uB3C4\uC640\uC900\uB2E4] \uB0B4\uACF5\uC744 \uBD88\uC5B4\uB123\uC5B4\uC900\uB2E4.
+      (\uCD5C\uB300 \uCCB4\uB825 5 \uAC10\uC18C)"
+    consequence: 2
+    value: 0
+    relicToObtain: {fileID: 0}
+    combatToStart: {fileID: 0}
+  - choiceText: "[\uC218\uC0C9\uD55C\uB2E4] \uAC00\uC9C4 \uAC83\uC744 \uD655\uC778\uD55C\uB2E4."
+    consequence: 3
+    value: 50
+    relicToObtain: {fileID: 0}
+    combatToStart: {fileID: 0}
+  - choiceText: "[\uBB34\uC2DC\uD55C\uB2E4] \uC57D\uC721\uAC15\uC2DD\uC740 \uAC15\uD638\uC758
+      \uC12D\uB9AC."
+    consequence: 0
+    value: 0
+    relicToObtain: {fileID: 0}
+    combatToStart: {fileID: 0}
