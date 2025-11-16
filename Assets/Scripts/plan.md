@@ -186,16 +186,16 @@
 ## Phase 10: UI 시스템
 
 ### 10.1 전투 UI
-- [ ] Test: Player의 체력/내공을 UI에 표시한다
-- [ ] Test: Enemy의 체력/Intent를 UI에 표시한다
-- [ ] Test: 핸드의 카드를 UI에 표시한다
-- [ ] Test: 카드 호버 시 툴팁이 표시된다
-- [ ] Test: 상태이상 아이콘이 표시된다
+- [x] Test: Player의 체력/내공을 UI에 표시한다
+- [x] Test: Enemy의 체력/Intent를 UI에 표시한다
+- [x] Test: 핸드의 카드를 UI에 표시한다
+- [x] Test: 카드 호버 시 툴팁이 표시된다
+- [x] Test: 상태이상 아이콘이 표시된다
 
 ### 10.2 맵 UI
-- [ ] Test: 맵 노드가 UI에 표시된다
-- [ ] Test: 현재 위치가 표시된다
-- [ ] Test: 이동 가능한 노드가 강조 표시된다
+- [x] Test: 맵 노드가 UI에 표시된다
+- [x] Test: 현재 위치가 표시된다
+- [x] Test: 이동 가능한 노드가 강조 표시된다
 
 ## Phase 11: 메타 시스템
 
