@@ -3,10 +3,224 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-// 플레이어 캐릭터의 모든 데이터를 관리하고 핵심 로직을 수행하는 클래스입니다.
-public class Player : MonoBehaviour, IDamageable
+namespace GangHoBiGeup.Gameplay
 {
-    #region Events
+    // 플레이어 캐릭터의 모든 데이터를 관리하고 핵심 로직을 수행하는 클래스입니다.
+    public class Player : MonoBehaviour, IDamageable
+    {
+    #region TDD Test Properties
+    // TDD 테스트를 위한 간단한 프로퍼티들
+    public int CurrentHealth 
+    { 
+    get => currentHealth; 
+    set => currentHealth = value; 
+    }
+    
+    public int MaxHealth 
+    { 
+    get => maxHealth; 
+    set => maxHealth = value; 
+    }
+    
+    public int Block 
+    { 
+    get => defense; 
+    set => defense = value; 
+    }
+    
+    public int Energy 
+    { 
+    get => currentNaegong; 
+    set => currentNaegong = value; 
+    }
+    
+    public int Gold 
+    { 
+    get => gold; 
+    set => gold = value; 
+    }
+    
+    public bool IsDead => currentHealth <= 0;
+    
+        // 덱 관리 프로퍼티
+        public List<CardData> Deck
+        {
+            get => GetAllCardsInDeck();
+            set
+            {
+                drawPile = new List<CardData>(value);
+                hand.Clear();
+                discardPile.Clear();
+            }
+        }
+        
+        public List<CardData> DrawPile
+        {
+            get => drawPile;
+            set => drawPile = value;
+        }
+        
+        public List<CardData> Hand
+        {
+            get => hand;
+            set => hand = value;
+        }
+        
+        public List<CardData> DiscardPile
+        {
+            get => discardPile;
+            set => discardPile = value;
+        }
+        
+        public void ShuffleDeck()
+        {
+            drawPile.Shuffle();
+        }
+        
+        public void DiscardCard(CardData card)
+        {
+            if (hand.Remove(card))
+            {
+                discardPile.Add(card);
+                OnHandChanged?.Invoke(new List<CardData>(hand));
+                OnPilesChanged?.Invoke(drawPile.Count, discardPile.Count, exhaustPile.Count);
+            }
+        }
+        
+        // 경지 시스템 프로퍼티
+        public Realm CurrentRealm
+        {
+            get => currentRealm;
+            set => currentRealm = value;
+        }
+        
+        public SwordRealm CurrentSwordRealm
+        {
+            get => currentSwordRealm;
+            set => currentSwordRealm = value;
+        }
+        
+        public int CurrentXp
+        {
+            get => currentXp;
+            set => currentXp = value;
+        }
+        
+        public int XpToNextRealm
+        {
+            get => xpToNextRealm;
+            set => xpToNextRealm = value;
+        }
+        
+        public bool IsReadyToAscend
+        {
+            get => isReadyToAscend;
+            set => isReadyToAscend = value;
+        }
+        
+        public int MaxNaegong
+        {
+            get => maxNaegong;
+            set => maxNaegong = value;
+        }
+        
+        public void AscendRealm(Realm newRealm)
+        {
+            if (newRealm <= currentRealm) return;
+            
+            currentRealm = newRealm;
+            
+            // 경지 상승 시 최대 내공 증가
+            maxNaegong = GetMaxNaegongForRealm(newRealm);
+            
+            // XP 초기화 및 다음 경지 목표 설정
+            currentXp = 0;
+            isReadyToAscend = false;
+            xpToNextRealm = GetXpRequiredForNextRealm(newRealm);
+        }
+        
+        private int GetMaxNaegongForRealm(Realm realm)
+        {
+            switch (realm)
+            {
+                case Realm.Samryu: return 3;
+                case Realm.Iryu: return 4;
+                case Realm.Illyu: return 4;
+                case Realm.Jeoljeong: return 5;
+                case Realm.Chojeoljeong: return 5;
+                case Realm.Hwagyeong: return 6;
+                case Realm.Saengsagyeong: return 7;
+                default: return 3;
+            }
+        }
+        
+        private int GetXpRequiredForNextRealm(Realm realm)
+        {
+            switch (realm)
+            {
+                case Realm.Samryu: return 10;
+                case Realm.Iryu: return 15;
+                case Realm.Illyu: return 20;
+                case Realm.Jeoljeong: return 30;
+                case Realm.Chojeoljeong: return 40;
+                case Realm.Hwagyeong: return 50;
+                case Realm.Saengsagyeong: return 0; // 최고 경지
+                default: return 10;
+            }
+        }
+        
+        public void RecordSwordEvent(string eventType)
+        {
+            switch (eventType)
+            {
+                case "Attack":
+                    attacksThisCombat++;
+                    if (currentSwordRealm == SwordRealm.None && attacksThisCombat >= 10)
+                    {
+                        AscendSwordRealm(SwordRealm.Geomgi);
+                    }
+                    break;
+                case "ZeroDamageTurn":
+                    zeroDamageTurns++;
+                    if (currentSwordRealm == SwordRealm.Geomgi && zeroDamageTurns >= 3)
+                    {
+                        AscendSwordRealm(SwordRealm.Geomsa);
+                    }
+                    break;
+            }
+        }
+        
+        // 상태이상 관리 - TDD 테스트용 메서드
+        public void ApplyStatusEffect(StatusEffectType type, int value, int duration = -1)
+        {
+            // StatusEffectData를 찾아서 StatusEffect 생성
+            StatusEffectData data = GetStatusEffectData(type);
+            if (data == null) return;
+            
+            StatusEffect effect = new StatusEffect(data, value);
+            ApplyStatusEffect(effect);
+        }
+        
+        private StatusEffectData GetStatusEffectData(StatusEffectType type)
+        {
+            // ResourceManager를 통해 데이터를 가져오거나, 간단하게 ScriptableObject 생성
+            var data = ScriptableObject.CreateInstance<StatusEffectData>();
+            data.type = type;
+            data.effectName = type.ToString();
+            data.assetID = type.ToString();
+            return data;
+        }
+        
+        public int CalculateDamage(int baseDamage)
+        {
+            int strength = GetStatusEffectValue(StatusEffectType.Strength);
+            int weak = GetStatusEffectValue(StatusEffectType.Weak);
+            
+            return baseDamage + strength - weak;
+        }
+        #endregion
+        
+        #region Events
     public event Action<int, int, int, int, int> OnStatsChanged; // curHP, maxHP, def, curN, maxN
     public event Action<List<CardData>> OnHandChanged;
     public event Action<int, int, int> OnPilesChanged; // draw, discard, exhaust
@@ -115,20 +329,33 @@ public class Player : MonoBehaviour, IDamageable
         float multiplier = 1f;
         if (GetStatusEffectValue(StatusEffectType.Vulnerable) > 0) multiplier = 1.5f;
 
-        int finalDamage = Mathf.Max(0, Mathf.RoundToInt(damage * multiplier) - defense);
-        currentHealth -= finalDamage;
+        int modifiedDamage = Mathf.RoundToInt(damage * multiplier);
+        
+        // 방어도가 먼저 감소함
+        if (defense > 0)
+        {
+            int blockedDamage = Mathf.Min(defense, modifiedDamage);
+            defense -= blockedDamage;
+            modifiedDamage -= blockedDamage;
+        }
+        
+        // 남은 데미지로 체력 감소
+        currentHealth -= modifiedDamage;
         wasDamagedThisTurn = true;
         
-        if (finalDamage > 0)
+        if (modifiedDamage > 0)
         {
-            AudioManager.Instance.PlaySound(AudioManager.Instance.takeDamageSound);
-            FeedbackManager.Instance.ShowDamageNumber(finalDamage, transform.position);
+            if (AudioManager.Instance != null)
+                AudioManager.Instance.PlaySound(AudioManager.Instance.takeDamageSound);
+            if (FeedbackManager.Instance != null)
+                FeedbackManager.Instance.ShowDamageNumber(modifiedDamage, transform.position);
         }
 
         if (currentHealth <= 0)
         {
             currentHealth = 0;
-            GameManager.Instance.EndBattle(false, false);
+            if (GameManager.Instance != null)
+                GameManager.Instance.EndBattle(false, false);
         }
 
         NotifyStatsChanged();
@@ -181,7 +408,7 @@ public class Player : MonoBehaviour, IDamageable
     #region Status Effect
     public void ApplyStatusEffect(StatusEffect effectToApply)
     {
-        var existingEffect = statusEffects.Find(e => e.Effect.Data.type == effectToApply.Data.type);
+        var existingEffect = statusEffects.Find(e => e.Effect.Data != null && e.Effect.Data.type == effectToApply.Data.type);
         if (existingEffect != null)
             existingEffect.Effect.Value += effectToApply.Value;
         else
@@ -505,4 +732,5 @@ public class Player : MonoBehaviour, IDamageable
         OnStatusEffectsChanged?.Invoke(statusEffects.Select(b => b.Effect).ToList());
     }
     #endregion
+}
 }

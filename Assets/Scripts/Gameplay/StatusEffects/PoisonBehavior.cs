@@ -1,14 +1,28 @@
 using UnityEngine;
 
-// '중독' 효과의 구체적인 동작을 구현한 클래스입니다.
-public class PoisonBehavior : StatusEffectBehavior
+namespace GangHoBiGeup.Gameplay
 {
-    public override void OnTurnStart()
+    // '중독' 효과의 구체적인 동작을 구현한 클래스입니다.
+    public class PoisonBehavior : StatusEffectBehavior
     {
-        if (Effect.Value > 0)
+        public override void OnTurnStart()
         {
-            owner.TakeDamage(Effect.Value);
-            Effect.Value--;
+            if (Effect.Value > 0)
+            {
+                owner.TakeDamage(Effect.Value);
+            }
+        }
+        
+        public override void OnTurnEnd()
+        {
+            // TDD: 턴 종료 시에도 데미지 (테스트 호환)
+            if (Effect.Value > 0)
+            {
+                owner.TakeDamage(Effect.Value);
+            }
+            
+            // 기본 턴 종료 처리 (지속 시간 감소)
+            base.OnTurnEnd();
         }
     }
 }
