@@ -296,5 +296,258 @@ namespace GangHoBiGeup.Tests
 
             Object.DestroyImmediate(playerObject);
         }
+
+        // Phase 4.3: 카드 사용
+        [Test]
+        public void Player가_카드를_사용할_수_있다()
+        {
+            // Arrange
+            var playerObject = new GameObject("Player");
+            var player = playerObject.AddComponent<Player>();
+            player.Energy = 3;
+
+            var card = ScriptableObject.CreateInstance<CardData>();
+            card.cost = 1;
+            card.effects = new List<GameEffect>();
+
+            player.Hand = new List<CardData> { card };
+
+            var enemyObject = new GameObject("Enemy");
+            var enemy = enemyObject.AddComponent<Enemy>();
+
+            // Act
+            player.PlayCard(card, enemy);
+
+            // Assert
+            Assert.AreEqual(2, player.Energy); // 3 - 1 = 2
+            Assert.IsFalse(player.Hand.Contains(card)); // 카드가 핸드에서 제거됨
+
+            Object.DestroyImmediate(playerObject);
+            Object.DestroyImmediate(enemyObject);
+        }
+
+        [Test]
+        public void 카드_사용_시_내공이_소모된다()
+        {
+            // Arrange
+            var playerObject = new GameObject("Player");
+            var player = playerObject.AddComponent<Player>();
+            player.Energy = 5;
+
+            var card = ScriptableObject.CreateInstance<CardData>();
+            card.cost = 2;
+            card.effects = new List<GameEffect>();
+
+            player.Hand = new List<CardData> { card };
+
+            var enemyObject = new GameObject("Enemy");
+            var enemy = enemyObject.AddComponent<Enemy>();
+
+            // Act
+            player.PlayCard(card, enemy);
+
+            // Assert
+            Assert.AreEqual(3, player.Energy); // 5 - 2 = 3
+
+            Object.DestroyImmediate(playerObject);
+            Object.DestroyImmediate(enemyObject);
+        }
+
+        [Test]
+        public void 내공이_부족하면_카드를_사용할_수_없다()
+        {
+            // Arrange
+            var playerObject = new GameObject("Player");
+            var player = playerObject.AddComponent<Player>();
+            player.Energy = 1;
+
+            var card = ScriptableObject.CreateInstance<CardData>();
+            card.cost = 3; // 필요 내공이 현재 내공보다 많음
+            card.effects = new List<GameEffect>();
+
+            player.Hand = new List<CardData> { card };
+
+            var enemyObject = new GameObject("Enemy");
+            var enemy = enemyObject.AddComponent<Enemy>();
+
+            // Act
+            player.PlayCard(card, enemy);
+
+            // Assert
+            Assert.AreEqual(1, player.Energy); // 내공이 소모되지 않음
+            Assert.IsTrue(player.Hand.Contains(card)); // 카드가 핸드에 남아있음
+
+            Object.DestroyImmediate(playerObject);
+            Object.DestroyImmediate(enemyObject);
+        }
+
+        [Test]
+        public void 카드_효과가_올바르게_적용된다()
+        {
+            // Arrange
+            var playerObject = new GameObject("Player");
+            var player = playerObject.AddComponent<Player>();
+            player.Energy = 5;
+
+            var card = ScriptableObject.CreateInstance<CardData>();
+            card.cost = 1;
+            card.effects = new List<GameEffect>
+            {
+                new GameEffect { effectType = GameEffectType.Damage, value = 10 }
+            };
+
+            player.Hand = new List<CardData> { card };
+
+            var enemyObject = new GameObject("Enemy");
+            var enemy = enemyObject.AddComponent<Enemy>();
+            enemy.CurrentHealth = 50;
+
+            // Act
+            player.PlayCard(card, enemy);
+
+            // Assert
+            Assert.AreEqual(40, enemy.CurrentHealth); // 50 - 10 = 40
+
+            Object.DestroyImmediate(playerObject);
+            Object.DestroyImmediate(enemyObject);
+        }
+
+        [Test]
+        public void 타겟이_필요한_카드는_타겟을_지정해야_사용할_수_있다()
+        {
+            // Arrange
+            var playerObject = new GameObject("Player");
+            var player = playerObject.AddComponent<Player>();
+            player.Energy = 5;
+
+            var card = ScriptableObject.CreateInstance<CardData>();
+            card.cost = 1;
+            card.effects = new List<GameEffect>
+            {
+                new GameEffect { effectType = GameEffectType.Damage, value = 10 }
+            };
+
+            player.Hand = new List<CardData> { card };
+
+            var enemyObject = new GameObject("Enemy");
+            var enemy = enemyObject.AddComponent<Enemy>();
+            enemy.CurrentHealth = 50;
+
+            // Act
+            player.PlayCard(card, enemy); // 타겟 지정
+
+            // Assert
+            Assert.AreEqual(40, enemy.CurrentHealth); // 타겟에 데미지가 적용됨
+
+            Object.DestroyImmediate(playerObject);
+            Object.DestroyImmediate(enemyObject);
+        }
+
+        [Test]
+        public void 절초_카드는_사용_후_소멸된다()
+        {
+            // Arrange
+            var playerObject = new GameObject("Player");
+            var player = playerObject.AddComponent<Player>();
+            player.Energy = 5;
+
+            var card = ScriptableObject.CreateInstance<CardData>();
+            card.cost = 0;
+            card.isJeolcho = true; // 절초 카드
+            card.effects = new List<GameEffect>();
+
+            player.Hand = new List<CardData> { card };
+            player.ExhaustPile = new List<CardData>();
+            player.DiscardPile = new List<CardData>();
+
+            var enemyObject = new GameObject("Enemy");
+            var enemy = enemyObject.AddComponent<Enemy>();
+
+            // Act
+            player.PlayCard(card, enemy);
+
+            // Assert
+            Assert.IsTrue(player.ExhaustPile.Contains(card)); // 소멸 더미에 추가됨
+            Assert.IsFalse(player.DiscardPile.Contains(card)); // 버린 더미에는 없음
+
+            Object.DestroyImmediate(playerObject);
+            Object.DestroyImmediate(enemyObject);
+        }
+
+        // Phase 4.4: 전투 종료
+        [Test]
+        public void 모든_적이_사망하면_전투에서_승리한다()
+        {
+            // Arrange
+            var enemyObject = new GameObject("Enemy");
+            var enemy = enemyObject.AddComponent<Enemy>();
+            enemy.CurrentHealth = 10;
+
+            // Act
+            enemy.TakeDamage(10);
+
+            // Assert
+            Assert.IsTrue(enemy.IsDead);
+            Assert.AreEqual(0, enemy.CurrentHealth);
+
+            Object.DestroyImmediate(enemyObject);
+        }
+
+        [Test]
+        public void Player가_사망하면_전투에서_패배한다()
+        {
+            // Arrange
+            var playerObject = new GameObject("Player");
+            var player = playerObject.AddComponent<Player>();
+            player.CurrentHealth = 10;
+
+            // Act
+            player.TakeDamage(10);
+
+            // Assert
+            Assert.IsTrue(player.IsDead);
+            Assert.AreEqual(0, player.CurrentHealth);
+
+            Object.DestroyImmediate(playerObject);
+        }
+
+        [Test]
+        public void 전투_승리_시_수련치를_획득한다()
+        {
+            // Arrange
+            var playerObject = new GameObject("Player");
+            var player = playerObject.AddComponent<Player>();
+            player.CurrentXp = 0;
+
+            // Act
+            player.GainXp(5); // 적 처치 시 수련치 획득
+
+            // Assert
+            Assert.AreEqual(5, player.CurrentXp);
+
+            Object.DestroyImmediate(playerObject);
+        }
+
+        [Test]
+        public void 전투_승리_시_보상을_받는다()
+        {
+            // Arrange
+            var playerObject = new GameObject("Player");
+            var player = playerObject.AddComponent<Player>();
+            player.Gold = 0;
+
+            var rewardCard = ScriptableObject.CreateInstance<CardData>();
+            rewardCard.id = "reward_card";
+
+            // Act
+            player.Gold += 50; // 골드 보상
+            player.AddCardToDeck(rewardCard); // 카드 보상
+
+            // Assert
+            Assert.AreEqual(50, player.Gold);
+            Assert.Contains(rewardCard, player.DiscardPile); // 새 카드는 버린 더미에 추가됨
+
+            Object.DestroyImmediate(playerObject);
+        }
     }
 }
