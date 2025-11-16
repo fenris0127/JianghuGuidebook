@@ -101,19 +101,19 @@
 ## Phase 4: 전투 시스템 (Battle Manager)
 
 ### 4.1 전투 초기화
-- [ ] Test: BattleManager를 싱글톤으로 생성할 수 있다
-- [ ] Test: 전투를 EncounterData로 초기화할 수 있다
-- [ ] Test: 전투 시작 시 적들을 생성한다
-- [ ] Test: 전투 시작 시 Player의 덱을 셔플한다
-- [ ] Test: 전투 시작 시 초기 핸드를 뽑는다
+- [x] Test: BattleManager를 싱글톤으로 생성할 수 있다
+- [x] Test: 전투를 EncounterData로 초기화할 수 있다
+- [x] Test: 전투 시작 시 적들을 생성한다
+- [x] Test: 전투 시작 시 Player의 덱을 셔플한다
+- [x] Test: 전투 시작 시 초기 핸드를 뽑는다
 
 ### 4.2 턴 관리
-- [ ] Test: Player 턴을 시작할 수 있다
-- [ ] Test: Player 턴 시작 시 내공이 리필된다
-- [ ] Test: Player 턴 시작 시 카드를 뽑는다
-- [ ] Test: Enemy 턴을 시작할 수 있다
-- [ ] Test: Enemy 턴에 모든 적이 순서대로 행동한다
-- [ ] Test: 턴 종료 시 핸드의 카드를 버린다
+- [x] Test: Player 턴을 시작할 수 있다
+- [x] Test: Player 턴 시작 시 내공이 리필된다
+- [x] Test: Player 턴 시작 시 카드를 뽑는다
+- [x] Test: Enemy 턴을 시작할 수 있다
+- [x] Test: Enemy 턴에 모든 적이 순서대로 행동한다
+- [x] Test: 턴 종료 시 핸드의 카드를 버린다
 
 ### 4.3 카드 사용
 - [ ] Test: Player가 카드를 사용할 수 있다

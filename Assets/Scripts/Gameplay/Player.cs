@@ -302,7 +302,20 @@ namespace GangHoBiGeup.Gameplay
         if(startingBlock > 0) GainDefense(startingBlock);
         NotifyStatsChanged();
     }
-    
+
+    public void EndTurn()
+    {
+        // 핸드의 모든 카드를 버린 카드 더미로 이동
+        while (hand.Count > 0)
+        {
+            var card = hand[0];
+            hand.RemoveAt(0);
+            discardPile.Add(card);
+        }
+
+        OnPilesChanged?.Invoke(drawPile.Count, discardPile.Count, exhaustPile.Count);
+    }
+
     public void PlayCard(CardData card, Component target)
     {
         if (currentNaegong < card.cost) return;
