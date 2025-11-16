@@ -140,15 +140,15 @@
 ## Phase 6: 게임 관리 시스템 (Game Manager)
 
 ### 6.1 게임 상태 관리
-- [ ] Test: GameManager를 싱글톤으로 생성할 수 있다
-- [ ] Test: 게임 상태(MainMenu, MapView, Battle 등)를 변경할 수 있다
-- [ ] Test: 새 게임을 시작할 수 있다
-- [ ] Test: 선택한 문파로 Player를 초기화한다
+- [x] Test: GameManager를 싱글톤으로 생성할 수 있다
+- [x] Test: 게임 상태(MainMenu, MapView, Battle 등)를 변경할 수 있다
+- [x] Test: 새 게임을 시작할 수 있다
+- [x] Test: 선택한 문파로 Player를 초기화한다
 
 ### 6.2 세이브/로드
-- [ ] Test: 게임 진행 상황을 저장할 수 있다
-- [ ] Test: 저장된 게임을 불러올 수 있다
-- [ ] Test: 전투 종료 시 자동 저장된다
+- [x] Test: 게임 진행 상황을 저장할 수 있다
+- [x] Test: 저장된 게임을 불러올 수 있다
+- [x] Test: 전투 종료 시 자동 저장된다
 
 ## Phase 7: 맵 시스템 (Map Manager)
 
