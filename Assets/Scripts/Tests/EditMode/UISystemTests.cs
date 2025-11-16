@@ -5,6 +5,7 @@ using TMPro;
 using GangHoBiGeup.Gameplay;
 using GangHoBiGeup.Data;
 using System.Collections.Generic;
+using static GangHoBiGeup.Tests.TestHelper;
 
 namespace GangHoBiGeup.Tests
 {
@@ -47,7 +48,7 @@ namespace GangHoBiGeup.Tests
             Assert.IsNotNull(healthText);
             Assert.IsNotNull(naegongText);
 
-            Object.DestroyImmediate(uiObject);
+            Cleanup(playerStatsUI);
         }
 
         [Test]
@@ -76,10 +77,7 @@ namespace GangHoBiGeup.Tests
             intentValueTextObj.transform.SetParent(intentPanelObj.transform);
             var intentValueText = intentValueTextObj.AddComponent<TextMeshProUGUI>();
 
-            var enemyObject = new GameObject("Enemy");
-            var enemy = enemyObject.AddComponent<Enemy>();
-            enemy.maxHealth = 50;
-            enemy.currentHealth = 30;
+            var enemy = CreateEnemy(maxHealth: 50, currentHealth: 30);
 
             // Act
             enemyUI.Setup(enemy);
@@ -90,8 +88,7 @@ namespace GangHoBiGeup.Tests
             Assert.IsNotNull(healthText);
             Assert.IsNotNull(intentIcon);
 
-            Object.DestroyImmediate(uiObject);
-            Object.DestroyImmediate(enemyObject);
+            Cleanup(enemyUI, enemy);
         }
 
         [Test]
@@ -106,17 +103,13 @@ namespace GangHoBiGeup.Tests
 
             // 카드 프리팹 생성
             var cardPrefabObj = new GameObject("CardPrefab");
-            cardPrefabObj.AddComponent<CardUI>();
+            var cardUI = cardPrefabObj.AddComponent<CardUI>();
 
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
+            var player = CreatePlayer();
 
-            var card1 = ScriptableObject.CreateInstance<CardData>();
-            card1.cardName = "타격";
-            var card2 = ScriptableObject.CreateInstance<CardData>();
-            card2.cardName = "방어";
-            var card3 = ScriptableObject.CreateInstance<CardData>();
-            card3.cardName = "참격";
+            var card1 = CreateCard("strike", "타격");
+            var card2 = CreateCard("defend", "방어");
+            var card3 = CreateCard("slash", "참격");
 
             player.hand.Add(card1);
             player.hand.Add(card2);
@@ -127,9 +120,7 @@ namespace GangHoBiGeup.Tests
             // 테스트에서는 핸드에 카드가 있는지만 확인
             Assert.AreEqual(3, player.hand.Count, "핸드에 3장의 카드가 있어야 합니다");
 
-            Object.DestroyImmediate(handUIObj);
-            Object.DestroyImmediate(playerObject);
-            Object.DestroyImmediate(cardPrefabObj);
+            Cleanup(handUI, player, cardUI);
         }
 
         [Test]
@@ -152,10 +143,8 @@ namespace GangHoBiGeup.Tests
             descriptionTextObj.transform.SetParent(cardUIObj.transform);
             descriptionTextObj.AddComponent<TextMeshProUGUI>();
 
-            var cardData = ScriptableObject.CreateInstance<CardData>();
-            cardData.cardName = "천마공살";
+            var cardData = CreateCard("cheonma", "천마공살", cost: 2);
             cardData.description = "적에게 10의 피해를 입힙니다.";
-            cardData.cost = 2;
 
             // Act
             cardUI.Setup(cardData);
@@ -167,20 +156,17 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual("천마공살", tooltipProvider.GetTooltipTitle());
             Assert.IsTrue(tooltipProvider.GetTooltipContent().Contains("적에게 10의 피해를 입힙니다"));
 
-            Object.DestroyImmediate(cardUIObj);
+            Cleanup(cardUI);
         }
 
         [Test]
         public void 상태이상_아이콘이_표시된다()
         {
             // Arrange
-            var enemyObject = new GameObject("Enemy");
-            var enemy = enemyObject.AddComponent<Enemy>();
-            enemy.maxHealth = 50;
-            enemy.currentHealth = 50;
+            var enemy = CreateEnemy(maxHealth: 50, currentHealth: 50);
 
-            var poisonEffect = new StatusEffect(StatusEffectType.Poison, 3, 2);
-            var strengthEffect = new StatusEffect(StatusEffectType.Strength, 2, 0);
+            var poisonEffect = Poison(3, 2);
+            var strengthEffect = Strength(2, 0);
 
             // Act
             enemy.ApplyStatusEffect(poisonEffect);
@@ -190,7 +176,7 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual(3, enemy.GetStatusEffectValue(StatusEffectType.Poison), "중독 상태이상이 3이어야 합니다");
             Assert.AreEqual(2, enemy.GetStatusEffectValue(StatusEffectType.Strength), "힘 상태이상이 2여야 합니다");
 
-            Object.DestroyImmediate(enemyObject);
+            Cleanup(enemy);
         }
 
         // Phase 10.2: 맵 UI
@@ -213,7 +199,7 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual(NodeType.Combat, mapNode.nodeType);
             Assert.AreEqual(0, mapNode.layer);
 
-            Object.DestroyImmediate(nodeObject);
+            Cleanup(mapNode);
         }
 
         [Test]
@@ -232,7 +218,7 @@ namespace GangHoBiGeup.Tests
             // Assert
             Assert.IsTrue(button.interactable, "현재 위치 노드는 활성화되어 있어야 합니다");
 
-            Object.DestroyImmediate(currentNode.gameObject);
+            Cleanup(currentNode);
         }
 
         [Test]
@@ -264,8 +250,7 @@ namespace GangHoBiGeup.Tests
             Assert.IsNotNull(clickableImage);
             Assert.IsNotNull(lockedImage);
 
-            Object.DestroyImmediate(clickableNode.gameObject);
-            Object.DestroyImmediate(lockedNode.gameObject);
+            Cleanup(clickableNode, lockedNode);
         }
     }
 }
