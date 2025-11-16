@@ -261,6 +261,10 @@ namespace GangHoBiGeup.Gameplay
     private bool wasDamagedThisTurn;
     private int zeroCostCardsThisCombat;
     private int jeolchoKills;
+
+    // Combo System
+    private List<CardData> cardPlayHistory = new List<CardData>();
+    private List<ComboData> registeredCombos = new List<ComboData>();
     #endregion
     
     public void Setup(List<CardData> startingDeck, int bonusHealth)
@@ -312,6 +316,9 @@ namespace GangHoBiGeup.Gameplay
             hand.RemoveAt(0);
             discardPile.Add(card);
         }
+
+        // 연계 카운터 초기화
+        cardPlayHistory.Clear();
 
         OnPilesChanged?.Invoke(drawPile.Count, discardPile.Count, exhaustPile.Count);
     }
@@ -731,6 +738,74 @@ namespace GangHoBiGeup.Gameplay
         // UI 갱신을 위해 모든 이벤트 호출
         NotifyAllEvents();
     }
+
+    #region Combo System
+    /// <summary>
+    /// 연계 초식을 등록합니다
+    /// </summary>
+    public void RegisterCombo(ComboData comboData)
+    {
+        if (!registeredCombos.Contains(comboData))
+        {
+            registeredCombos.Add(comboData);
+        }
+    }
+
+    /// <summary>
+    /// 카드 사용을 기록하고 연계 초식을 확인합니다
+    /// </summary>
+    /// <returns>연계가 발동되었는지 여부</returns>
+    public bool RecordCardPlay(CardData card)
+    {
+        cardPlayHistory.Add(card);
+
+        // 등록된 모든 연계 초식을 확인
+        foreach (var combo in registeredCombos)
+        {
+            if (CheckComboTriggered(combo))
+            {
+                // 연계 발동! 히스토리 초기화하고 true 반환
+                cardPlayHistory.Clear();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 특정 연계 초식이 발동되었는지 확인합니다
+    /// </summary>
+    private bool CheckComboTriggered(ComboData combo)
+    {
+        if (combo.requiredCardIDs == null || combo.requiredCardIDs.Count == 0)
+            return false;
+
+        int requiredLength = combo.requiredCardIDs.Count;
+        if (cardPlayHistory.Count < requiredLength)
+            return false;
+
+        // 최근 N개의 카드가 요구되는 순서와 일치하는지 확인
+        int startIndex = cardPlayHistory.Count - requiredLength;
+        for (int i = 0; i < requiredLength; i++)
+        {
+            if (cardPlayHistory[startIndex + i].id != combo.requiredCardIDs[i])
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// 현재 카드 사용 히스토리를 반환합니다
+    /// </summary>
+    public List<CardData> GetCardPlayHistory()
+    {
+        return new List<CardData>(cardPlayHistory);
+    }
+    #endregion
 
     #region Notify
     private void NotifyStatsChanged() => OnStatsChanged?.Invoke(currentHealth, maxHealth, defense, currentNaegong, maxNaegong);
