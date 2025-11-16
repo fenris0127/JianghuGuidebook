@@ -3,6 +3,7 @@ using UnityEngine;
 using GangHoBiGeup.Data;
 using GangHoBiGeup.Gameplay;
 using System.Collections.Generic;
+using static GangHoBiGeup.Tests.TestHelper;
 
 namespace GangHoBiGeup.Tests
 {
@@ -13,36 +14,30 @@ namespace GangHoBiGeup.Tests
         [Test]
         public void MapManager를_생성할_수_있다()
         {
-            // Arrange
-            var mapManagerObject = new GameObject("MapManager");
-
-            // Act
-            var mapManager = mapManagerObject.AddComponent<MapManager>();
+            // Arrange & Act
+            var mapManager = CreateGameObject<MapManager>("MapManager");
 
             // Assert
             Assert.IsNotNull(mapManager);
             Assert.IsInstanceOf<MapManager>(mapManager);
 
-            Object.DestroyImmediate(mapManagerObject);
+            Cleanup(mapManager);
         }
 
         [Test]
         public void MapManager를_싱글톤으로_생성할_수_있다()
         {
             // Arrange
-            var mapManagerObject = new GameObject("MapManager");
-            var mapManager = mapManagerObject.AddComponent<MapManager>();
+            var mapManager = CreateGameObject<MapManager>("MapManager");
 
             // Act
-            var awakeMethod = typeof(MapManager).GetMethod("Awake",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            awakeMethod?.Invoke(mapManager, null);
+            InvokeAwake(mapManager);
 
             // Assert
             Assert.IsNotNull(MapManager.Instance);
             Assert.AreEqual(mapManager, MapManager.Instance);
 
-            Object.DestroyImmediate(mapManagerObject);
+            Cleanup(mapManager);
         }
 
         [Test]
@@ -62,7 +57,7 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual(NodeType.Combat, mapNode.nodeType);
             Assert.AreEqual(0, mapNode.layer);
 
-            Object.DestroyImmediate(nodeObject);
+            Cleanup(mapNode);
         }
 
         [Test]
@@ -93,9 +88,7 @@ namespace GangHoBiGeup.Tests
             Assert.Contains(node2, node1.connectedNodes);
             Assert.Contains(node3, node1.connectedNodes);
 
-            Object.DestroyImmediate(node1Object);
-            Object.DestroyImmediate(node2Object);
-            Object.DestroyImmediate(node3Object);
+            Cleanup(node1, node2, node3);
         }
 
         [Test]
@@ -125,10 +118,7 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual(NodeType.RestSite, nodes[4].nodeType);
 
             // Cleanup
-            foreach (var node in nodes)
-            {
-                Object.DestroyImmediate(node.gameObject);
-            }
+            Cleanup(nodes.ToArray());
         }
 
         [Test]
@@ -173,10 +163,10 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual(1, layer1Nodes[0].layer);
 
             // Cleanup
-            foreach (var node in layer0Nodes)
-                Object.DestroyImmediate(node.gameObject);
-            foreach (var node in layer1Nodes)
-                Object.DestroyImmediate(node.gameObject);
+            var allNodes = new List<MapNode>();
+            allNodes.AddRange(layer0Nodes);
+            allNodes.AddRange(layer1Nodes);
+            Cleanup(allNodes.ToArray());
         }
 
         // Phase 7.2: 노드 상호작용
@@ -196,7 +186,7 @@ namespace GangHoBiGeup.Tests
             // Assert
             Assert.IsTrue(button.interactable, "노드가 클릭 가능해야 합니다");
 
-            Object.DestroyImmediate(nodeObject);
+            Cleanup(node);
         }
 
         [Test]
@@ -217,11 +207,7 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual(NodeType.Boss, bossNode.nodeType);
 
             // Cleanup
-            Object.DestroyImmediate(combatNode.gameObject);
-            Object.DestroyImmediate(shopNode.gameObject);
-            Object.DestroyImmediate(restNode.gameObject);
-            Object.DestroyImmediate(eventNode.gameObject);
-            Object.DestroyImmediate(bossNode.gameObject);
+            Cleanup(combatNode, shopNode, restNode, eventNode, bossNode);
         }
 
         [Test]
@@ -244,7 +230,7 @@ namespace GangHoBiGeup.Tests
             Assert.IsNotNull(node.encounterData);
             Assert.AreEqual(encounterData, node.encounterData);
 
-            Object.DestroyImmediate(nodeObject);
+            Cleanup(node);
         }
 
         [Test]
@@ -267,7 +253,7 @@ namespace GangHoBiGeup.Tests
             Assert.IsNotNull(node.eventData);
             Assert.AreEqual("신비한 만남", node.eventData.eventName);
 
-            Object.DestroyImmediate(nodeObject);
+            Cleanup(node);
         }
 
         [Test]
@@ -300,9 +286,7 @@ namespace GangHoBiGeup.Tests
             Assert.IsTrue(button2.interactable, "연결된 노드2가 활성화되어야 합니다");
 
             // Cleanup
-            Object.DestroyImmediate(currentNode.gameObject);
-            Object.DestroyImmediate(nextNode1.gameObject);
-            Object.DestroyImmediate(nextNode2.gameObject);
+            Cleanup(currentNode, nextNode1, nextNode2);
         }
 
         [Test]
@@ -315,7 +299,7 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual(NodeType.RestSite, restNode.nodeType);
             // 실제 RestSiteManager 호출은 통합 테스트에서 검증
 
-            Object.DestroyImmediate(restNode.gameObject);
+            Cleanup(restNode);
         }
 
         [Test]
@@ -328,7 +312,7 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual(NodeType.Shop, shopNode.nodeType);
             // 실제 ShopManager 호출은 통합 테스트에서 검증
 
-            Object.DestroyImmediate(shopNode.gameObject);
+            Cleanup(shopNode);
         }
 
         // Helper method
