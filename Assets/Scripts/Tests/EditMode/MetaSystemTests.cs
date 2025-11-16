@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using UnityEngine;
+using static GangHoBiGeup.Tests.TestHelper;
 
 namespace GangHoBiGeup.Tests
 {
@@ -11,13 +12,8 @@ namespace GangHoBiGeup.Tests
         public void 게임_종료_시_깨달음_포인트를_획득한다()
         {
             // Arrange
-            var metaManagerObject = new GameObject("MetaManager");
-            var metaManager = metaManagerObject.AddComponent<MetaManager>();
-
-            // MetaManager의 Awake를 호출하여 초기화
-            var awakeMethod = typeof(MetaManager).GetMethod("Awake",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            awakeMethod?.Invoke(metaManager, null);
+            var metaManager = CreateGameObject<MetaManager>("MetaManager");
+            InvokeAwake(metaManager);
 
             int initialPoints = metaManager.Progress.enlightenmentPoints;
 
@@ -29,19 +25,15 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual(initialPoints + 30, metaManager.Progress.enlightenmentPoints,
                 "3층에서 패배 시 30 깨달음 포인트를 얻어야 합니다");
 
-            Object.DestroyImmediate(metaManagerObject);
+            Cleanup(metaManager);
         }
 
         [Test]
         public void 깨달음_포인트로_영구_강화를_구매할_수_있다()
         {
             // Arrange
-            var metaManagerObject = new GameObject("MetaManager");
-            var metaManager = metaManagerObject.AddComponent<MetaManager>();
-
-            var awakeMethod = typeof(MetaManager).GetMethod("Awake",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            awakeMethod?.Invoke(metaManager, null);
+            var metaManager = CreateGameObject<MetaManager>("MetaManager");
+            InvokeAwake(metaManager);
 
             // 충분한 포인트 지급
             metaManager.Progress.enlightenmentPoints = 100;
@@ -58,19 +50,15 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual(100 - cost, metaManager.Progress.enlightenmentPoints,
                 "소비한 포인트만큼 차감되어야 합니다");
 
-            Object.DestroyImmediate(metaManagerObject);
+            Cleanup(metaManager);
         }
 
         [Test]
         public void 영구_강화가_새_게임에_적용된다()
         {
             // Arrange
-            var metaManagerObject = new GameObject("MetaManager");
-            var metaManager = metaManagerObject.AddComponent<MetaManager>();
-
-            var awakeMethod = typeof(MetaManager).GetMethod("Awake",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            awakeMethod?.Invoke(metaManager, null);
+            var metaManager = CreateGameObject<MetaManager>("MetaManager");
+            InvokeAwake(metaManager);
 
             // 영구 강화 구매
             metaManager.Progress.enlightenmentPoints = 100;
@@ -80,8 +68,7 @@ namespace GangHoBiGeup.Tests
             var factionData = ScriptableObject.CreateInstance<FactionData>();
             factionData.startingDeck = new System.Collections.Generic.List<CardData>();
 
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
+            var player = CreatePlayer();
 
             // Act - 새 게임 시작 시 영구 강화 적용
             int bonusHealth = metaManager.Progress.bonusHealthLevel * 5; // 2 * 5 = 10
@@ -96,20 +83,15 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual(20, startingGold, "시작 골드가 20이어야 합니다");
             Assert.AreEqual(20, player.gold, "플레이어가 시작 골드를 가지고 있어야 합니다");
 
-            Object.DestroyImmediate(metaManagerObject);
-            Object.DestroyImmediate(playerObject);
+            Cleanup(metaManager, player);
         }
 
         [Test]
         public void 포인트가_부족하면_강화를_구매할_수_없다()
         {
             // Arrange
-            var metaManagerObject = new GameObject("MetaManager");
-            var metaManager = metaManagerObject.AddComponent<MetaManager>();
-
-            var awakeMethod = typeof(MetaManager).GetMethod("Awake",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            awakeMethod?.Invoke(metaManager, null);
+            var metaManager = CreateGameObject<MetaManager>("MetaManager");
+            InvokeAwake(metaManager);
 
             // 포인트를 부족하게 설정
             metaManager.Progress.enlightenmentPoints = 5;
@@ -123,19 +105,15 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual(5, metaManager.Progress.enlightenmentPoints,
                 "실패 시 포인트가 차감되지 않아야 합니다");
 
-            Object.DestroyImmediate(metaManagerObject);
+            Cleanup(metaManager);
         }
 
         [Test]
         public void 강화_비용이_레벨에_따라_증가한다()
         {
             // Arrange
-            var metaManagerObject = new GameObject("MetaManager");
-            var metaManager = metaManagerObject.AddComponent<MetaManager>();
-
-            var awakeMethod = typeof(MetaManager).GetMethod("Awake",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            awakeMethod?.Invoke(metaManager, null);
+            var metaManager = CreateGameObject<MetaManager>("MetaManager");
+            InvokeAwake(metaManager);
 
             metaManager.Progress.bonusHealthLevel = 0;
 
@@ -154,7 +132,7 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual(20, cost3, "레벨 2일 때 비용은 20이어야 합니다");
             Assert.IsTrue(cost3 > cost2 && cost2 > cost1, "레벨이 올라갈수록 비용이 증가해야 합니다");
 
-            Object.DestroyImmediate(metaManagerObject);
+            Cleanup(metaManager);
         }
     }
 }

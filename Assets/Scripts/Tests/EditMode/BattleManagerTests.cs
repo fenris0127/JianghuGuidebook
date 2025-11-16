@@ -3,6 +3,7 @@ using UnityEngine;
 using GangHoBiGeup.Data;
 using GangHoBiGeup.Gameplay;
 using System.Collections.Generic;
+using static GangHoBiGeup.Tests.TestHelper;
 
 namespace GangHoBiGeup.Tests
 {
@@ -32,9 +33,7 @@ namespace GangHoBiGeup.Tests
         {
             // Arrange & Act
             // BattleManager는 Awake에서 Instance를 설정하므로 수동 호출
-            var awakeMethod = typeof(BattleManager).GetMethod("Awake",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            awakeMethod?.Invoke(battleManager, null);
+            InvokeAwake(battleManager);
 
             // Assert
             Assert.IsNotNull(BattleManager.Instance);
@@ -57,8 +56,7 @@ namespace GangHoBiGeup.Tests
             };
 
             // BattleManager에 필요한 참조 설정
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
+            var player = CreatePlayer();
             typeof(BattleManager).GetField("player",
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
                 ?.SetValue(battleManager, player);
@@ -75,7 +73,7 @@ namespace GangHoBiGeup.Tests
             Assert.IsNotNull(encounterData);
             Assert.AreEqual(1, encounterData.enemies.Count);
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
 
         [Test]
@@ -104,14 +102,12 @@ namespace GangHoBiGeup.Tests
         public void 전투_시작_시_Player의_덱을_셔플한다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
+            var player = CreatePlayer();
 
             var cards = new List<CardData>();
             for (int i = 0; i < 10; i++)
             {
-                var card = ScriptableObject.CreateInstance<CardData>();
-                card.id = $"card_{i}";
+                var card = CreateCard($"card_{i}", $"카드 {i}");
                 cards.Add(card);
             }
 
@@ -123,21 +119,19 @@ namespace GangHoBiGeup.Tests
             // Assert
             Assert.AreEqual(10, player.DrawPile.Count);
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
 
         [Test]
         public void 전투_시작_시_초기_핸드를_뽑는다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
+            var player = CreatePlayer();
 
             var cards = new List<CardData>();
             for (int i = 0; i < 10; i++)
             {
-                var card = ScriptableObject.CreateInstance<CardData>();
-                card.id = $"card_{i}";
+                var card = CreateCard($"card_{i}", $"카드 {i}");
                 cards.Add(card);
             }
 
@@ -151,7 +145,7 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual(5, player.Hand.Count);
             Assert.AreEqual(5, player.DrawPile.Count);
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
 
         // Phase 4.2: 턴 관리
@@ -159,9 +153,7 @@ namespace GangHoBiGeup.Tests
         public void Player_턴을_시작할_수_있다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
-            player.MaxNaegong = 3;
+            var player = CreatePlayer(maxNaegong: 3);
 
             // Act
             player.StartTurn();
@@ -169,16 +161,14 @@ namespace GangHoBiGeup.Tests
             // Assert
             Assert.AreEqual(3, player.Energy);
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
 
         [Test]
         public void Player_턴_시작_시_내공이_리필된다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
-            player.MaxNaegong = 3;
+            var player = CreatePlayer(maxNaegong: 3);
             player.Energy = 0;
 
             // Act
@@ -187,21 +177,19 @@ namespace GangHoBiGeup.Tests
             // Assert
             Assert.AreEqual(3, player.Energy);
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
 
         [Test]
         public void Player_턴_시작_시_카드를_뽑는다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
+            var player = CreatePlayer();
 
             var cards = new List<CardData>();
             for (int i = 0; i < 10; i++)
             {
-                var card = ScriptableObject.CreateInstance<CardData>();
-                card.id = $"card_{i}";
+                var card = CreateCard($"card_{i}", $"카드 {i}");
                 cards.Add(card);
             }
 
@@ -215,18 +203,15 @@ namespace GangHoBiGeup.Tests
             // StartTurn이 카드를 뽑는지 확인 (구현에 따라 다를 수 있음)
             Assert.IsNotNull(player.Hand);
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
 
         [Test]
         public void Enemy_턴을_시작할_수_있다()
         {
             // Arrange
-            var enemyObject = new GameObject("Enemy");
-            var enemy = enemyObject.AddComponent<Enemy>();
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
-            player.CurrentHealth = 100;
+            var enemy = CreateEnemy();
+            var player = CreatePlayer(currentHealth: 100);
 
             var action = new EnemyAction
             {
@@ -241,25 +226,20 @@ namespace GangHoBiGeup.Tests
             // Assert
             Assert.AreEqual(90, player.CurrentHealth);
 
-            Object.DestroyImmediate(enemyObject);
-            Object.DestroyImmediate(playerObject);
+            Cleanup(enemy, player);
         }
 
         [Test]
         public void Enemy_턴에_모든_적이_순서대로_행동한다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
-            player.CurrentHealth = 100;
+            var player = CreatePlayer(currentHealth: 100);
 
-            var enemy1Object = new GameObject("Enemy1");
-            var enemy1 = enemy1Object.AddComponent<Enemy>();
+            var enemy1 = CreateEnemy();
             var action1 = new EnemyAction { actionType = EnemyActionType.Attack, value = 5 };
             enemy1.SetNextAction(action1);
 
-            var enemy2Object = new GameObject("Enemy2");
-            var enemy2 = enemy2Object.AddComponent<Enemy>();
+            var enemy2 = CreateEnemy();
             var action2 = new EnemyAction { actionType = EnemyActionType.Attack, value = 10 };
             enemy2.SetNextAction(action2);
 
@@ -270,20 +250,17 @@ namespace GangHoBiGeup.Tests
             // Assert
             Assert.AreEqual(85, player.CurrentHealth); // 100 - 5 - 10 = 85
 
-            Object.DestroyImmediate(enemy1Object);
-            Object.DestroyImmediate(enemy2Object);
-            Object.DestroyImmediate(playerObject);
+            Cleanup(enemy1, enemy2, player);
         }
 
         [Test]
         public void 턴_종료_시_핸드의_카드를_버린다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
+            var player = CreatePlayer();
 
-            var card1 = ScriptableObject.CreateInstance<CardData>();
-            var card2 = ScriptableObject.CreateInstance<CardData>();
+            var card1 = CreateCard("card1", "카드1");
+            var card2 = CreateCard("card2", "카드2");
             player.Hand = new List<CardData> { card1, card2 };
             player.DiscardPile = new List<CardData>();
 
@@ -294,7 +271,7 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual(0, player.Hand.Count);
             Assert.AreEqual(2, player.DiscardPile.Count);
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
 
         // Phase 4.3: 카드 사용
@@ -302,18 +279,14 @@ namespace GangHoBiGeup.Tests
         public void Player가_카드를_사용할_수_있다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
+            var player = CreatePlayer();
             player.Energy = 3;
 
-            var card = ScriptableObject.CreateInstance<CardData>();
-            card.cost = 1;
-            card.effects = new List<GameEffect>();
+            var card = CreateCard("strike", "타격", 1);
 
             player.Hand = new List<CardData> { card };
 
-            var enemyObject = new GameObject("Enemy");
-            var enemy = enemyObject.AddComponent<Enemy>();
+            var enemy = CreateEnemy();
 
             // Act
             player.PlayCard(card, enemy);
@@ -322,26 +295,21 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual(2, player.Energy); // 3 - 1 = 2
             Assert.IsFalse(player.Hand.Contains(card)); // 카드가 핸드에서 제거됨
 
-            Object.DestroyImmediate(playerObject);
-            Object.DestroyImmediate(enemyObject);
+            Cleanup(player, enemy);
         }
 
         [Test]
         public void 카드_사용_시_내공이_소모된다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
+            var player = CreatePlayer();
             player.Energy = 5;
 
-            var card = ScriptableObject.CreateInstance<CardData>();
-            card.cost = 2;
-            card.effects = new List<GameEffect>();
+            var card = CreateCard("strike", "타격", 2);
 
             player.Hand = new List<CardData> { card };
 
-            var enemyObject = new GameObject("Enemy");
-            var enemy = enemyObject.AddComponent<Enemy>();
+            var enemy = CreateEnemy();
 
             // Act
             player.PlayCard(card, enemy);
@@ -349,26 +317,21 @@ namespace GangHoBiGeup.Tests
             // Assert
             Assert.AreEqual(3, player.Energy); // 5 - 2 = 3
 
-            Object.DestroyImmediate(playerObject);
-            Object.DestroyImmediate(enemyObject);
+            Cleanup(player, enemy);
         }
 
         [Test]
         public void 내공이_부족하면_카드를_사용할_수_없다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
+            var player = CreatePlayer();
             player.Energy = 1;
 
-            var card = ScriptableObject.CreateInstance<CardData>();
-            card.cost = 3; // 필요 내공이 현재 내공보다 많음
-            card.effects = new List<GameEffect>();
+            var card = CreateCard("strike", "타격", 3); // 필요 내공이 현재 내공보다 많음
 
             player.Hand = new List<CardData> { card };
 
-            var enemyObject = new GameObject("Enemy");
-            var enemy = enemyObject.AddComponent<Enemy>();
+            var enemy = CreateEnemy();
 
             // Act
             player.PlayCard(card, enemy);
@@ -377,30 +340,21 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual(1, player.Energy); // 내공이 소모되지 않음
             Assert.IsTrue(player.Hand.Contains(card)); // 카드가 핸드에 남아있음
 
-            Object.DestroyImmediate(playerObject);
-            Object.DestroyImmediate(enemyObject);
+            Cleanup(player, enemy);
         }
 
         [Test]
         public void 카드_효과가_올바르게_적용된다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
+            var player = CreatePlayer();
             player.Energy = 5;
 
-            var card = ScriptableObject.CreateInstance<CardData>();
-            card.cost = 1;
-            card.effects = new List<GameEffect>
-            {
-                new GameEffect { effectType = GameEffectType.Damage, value = 10 }
-            };
+            var card = CreateCard("strike", "타격", 1, Damage(10));
 
             player.Hand = new List<CardData> { card };
 
-            var enemyObject = new GameObject("Enemy");
-            var enemy = enemyObject.AddComponent<Enemy>();
-            enemy.CurrentHealth = 50;
+            var enemy = CreateEnemy(currentHealth: 50);
 
             // Act
             player.PlayCard(card, enemy);
@@ -408,30 +362,21 @@ namespace GangHoBiGeup.Tests
             // Assert
             Assert.AreEqual(40, enemy.CurrentHealth); // 50 - 10 = 40
 
-            Object.DestroyImmediate(playerObject);
-            Object.DestroyImmediate(enemyObject);
+            Cleanup(player, enemy);
         }
 
         [Test]
         public void 타겟이_필요한_카드는_타겟을_지정해야_사용할_수_있다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
+            var player = CreatePlayer();
             player.Energy = 5;
 
-            var card = ScriptableObject.CreateInstance<CardData>();
-            card.cost = 1;
-            card.effects = new List<GameEffect>
-            {
-                new GameEffect { effectType = GameEffectType.Damage, value = 10 }
-            };
+            var card = CreateCard("strike", "타격", 1, Damage(10));
 
             player.Hand = new List<CardData> { card };
 
-            var enemyObject = new GameObject("Enemy");
-            var enemy = enemyObject.AddComponent<Enemy>();
-            enemy.CurrentHealth = 50;
+            var enemy = CreateEnemy(currentHealth: 50);
 
             // Act
             player.PlayCard(card, enemy); // 타겟 지정
@@ -439,29 +384,24 @@ namespace GangHoBiGeup.Tests
             // Assert
             Assert.AreEqual(40, enemy.CurrentHealth); // 타겟에 데미지가 적용됨
 
-            Object.DestroyImmediate(playerObject);
-            Object.DestroyImmediate(enemyObject);
+            Cleanup(player, enemy);
         }
 
         [Test]
         public void 절초_카드는_사용_후_소멸된다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
+            var player = CreatePlayer();
             player.Energy = 5;
 
-            var card = ScriptableObject.CreateInstance<CardData>();
-            card.cost = 0;
+            var card = CreateCard("exhaust_card", "절초 카드", 0);
             card.isJeolcho = true; // 절초 카드
-            card.effects = new List<GameEffect>();
 
             player.Hand = new List<CardData> { card };
             player.ExhaustPile = new List<CardData>();
             player.DiscardPile = new List<CardData>();
 
-            var enemyObject = new GameObject("Enemy");
-            var enemy = enemyObject.AddComponent<Enemy>();
+            var enemy = CreateEnemy();
 
             // Act
             player.PlayCard(card, enemy);
@@ -470,8 +410,7 @@ namespace GangHoBiGeup.Tests
             Assert.IsTrue(player.ExhaustPile.Contains(card)); // 소멸 더미에 추가됨
             Assert.IsFalse(player.DiscardPile.Contains(card)); // 버린 더미에는 없음
 
-            Object.DestroyImmediate(playerObject);
-            Object.DestroyImmediate(enemyObject);
+            Cleanup(player, enemy);
         }
 
         // Phase 4.4: 전투 종료
@@ -479,9 +418,7 @@ namespace GangHoBiGeup.Tests
         public void 모든_적이_사망하면_전투에서_승리한다()
         {
             // Arrange
-            var enemyObject = new GameObject("Enemy");
-            var enemy = enemyObject.AddComponent<Enemy>();
-            enemy.CurrentHealth = 10;
+            var enemy = CreateEnemy(currentHealth: 10);
 
             // Act
             enemy.TakeDamage(10);
@@ -490,16 +427,14 @@ namespace GangHoBiGeup.Tests
             Assert.IsTrue(enemy.IsDead);
             Assert.AreEqual(0, enemy.CurrentHealth);
 
-            Object.DestroyImmediate(enemyObject);
+            Cleanup(enemy);
         }
 
         [Test]
         public void Player가_사망하면_전투에서_패배한다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
-            player.CurrentHealth = 10;
+            var player = CreatePlayer(currentHealth: 10);
 
             // Act
             player.TakeDamage(10);
@@ -508,15 +443,14 @@ namespace GangHoBiGeup.Tests
             Assert.IsTrue(player.IsDead);
             Assert.AreEqual(0, player.CurrentHealth);
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
 
         [Test]
         public void 전투_승리_시_수련치를_획득한다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
+            var player = CreatePlayer();
             player.CurrentXp = 0;
 
             // Act
@@ -525,19 +459,17 @@ namespace GangHoBiGeup.Tests
             // Assert
             Assert.AreEqual(5, player.CurrentXp);
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
 
         [Test]
         public void 전투_승리_시_보상을_받는다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
+            var player = CreatePlayer();
             player.Gold = 0;
 
-            var rewardCard = ScriptableObject.CreateInstance<CardData>();
-            rewardCard.id = "reward_card";
+            var rewardCard = CreateCard("reward_card", "보상 카드");
 
             // Act
             player.Gold += 50; // 골드 보상
@@ -547,7 +479,7 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual(50, player.Gold);
             Assert.Contains(rewardCard, player.DiscardPile); // 새 카드는 버린 더미에 추가됨
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
     }
 }

@@ -3,6 +3,7 @@ using UnityEngine;
 using GangHoBiGeup.Data;
 using GangHoBiGeup.Gameplay;
 using System.Collections.Generic;
+using static GangHoBiGeup.Tests.TestHelper;
 
 namespace GangHoBiGeup.Tests
 {
@@ -31,9 +32,7 @@ namespace GangHoBiGeup.Tests
         public void GameManager를_싱글톤으로_생성할_수_있다()
         {
             // Arrange & Act
-            var awakeMethod = typeof(GameManager).GetMethod("Awake",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            awakeMethod?.Invoke(gameManager, null);
+            InvokeAwake(gameManager);
 
             // Assert
             Assert.IsNotNull(GameManager.Instance);
@@ -81,20 +80,12 @@ namespace GangHoBiGeup.Tests
         public void 새_게임을_시작할_수_있다()
         {
             // Arrange
-            var awakeMethod = typeof(GameManager).GetMethod("Awake",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            awakeMethod?.Invoke(gameManager, null);
+            InvokeAwake(gameManager);
 
-            var factionData = ScriptableObject.CreateInstance<FactionData>();
+            var card1 = CreateCard("strike", "타격");
+            var card2 = CreateCard("defend", "방어");
+            var factionData = CreateFactionData("화산파", card1, card2);
             factionData.id = "hwasan";
-            factionData.factionName = "화산파";
-
-            var card1 = ScriptableObject.CreateInstance<CardData>();
-            card1.id = "strike";
-            var card2 = ScriptableObject.CreateInstance<CardData>();
-            card2.id = "defend";
-
-            factionData.startingDeck = new List<CardData> { card1, card2 };
 
             // Note: StartNewGame requires other managers (SaveLoadManager, MetaManager, MapManager)
             // This test verifies the method can be called with proper data structure
@@ -108,19 +99,12 @@ namespace GangHoBiGeup.Tests
         public void 선택한_문파로_Player를_초기화한다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
+            var player = CreatePlayer();
 
-            var factionData = ScriptableObject.CreateInstance<FactionData>();
+            var card1 = CreateCard("strike", "타격");
+            var card2 = CreateCard("defend", "방어");
+            var factionData = CreateFactionData("화산파", card1, card2);
             factionData.id = "hwasan";
-            factionData.factionName = "화산파";
-
-            var card1 = ScriptableObject.CreateInstance<CardData>();
-            card1.id = "strike";
-            var card2 = ScriptableObject.CreateInstance<CardData>();
-            card2.id = "defend";
-
-            factionData.startingDeck = new List<CardData> { card1, card2 };
 
             // Act
             player.Setup(new List<CardData>(factionData.startingDeck), 0);
@@ -128,7 +112,7 @@ namespace GangHoBiGeup.Tests
             // Assert
             Assert.AreEqual(2, player.GetAllCardsInDeck().Count);
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
 
         // Phase 6.2: 세이브/로드
@@ -136,8 +120,7 @@ namespace GangHoBiGeup.Tests
         public void 게임_진행_상황을_저장할_수_있다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
+            var player = CreatePlayer();
 
             player.Setup(new List<CardData>(), 0);
             player.GainGold(100);
@@ -160,7 +143,7 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual(2, runData.currentFloor);
             Assert.AreEqual(100, runData.playerGold);
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
 
         [Test]
@@ -198,13 +181,12 @@ namespace GangHoBiGeup.Tests
         public void RunData에_모든_플레이어_상태가_포함된다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
+            var player = CreatePlayer();
             player.Setup(new List<CardData>(), 10);
 
-            var card1 = ScriptableObject.CreateInstance<CardData>();
+            var card1 = CreateCard("strike", "타격");
             card1.assetID = "strike_001";
-            var card2 = ScriptableObject.CreateInstance<CardData>();
+            var card2 = CreateCard("defend", "방어");
             card2.assetID = "defend_001";
 
             player.AddCardToDeck(card1);
@@ -234,7 +216,7 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual(75, runData.playerGold);
             Assert.AreEqual(2, runData.drawPileIDs.Count);
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
 
         [Test]
@@ -256,9 +238,7 @@ namespace GangHoBiGeup.Tests
         public void 현재_층수를_추적할_수_있다()
         {
             // Arrange
-            var awakeMethod = typeof(GameManager).GetMethod("Awake",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            awakeMethod?.Invoke(gameManager, null);
+            InvokeAwake(gameManager);
 
             // Act
             int initialFloor = gameManager.currentFloor;

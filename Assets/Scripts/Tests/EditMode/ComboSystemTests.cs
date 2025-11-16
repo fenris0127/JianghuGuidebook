@@ -3,6 +3,7 @@ using UnityEngine;
 using GangHoBiGeup.Data;
 using GangHoBiGeup.Gameplay;
 using System.Collections.Generic;
+using static GangHoBiGeup.Tests.TestHelper;
 
 namespace GangHoBiGeup.Tests
 {
@@ -20,7 +21,7 @@ namespace GangHoBiGeup.Tests
             comboData.requiredCardIDs = new List<string> { "strike", "strike", "strike" };
             comboData.resultEffects = new List<GameEffect>
             {
-                new GameEffect { effectType = GameEffectType.Damage, value = 5 }
+                CreateEffect(GameEffectType.Damage, 5)
             };
 
             // Assert
@@ -35,14 +36,11 @@ namespace GangHoBiGeup.Tests
         public void 카드_사용_순서를_추적할_수_있다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
+            var player = CreatePlayer();
 
-            var card1 = ScriptableObject.CreateInstance<CardData>();
-            card1.id = "strike";
-            var card2 = ScriptableObject.CreateInstance<CardData>();
-            card2.id = "defend";
-            var card3 = ScriptableObject.CreateInstance<CardData>();
+            var card1 = CreateCard("strike", "타격");
+            var card2 = CreateCard("defend", "방어");
+            var card3 = CreateCard("strike2", "타격2");
             card3.id = "strike";
 
             // Act
@@ -57,29 +55,28 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual("defend", history[1].id);
             Assert.AreEqual("strike", history[2].id);
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
 
         [Test]
         public void 특정_순서로_카드를_사용하면_연계가_발동한다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
+            var player = CreatePlayer();
 
             var comboData = ScriptableObject.CreateInstance<ComboData>();
             comboData.comboName = "검기 연타";
             comboData.requiredCardIDs = new List<string> { "strike", "strike", "strike" };
             comboData.resultEffects = new List<GameEffect>
             {
-                new GameEffect { effectType = GameEffectType.Damage, value = 10 }
+                CreateEffect(GameEffectType.Damage, 10)
             };
 
-            var strike1 = ScriptableObject.CreateInstance<CardData>();
+            var strike1 = CreateCard("strike1", "타격1");
             strike1.id = "strike";
-            var strike2 = ScriptableObject.CreateInstance<CardData>();
+            var strike2 = CreateCard("strike2", "타격2");
             strike2.id = "strike";
-            var strike3 = ScriptableObject.CreateInstance<CardData>();
+            var strike3 = CreateCard("strike3", "타격3");
             strike3.id = "strike";
 
             // 콤보 데이터를 플레이어에게 등록
@@ -93,31 +90,27 @@ namespace GangHoBiGeup.Tests
             // Assert
             Assert.IsTrue(comboTriggered, "연계가 발동되어야 합니다");
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
 
         [Test]
         public void 연계_발동_시_추가_효과가_적용된다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
-
-            var enemyObject = new GameObject("Enemy");
-            var enemy = enemyObject.AddComponent<Enemy>();
-            enemy.CurrentHealth = 100;
+            var player = CreatePlayer();
+            var enemy = CreateEnemy(currentHealth: 100);
 
             var comboData = ScriptableObject.CreateInstance<ComboData>();
             comboData.comboName = "검기 연타";
             comboData.requiredCardIDs = new List<string> { "strike", "strike" };
             comboData.resultEffects = new List<GameEffect>
             {
-                new GameEffect { effectType = GameEffectType.Damage, value = 10 }
+                CreateEffect(GameEffectType.Damage, 10)
             };
 
-            var strike1 = ScriptableObject.CreateInstance<CardData>();
+            var strike1 = CreateCard("strike1", "타격1");
             strike1.id = "strike";
-            var strike2 = ScriptableObject.CreateInstance<CardData>();
+            var strike2 = CreateCard("strike2", "타격2");
             strike2.id = "strike";
 
             player.RegisterCombo(comboData);
@@ -142,24 +135,20 @@ namespace GangHoBiGeup.Tests
             Assert.IsTrue(comboTriggered, "연계가 발동되어야 합니다");
             Assert.AreEqual(90, enemy.CurrentHealth, "연계 추가 데미지가 적용되어야 합니다");
 
-            Object.DestroyImmediate(playerObject);
-            Object.DestroyImmediate(enemyObject);
+            Cleanup(player, enemy);
         }
 
         [Test]
         public void 잘못된_순서로_카드를_사용하면_연계가_발동하지_않는다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
+            var player = CreatePlayer();
 
             var comboData = ScriptableObject.CreateInstance<ComboData>();
             comboData.requiredCardIDs = new List<string> { "strike", "strike", "strike" };
 
-            var strike = ScriptableObject.CreateInstance<CardData>();
-            strike.id = "strike";
-            var defend = ScriptableObject.CreateInstance<CardData>();
-            defend.id = "defend";
+            var strike = CreateCard("strike", "타격");
+            var defend = CreateCard("defend", "방어");
 
             player.RegisterCombo(comboData);
 
@@ -171,18 +160,16 @@ namespace GangHoBiGeup.Tests
             // Assert
             Assert.IsFalse(comboTriggered, "잘못된 순서로 카드를 사용하면 연계가 발동하지 않아야 합니다");
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
 
         [Test]
         public void 턴_종료_시_연계_카운터가_초기화된다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
+            var player = CreatePlayer();
 
-            var strike = ScriptableObject.CreateInstance<CardData>();
-            strike.id = "strike";
+            var strike = CreateCard("strike", "타격");
 
             // Act
             player.RecordCardPlay(strike);
@@ -198,7 +185,7 @@ namespace GangHoBiGeup.Tests
             // Assert
             Assert.AreEqual(0, historyAfterEndTurn.Count, "턴 종료 후 카드 사용 히스토리가 초기화되어야 합니다");
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
     }
 }

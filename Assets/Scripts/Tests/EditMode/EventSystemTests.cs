@@ -1,6 +1,8 @@
 using NUnit.Framework;
 using UnityEngine;
 using System.Collections.Generic;
+using GangHoBiGeup.Gameplay;
+using static GangHoBiGeup.Tests.TestHelper;
 
 namespace GangHoBiGeup.Tests
 {
@@ -24,7 +26,7 @@ namespace GangHoBiGeup.Tests
                 successChance = 100,
                 successEffects = new List<GameEffect>
                 {
-                    new GameEffect { type = GameEffectType.GainGold, value = 50 }
+                    CreateEffect(GameEffectType.GainGold, 50)
                 }
             };
 
@@ -34,7 +36,7 @@ namespace GangHoBiGeup.Tests
                 successChance = 100,
                 successEffects = new List<GameEffect>
                 {
-                    new GameEffect { type = GameEffectType.HealHealth, value = 10 }
+                    CreateEffect(GameEffectType.HealHealth, 10)
                 }
             };
 
@@ -64,11 +66,11 @@ namespace GangHoBiGeup.Tests
                 successChance = 70,
                 successEffects = new List<GameEffect>
                 {
-                    new GameEffect { type = GameEffectType.GainGold, value = 100 }
+                    CreateEffect(GameEffectType.GainGold, 100)
                 },
                 failureEffects = new List<GameEffect>
                 {
-                    new GameEffect { type = GameEffectType.TakeDamage, value = 10 }
+                    CreateEffect(GameEffectType.TakeDamage, 10)
                 }
             };
 
@@ -96,10 +98,7 @@ namespace GangHoBiGeup.Tests
         public void 선택지_선택_시_결과가_적용된다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
-            player.maxHealth = 100;
-            player.currentHealth = 50;
+            var player = CreatePlayer(currentHealth: 50);
 
             var choice = new EventChoice
             {
@@ -107,7 +106,7 @@ namespace GangHoBiGeup.Tests
                 successChance = 100,
                 successEffects = new List<GameEffect>
                 {
-                    new GameEffect { type = GameEffectType.HealHealth, value = 20 }
+                    CreateEffect(GameEffectType.HealHealth, 20)
                 }
             };
 
@@ -126,17 +125,14 @@ namespace GangHoBiGeup.Tests
             // Assert
             Assert.AreEqual(healthBefore + 20, player.currentHealth, "체력이 20 회복되어야 합니다");
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
 
         [Test]
         public void 확률적_결과가_있는_이벤트가_작동한다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
-            player.maxHealth = 100;
-            player.currentHealth = 100;
+            var player = CreatePlayer();
 
             var choice = new EventChoice
             {
@@ -144,11 +140,11 @@ namespace GangHoBiGeup.Tests
                 successChance = 50, // 50% 확률
                 successEffects = new List<GameEffect>
                 {
-                    new GameEffect { type = GameEffectType.GainGold, value = 100 }
+                    CreateEffect(GameEffectType.GainGold, 100)
                 },
                 failureEffects = new List<GameEffect>
                 {
-                    new GameEffect { type = GameEffectType.TakeDamage, value = 15 }
+                    CreateEffect(GameEffectType.TakeDamage, 15)
                 }
             };
 
@@ -185,7 +181,7 @@ namespace GangHoBiGeup.Tests
             }
             Assert.AreEqual(healthBefore - 15, player.currentHealth, "실패 시 15의 피해를 받아야 합니다");
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
     }
 }
