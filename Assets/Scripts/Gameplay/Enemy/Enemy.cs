@@ -7,45 +7,54 @@ using GangHoBiGeup.Data;
 namespace GangHoBiGeup.Gameplay
 {
     // 적 캐릭터의 데이터를 관리하고 행동 로직을 수행하는 클래스입니다.
+    // 컴포넌트 기반 아키텍처로 리팩토링되었습니다.
     public class Enemy : MonoBehaviour, IDamageable
     {
+        #region Components
+        private HealthComponent _health;
+        private StatusEffectContainer _statusEffects;
+
+        // Lazy initialization for components
+        private HealthComponent health => _health ?? (_health = GetComponent<HealthComponent>() ?? gameObject.AddComponent<HealthComponent>());
+        private StatusEffectContainer statusEffects => _statusEffects ?? (_statusEffects = GetComponent<StatusEffectContainer>() ?? gameObject.AddComponent<StatusEffectContainer>());
+        #endregion
+
         #region TDD Test Properties
         // TDD 테스트를 위한 프로퍼티들
         public int CurrentHealth
         {
-            get => currentHealth;
-            set => currentHealth = value;
+            get => health.CurrentHealth;
+            set => health.CurrentHealth = value;
         }
-        
+
         public int MaxHealth
         {
-            get => maxHealth;
-            set => maxHealth = value;
+            get => health.MaxHealth;
+            set => health.MaxHealth = value;
         }
-        
+
         public int Block
         {
-            get => defense;
-            set => defense = value;
+            get => health.Defense;
+            set => health.Defense = value;
         }
-        
-        public bool IsDead => currentHealth <= 0;
-        
+
+        public bool IsDead => health.IsDead;
+
         // TDD 테스트용 간단한 초기화 메서드
         public void Initialize(EnemyData data)
         {
             this.enemyData = data;
-            maxHealth = data.maxHealth;
-            currentHealth = maxHealth;
-            defense = 0;
+            health.Initialize(data.maxHealth);
+            statusEffects.Initialize(this);
         }
-        
+
         // TDD: 다음 행동 설정
         public void SetNextAction(EnemyAction action)
         {
             nextAction = action;
         }
-        
+
         // TDD: 패턴으로 초기화
         public void InitializeWithPattern(EnemyData data, List<EnemyAction> pattern)
         {
@@ -57,7 +66,7 @@ namespace GangHoBiGeup.Gameplay
                 nextAction = pattern[0];
             }
         }
-        
+
         // TDD: 턴 진행 (다음 행동으로 이동)
         public void AdvanceTurn()
         {
@@ -67,7 +76,7 @@ namespace GangHoBiGeup.Gameplay
                 nextAction = actionPattern[turnIndex % actionPattern.Count];
             }
         }
-        
+
         // TDD: 현재 행동 수행
         public void PerformAction(Player target)
         {
@@ -78,18 +87,18 @@ namespace GangHoBiGeup.Gameplay
                 case EnemyActionType.Attack:
                     target.TakeDamage(nextAction.value);
                     break;
-                    
+
                 case EnemyActionType.Defend:
-                    defense += nextAction.value;
+                    health.GainDefense(nextAction.value);
                     break;
-                    
+
                 case EnemyActionType.Buff:
                     if (nextAction.statusEffectData != null)
                     {
                         ApplyStatusEffect(new StatusEffect(nextAction.statusEffectData, nextAction.value));
                     }
                     break;
-                    
+
                 case EnemyActionType.Debuff:
                     if (nextAction.statusEffectData != null)
                     {
@@ -99,19 +108,16 @@ namespace GangHoBiGeup.Gameplay
             }
         }
         #endregion
-        
+
         // 이벤트: 자신의 상태(체력, 다음 행동)가 변경되었음을 UI에 알림
         public event Action<int, int, EnemyAction> OnStateChanged;
         public event Action<List<StatusEffect>> OnStatusEffectsChanged;
-        
+
         // 상태 변수
-        public int maxHealth { get; private set; }
-        public int currentHealth { get; private set; }
-        public int defense { get; private set; }
-        
-        // 상태 이상 목록
-        private List<StatusEffectBehavior> activeStatusEffects = new List<StatusEffectBehavior>();
-        
+        public int maxHealth => health.MaxHealth;
+        public int currentHealth => health.CurrentHealth;
+        public int defense => health.Defense;
+
         // 전투 정보
         public EnemyData enemyData { get; private set; }
         private EncounterData encounterData;
@@ -120,74 +126,88 @@ namespace GangHoBiGeup.Gameplay
         private int currentPhase = 1;
         private EnemyAction nextAction;
 
+        void Awake()
+        {
+            InitializeComponents();
+        }
+
+        private void InitializeComponents()
+        {
+            // Force initialization
+            var _ = health;
+            var __ = statusEffects;
+
+            // 이벤트 구독
+            health.OnStatsChanged += (curHP, maxHP, def) =>
+            {
+                OnStateChanged?.Invoke(curHP, maxHP, nextAction);
+            };
+
+            statusEffects.OnStatusEffectsChanged += (effects) =>
+            {
+                OnStatusEffectsChanged?.Invoke(effects);
+            };
+        }
+
         // BattleManager가 호출하여 적을 초기화합니다.
         public void Setup(EnemyData data, EncounterData encounter)
         {
             this.enemyData = data;
             this.encounterData = encounter;
-            maxHealth = data.maxHealth;
-            currentHealth = maxHealth;
+
+            health.Initialize(data.maxHealth);
+            statusEffects.Initialize(this);
+
             actionPattern = new List<EnemyAction>(data.actionPattern);
             turnIndex = 0;
             currentPhase = 1;
-            defense = 0;
-            activeStatusEffects.Clear();
-            
+
             // 첫 행동 계획 및 UI 업데이트 요청
             PlanNextAction();
-            OnStatusEffectsChanged?.Invoke(activeStatusEffects.Select(b => b.Effect).ToList());
         }
 
         // 피해를 받는 로직을 처리합니다. IDamageable 인터페이스 구현.
         public void TakeDamage(int damage)
         {
-            int finalDamage = damage;
+            // 상태이상에 따른 피해량 계산
+            int finalDamage = statusEffects.CalculateDamageTaken(damage);
 
-            // 새로운 상태 이상 시스템을 통해 받는 피해량 계산
-            foreach (var behavior in activeStatusEffects)
-                finalDamage = behavior.OnDamageTaken(finalDamage);
+            // 취약 상태 적용
+            float multiplier = 1f;
+            if (GetStatusEffectValue(StatusEffectType.Vulnerable) > 0)
+                multiplier = 1.5f;
 
-            // TDD: 방어도가 먼저 감소함
-            if (defense > 0)
-            {
-                int blockedDamage = Mathf.Min(defense, finalDamage);
-                defense -= blockedDamage;
-                finalDamage -= blockedDamage;
-            }
-            
-            currentHealth -= finalDamage;
-            
-            if (finalDamage > 0 && FeedbackManager.Instance != null)
-                FeedbackManager.Instance.ShowDamageNumber(finalDamage, transform.position);
+            int actualDamage = health.TakeDamage(finalDamage, multiplier);
 
-            if (encounterData != null && encounterData.hasMultiplePhases && currentPhase == 1 && 
-                (float)currentHealth / maxHealth <= encounterData.phaseTransitionHealthThreshold &&
+            if (actualDamage > 0 && FeedbackManager.Instance != null)
+                FeedbackManager.Instance.ShowDamageNumber(actualDamage, transform.position);
+
+            // 다중 페이즈 체크
+            if (encounterData != null && encounterData.hasMultiplePhases && currentPhase == 1 &&
+                (float)health.CurrentHealth / health.MaxHealth <= encounterData.phaseTransitionHealthThreshold &&
                 encounterData.actionPatternPhase2 != null && encounterData.actionPatternPhase2.Count > 0)
-                SwitchToPhase2();
-
-            if (currentHealth <= 0)
             {
-                currentHealth = 0;
+                SwitchToPhase2();
+            }
+
+            if (health.IsDead)
+            {
                 Die();
             }
-
-            OnStateChanged?.Invoke(currentHealth, maxHealth, nextAction);
         }
 
         // 방어도를 무시하는 직접적인 피해를 입습니다 (예: 중독).
         public void TakeDirectDamage(int damage)
         {
-            currentHealth -= damage;
-            if (damage > 0 && FeedbackManager.Instance != null)
-                FeedbackManager.Instance.ShowDamageNumber(damage, transform.position);
+            int actualDamage = health.TakeDirectDamage(damage);
 
-            if (currentHealth <= 0)
+            if (actualDamage > 0 && FeedbackManager.Instance != null)
+                FeedbackManager.Instance.ShowDamageNumber(actualDamage, transform.position);
+
+            if (health.IsDead)
             {
-                currentHealth = 0;
                 Die();
             }
-
-            OnStateChanged?.Invoke(currentHealth, maxHealth, nextAction);
         }
 
         // 사망 처리 로직.
@@ -200,7 +220,7 @@ namespace GangHoBiGeup.Gameplay
                 // BattleManager에게 사망했음을 알림 (전투 종료 체크용)
                 BattleManager.Instance.OnEnemyDied(this);
             }
-            
+
             // 자기 자신을 파괴
             Destroy(gameObject);
         }
@@ -215,82 +235,56 @@ namespace GangHoBiGeup.Gameplay
             if (nextAction.actionType == EnemyActionType.Attack)
             {
                 finalAttackValue += GetStatusEffectValue(StatusEffectType.Strength);
-                foreach (var behavior in activeStatusEffects)
-                    finalAttackValue = behavior.OnDamageDealt(finalAttackValue);
+                finalAttackValue = statusEffects.CalculateDamageDealt(finalAttackValue);
             }
 
             switch (nextAction.actionType)
             {
                 case EnemyActionType.Attack:
-                    target.TakeDamage(nextAction.value + GetStatusEffectValue(StatusEffectType.Strength));
+                    target.TakeDamage(finalAttackValue);
                     break;
                 case EnemyActionType.Defend:
-                    defense += nextAction.value;
+                    health.GainDefense(nextAction.value);
                     break;
                 case EnemyActionType.Buff:
                     ApplyStatusEffect(new StatusEffect(nextAction.statusEffectData, nextAction.value));
                     break;
                 case EnemyActionType.Debuff:
-                    // 올바른 생성자 문법 사용
                     target.ApplyStatusEffect(new StatusEffect(nextAction.statusEffectData, nextAction.value));
                     break;
             }
-            
+
             // 다음 턴 행동 계획
             turnIndex++;
             PlanNextAction();
         }
-        
+
         // 상태 이상을 적용합니다. IDamageable 인터페이스 구현.
         public void ApplyStatusEffect(StatusEffect effectToApply)
         {
-            var existingEffect = activeStatusEffects.Find(e => e.Effect.Data != null && e.Effect.Data.type == effectToApply.Data.type);
-            if (existingEffect != null)
-                existingEffect.Effect.Value += effectToApply.Value;
-            else
-            {
-                StatusEffectBehavior newBehavior = StatusEffectFactory.Create(effectToApply);
-                newBehavior.Setup(effectToApply, this);
-                activeStatusEffects.Add(newBehavior);
-                newBehavior.OnApplied();
-            }
-
-            OnStatusEffectsChanged?.Invoke(activeStatusEffects.Select(b => b.Effect).ToList());
+            statusEffects.ApplyStatusEffect(effectToApply);
         }
-        
+
         public int GetStatusEffectValue(StatusEffectType type)
         {
-            var behavior = activeStatusEffects.Find(b => b.Effect.Data != null && b.Effect.Data.type == type);
-            return behavior?.Effect.Value ?? 0;
+            return statusEffects.GetStatusEffectValue(type);
         }
 
         /// 턴 종료 시 지속 시간이 있는 상태 이상들을 처리합니다.
         public void ProcessStatusEffectsOnTurnEnd()
         {
-            bool changed = false;
-            for(int i = activeStatusEffects.Count - 1; i >= 0; i--)
-            {
-                activeStatusEffects[i].OnTurnEnd();
-                if(activeStatusEffects[i].IsFinished())
-                {
-                    activeStatusEffects.RemoveAt(i);
-                    changed = true;
-                }
-            }
-            
-            if (changed)
-                OnStatusEffectsChanged?.Invoke(activeStatusEffects.Select(b => b.Effect).ToList());
+            statusEffects.ProcessStatusEffectsOnTurnEnd();
         }
 
         // 다음 행동을 반환합니다 (UI 표시용).
         public EnemyAction GetNextAction() => nextAction;
-        
+
         // 행동 패턴에 따라 다음 행동을 계획합니다.
         private void PlanNextAction()
         {
             if (actionPattern == null || actionPattern.Count == 0) return;
             nextAction = actionPattern[turnIndex % actionPattern.Count];
-            OnStateChanged?.Invoke(currentHealth, maxHealth, nextAction);
+            OnStateChanged?.Invoke(health.CurrentHealth, health.MaxHealth, nextAction);
         }
 
         private void SwitchToPhase2()
@@ -298,16 +292,13 @@ namespace GangHoBiGeup.Gameplay
             currentPhase = 2;
             actionPattern = new List<EnemyAction>(encounterData.actionPatternPhase2);
             turnIndex = 0; // 2페이즈 패턴의 처음부터 시작
-            
+
             // 페이즈 전환 시 모든 디버프 제거 및 강력한 버프 (예시)
-            activeStatusEffects.RemoveAll(b => !b.Effect.Data.isBuff);
+            statusEffects.RemoveAllDebuffs();
             if (ResourceManager.Instance != null)
                 ApplyStatusEffect(new StatusEffect(ResourceManager.Instance.GetStatusEffectData("Strength"), 3));
 
             Debug.LogWarning($"<color=red>{enemyData.enemyName}이(가) 분노합니다! (2페이즈 돌입)</color>");
-            
-            // 변경된 상태 이상 목록을 UI에 즉시 반영
-            OnStatusEffectsChanged?.Invoke(activeStatusEffects.Select(b => b.Effect).ToList());
         }
     }
 }
