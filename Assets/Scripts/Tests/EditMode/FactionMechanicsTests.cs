@@ -3,6 +3,7 @@ using UnityEngine;
 using GangHoBiGeup.Data;
 using GangHoBiGeup.Gameplay;
 using System.Collections.Generic;
+using static GangHoBiGeup.Tests.TestHelper;
 
 namespace GangHoBiGeup.Tests
 {
@@ -14,8 +15,7 @@ namespace GangHoBiGeup.Tests
         public void 화산파_전용_연계_초식이_작동한다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
+            var player = CreatePlayer();
 
             // 화산파 전용 연계 초식 설정
             var hwasanCombo = ScriptableObject.CreateInstance<ComboData>();
@@ -26,17 +26,9 @@ namespace GangHoBiGeup.Tests
                 new GameEffect { effectType = GameEffectType.Damage, value = 15 }
             };
 
-            var card1 = ScriptableObject.CreateInstance<CardData>();
-            card1.id = "hwasan_strike";
-            card1.cardName = "매화검 타격";
-
-            var card2 = ScriptableObject.CreateInstance<CardData>();
-            card2.id = "hwasan_strike";
-            card2.cardName = "매화검 타격";
-
-            var card3 = ScriptableObject.CreateInstance<CardData>();
-            card3.id = "hwasan_strike";
-            card3.cardName = "매화검 타격";
+            var card1 = CreateCard("hwasan_strike", "매화검 타격");
+            var card2 = CreateCard("hwasan_strike", "매화검 타격");
+            var card3 = CreateCard("hwasan_strike", "매화검 타격");
 
             player.RegisterCombo(hwasanCombo);
 
@@ -49,22 +41,18 @@ namespace GangHoBiGeup.Tests
             Assert.IsTrue(comboTriggered, "화산파 연계 초식이 발동되어야 합니다");
             Assert.AreEqual("매화검법 3연격", hwasanCombo.comboName);
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
 
         [Test]
         public void 연계_콤보_카운터가_작동한다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
+            var player = CreatePlayer();
 
-            var card1 = ScriptableObject.CreateInstance<CardData>();
-            card1.id = "strike";
-            var card2 = ScriptableObject.CreateInstance<CardData>();
-            card2.id = "strike";
-            var card3 = ScriptableObject.CreateInstance<CardData>();
-            card3.id = "defend";
+            var card1 = CreateCard("strike", "타격");
+            var card2 = CreateCard("strike", "타격");
+            var card3 = CreateCard("defend", "방어");
 
             // Act
             player.RecordCardPlay(card1);
@@ -84,7 +72,7 @@ namespace GangHoBiGeup.Tests
             // Assert
             Assert.AreEqual(0, historyAfterEndTurn.Count, "턴 종료 시 연계 카운터가 초기화되어야 합니다");
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
 
         // Phase 13.2: 천마신교 체력 소모 시스템
@@ -92,14 +80,8 @@ namespace GangHoBiGeup.Tests
         public void 체력을_대가로_하는_카드가_작동한다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
-            player.maxHealth = 100;
-            player.currentHealth = 100;
-
-            var enemyObject = new GameObject("Enemy");
-            var enemy = enemyObject.AddComponent<Enemy>();
-            enemy.CurrentHealth = 50;
+            var player = CreatePlayer(maxHealth: 100, currentHealth: 100);
+            var enemy = CreateEnemy(maxHealth: 50, currentHealth: 50);
 
             // 천마신교 전용 카드: 체력을 소모하여 강력한 공격
             var bloodStrikeCard = ScriptableObject.CreateInstance<CardData>();
@@ -121,21 +103,17 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual(healthBefore - 5, player.currentHealth, "체력을 5 소모해야 합니다");
             Assert.AreEqual(30, enemy.CurrentHealth, "적에게 20의 피해를 입혀야 합니다");
 
-            Object.DestroyImmediate(playerObject);
-            Object.DestroyImmediate(enemyObject);
+            Cleanup(player, enemy);
         }
 
         [Test]
         public void 천마_상태가_올바르게_적용된다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
-            player.maxHealth = 100;
-            player.currentHealth = 50; // 체력이 50% 이하
+            var player = CreatePlayer(maxHealth: 100, currentHealth: 50);
 
             // 천마 상태: 체력이 낮을수록 공격력 증가 (Strength 버프로 표현)
-            var strengthEffect = new StatusEffect(StatusEffectType.Strength, 3, 0);
+            var strengthEffect = Strength(3, 0);
 
             // Act
             // 체력이 25% 이하일 때 천마 상태 발동
@@ -150,7 +128,7 @@ namespace GangHoBiGeup.Tests
             // 조건 재확인 후 천마 상태 적용
             if (player.currentHealth <= player.maxHealth * 0.25f)
             {
-                player.ApplyStatusEffect(new StatusEffect(StatusEffectType.Strength, 3, 0));
+                player.ApplyStatusEffect(Strength(3, 0));
             }
 
             // Assert
@@ -158,7 +136,7 @@ namespace GangHoBiGeup.Tests
             Assert.Greater(player.GetStatusEffectValue(StatusEffectType.Strength), 0,
                 "체력이 25% 이하일 때 천마 상태(힘 버프)가 적용되어야 합니다");
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
 
         // Phase 13.3: 사천당문 중독 시스템
@@ -166,42 +144,34 @@ namespace GangHoBiGeup.Tests
         public void 중독_중첩이_올바르게_작동한다()
         {
             // Arrange
-            var enemyObject = new GameObject("Enemy");
-            var enemy = enemyObject.AddComponent<Enemy>();
-            enemy.maxHealth = 100;
-            enemy.currentHealth = 100;
+            var enemy = CreateEnemy(maxHealth: 100, currentHealth: 100);
 
             // Act - 중독을 여러 번 적용
-            var poison1 = new StatusEffect(StatusEffectType.Poison, 3, 3);
+            var poison1 = Poison(3, 3);
             enemy.ApplyStatusEffect(poison1);
 
-            var poison2 = new StatusEffect(StatusEffectType.Poison, 2, 3);
+            var poison2 = Poison(2, 3);
             enemy.ApplyStatusEffect(poison2);
 
-            var poison3 = new StatusEffect(StatusEffectType.Poison, 4, 3);
+            var poison3 = Poison(4, 3);
             enemy.ApplyStatusEffect(poison3);
 
             // Assert
             int totalPoison = enemy.GetStatusEffectValue(StatusEffectType.Poison);
             Assert.AreEqual(9, totalPoison, "중독이 3 + 2 + 4 = 9로 중첩되어야 합니다");
 
-            Object.DestroyImmediate(enemyObject);
+            Cleanup(enemy);
         }
 
         [Test]
         public void 중독_시너지_카드가_작동한다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
-
-            var enemyObject = new GameObject("Enemy");
-            var enemy = enemyObject.AddComponent<Enemy>();
-            enemy.maxHealth = 100;
-            enemy.currentHealth = 100;
+            var player = CreatePlayer();
+            var enemy = CreateEnemy(maxHealth: 100, currentHealth: 100);
 
             // 먼저 중독 적용
-            var poisonEffect = new StatusEffect(StatusEffectType.Poison, 5, 3);
+            var poisonEffect = Poison(5, 3);
             enemy.ApplyStatusEffect(poisonEffect);
 
             // 중독 시너지 카드: 적의 중독 수치만큼 추가 피해
@@ -228,8 +198,7 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual(85, enemy.CurrentHealth, "기본 피해 10 + 중독 시너지 5 = 15 피해를 받아야 합니다");
             Assert.AreEqual(5, poisonValue, "중독 수치가 5여야 합니다");
 
-            Object.DestroyImmediate(playerObject);
-            Object.DestroyImmediate(enemyObject);
+            Cleanup(player, enemy);
         }
 
         // Phase 13.4: 하북팽가 무방비/힘 시스템
@@ -237,13 +206,10 @@ namespace GangHoBiGeup.Tests
         public void 무방비_상태가_올바르게_적용된다()
         {
             // Arrange
-            var enemyObject = new GameObject("Enemy");
-            var enemy = enemyObject.AddComponent<Enemy>();
-            enemy.maxHealth = 100;
-            enemy.currentHealth = 100;
+            var enemy = CreateEnemy(maxHealth: 100, currentHealth: 100);
 
             // 무방비 상태 적용 (받는 피해 증가)
-            var vulnerableEffect = new StatusEffect(StatusEffectType.Vulnerable, 2, 3);
+            var vulnerableEffect = Vulnerable(2, 3);
 
             // Act
             enemy.ApplyStatusEffect(vulnerableEffect);
@@ -262,29 +228,22 @@ namespace GangHoBiGeup.Tests
 
             Assert.AreEqual(85, enemy.CurrentHealth, "무방비 상태에서 15의 피해를 받아야 합니다 (10 * 1.5)");
 
-            Object.DestroyImmediate(enemyObject);
+            Cleanup(enemy);
         }
 
         [Test]
         public void 무방비와_힘의_시너지가_작동한다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
-            player.maxHealth = 100;
-            player.currentHealth = 100;
-
-            var enemyObject = new GameObject("Enemy");
-            var enemy = enemyObject.AddComponent<Enemy>();
-            enemy.maxHealth = 100;
-            enemy.currentHealth = 100;
+            var player = CreatePlayer(maxHealth: 100, currentHealth: 100);
+            var enemy = CreateEnemy(maxHealth: 100, currentHealth: 100);
 
             // 플레이어에게 힘 버프 적용
-            var strengthEffect = new StatusEffect(StatusEffectType.Strength, 3, 0);
+            var strengthEffect = Strength(3, 0);
             player.ApplyStatusEffect(strengthEffect);
 
             // 적에게 무방비 디버프 적용
-            var vulnerableEffect = new StatusEffect(StatusEffectType.Vulnerable, 2, 3);
+            var vulnerableEffect = Vulnerable(2, 3);
             enemy.ApplyStatusEffect(vulnerableEffect);
 
             // 하북팽가 카드: 기본 피해
@@ -319,8 +278,7 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual(2, vulnerableValue, "무방비 디버프가 2여야 합니다");
             Assert.Less(enemy.CurrentHealth, 100, "적이 피해를 받아야 합니다");
 
-            Object.DestroyImmediate(playerObject);
-            Object.DestroyImmediate(enemyObject);
+            Cleanup(player, enemy);
         }
 
         [Test]
