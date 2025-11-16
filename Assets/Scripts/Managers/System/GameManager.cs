@@ -1,11 +1,14 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using GangHoBiGeup.Data;
+using GangHoBiGeup.Managers;
 
 // 게임의 전체적인 상태를 정의합니다.
 public enum GameState { MainMenu, MapView, Battle, Reward, Shop, Event, RestSite, GameOver, Victory }
 
 // 게임의 전체적인 흐름과 상태를 관리하는 최고 관리자 클래스입니다.
+// 보상 생성 로직은 RewardManager로 분리되었습니다.
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
@@ -57,15 +60,16 @@ public class GameManager : MonoBehaviour
         SelectedFaction = faction;
         PlayerDeck = new List<CardData>(faction.startingDeck);
         currentFloor = 1;
-        
+
         Player player = FindObjectOfType<Player>(true);
         MetaProgress progress = MetaManager.Instance.Progress;
-        
-        int bonusHealth = progress.bonusHealthLevel * 5;
+
+        // RewardManager를 통해 보너스 계산
+        int bonusHealth = RewardManager.Instance.CalculateBonusHealth(progress.bonusHealthLevel);
         player.Setup(new List<CardData>(faction.startingDeck), bonusHealth);
 
-        // --- 새로운 강화 적용 로직 ---
-        int startingGold = progress.startingGoldLevel * 20; // 1레벨당 20골드
+        // RewardManager를 통해 시작 골드 계산
+        int startingGold = RewardManager.Instance.CalculateStartingGold(progress.startingGoldLevel);
         if (startingGold > 0)
             player.GainGold(startingGold);
 
@@ -91,7 +95,9 @@ public class GameManager : MonoBehaviour
     {
         if (playerWon)
         {
-            FindObjectOfType<Player>().GainGold(Random.Range(10, 21));
+            // RewardManager를 통해 전투 보상 골드 생성
+            int goldReward = RewardManager.Instance.GenerateCombatRewardGold();
+            FindObjectOfType<Player>().GainGold(goldReward);
 
             if (wasBossFight && currentFloor == MapManager.FINAL_FLOOR)
                 ShowVictoryScreen();
@@ -103,7 +109,8 @@ public class GameManager : MonoBehaviour
         else
         {
             ChangeState(GameState.GameOver);
-            int pointsEarned = currentFloor * 10;
+            // RewardManager를 통해 깨달음 포인트 계산
+            int pointsEarned = RewardManager.Instance.CalculateEnlightenmentPoints(currentFloor);
             MetaManager.Instance.AddEnlightenmentPoints(pointsEarned);
             MetaManager.Instance.SaveProgress();
         }
@@ -118,43 +125,14 @@ public class GameManager : MonoBehaviour
 
         foreach (Transform child in cardRewardContainer) Destroy(child.gameObject);
 
-        List<CardData> rewardChoices = GenerateCardChoices(3);
+        // RewardManager를 통해 카드 보상 생성
+        List<CardData> rewardChoices = RewardManager.Instance.GenerateCardRewards();
         foreach (var card in rewardChoices)
         {
             GameObject slotObj = Instantiate(cardRewardSlotPrefab, cardRewardContainer);
             slotObj.GetComponent<CardUI>().Setup(card);
             slotObj.GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() => SelectCardReward(card));
         }
-    }
-
-    private List<CardData> GenerateCardChoices(int count)
-    {
-        List<CardData> choices = new List<CardData>();
-        List<CardData> availableCards = new List<CardData>(ResourceManager.Instance.GetAllCards());
-        
-        for (int i = 0; i < count; i++)
-        {
-            if (availableCards.Count == 0) break;
-            CardRarity rarity = GetRandomRarity();
-            List<CardData> candidates = availableCards.Where(c => c.rarity == rarity && !c.isUpgraded).ToList();
-            if (candidates.Count == 0) candidates = availableCards.Where(c => c.rarity == CardRarity.Common && !c.isUpgraded).ToList();
-            if (candidates.Count == 0) continue;
-
-            CardData choice = candidates[Random.Range(0, candidates.Count)];
-            choices.Add(choice);
-            availableCards.Remove(choice);
-        }
-        return choices;
-    }
-
-    private CardRarity GetRandomRarity()
-    {
-        float roll = Random.value;
-        if (roll <= 0.02f) return CardRarity.Legendary;
-        if (roll <= 0.10f) return CardRarity.Epic;
-        if (roll <= 0.30f) return CardRarity.Rare;
-        if (roll <= 0.65f) return CardRarity.Uncommon;
-        return CardRarity.Common;
     }
 
     public void SelectCardReward(CardData chosenCard)
@@ -170,9 +148,9 @@ public class GameManager : MonoBehaviour
 
         foreach (Transform child in relicRewardContainer) Destroy(child.gameObject);
 
-        List<RelicData> allRelics = ResourceManager.Instance.GetAllRelics();
-        var relicChoices = allRelics.OrderBy(r => Random.value).Take(3).ToList();
-        
+        // RewardManager를 통해 유물 보상 생성
+        List<RelicData> relicChoices = RewardManager.Instance.GenerateRelicRewards();
+
         foreach (var relic in relicChoices)
         {
             GameObject slotObj = Instantiate(relicRewardSlotPrefab, relicRewardContainer);
@@ -200,7 +178,8 @@ public class GameManager : MonoBehaviour
     private void ShowVictoryScreen()
     {
         ChangeState(GameState.Victory);
-        int pointsEarned = 100 + (currentFloor * 10);
+        // RewardManager를 통해 승리 포인트 계산
+        int pointsEarned = RewardManager.Instance.CalculateVictoryEnlightenmentPoints(currentFloor);
         MetaManager.Instance.AddEnlightenmentPoints(pointsEarned);
         MetaManager.Instance.SaveProgress();
         SaveLoadManager.Instance.DeleteSaveFile();
