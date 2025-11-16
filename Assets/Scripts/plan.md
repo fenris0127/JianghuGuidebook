@@ -42,7 +42,7 @@
 - [x] Test: CardEffect에 데미지 타입과 값을 설정할 수 있다
 - [x] Test: CardEffect에 방어도 타입과 값을 설정할 수 있다
 - [x] Test: CardData의 Rarity(등급)를 설정할 수 있다
-- [ ] Test: CardData의 문파(faction)를 설정할 수 있다 (유보: Phase 1.4에서 처리)
+- [x] Test: CardData의 문파(faction)를 설정할 수 있다
 
 ### 1.2 적 데이터 구조
 - [x] Test: EnemyData ScriptableObject를 생성할 수 있다
