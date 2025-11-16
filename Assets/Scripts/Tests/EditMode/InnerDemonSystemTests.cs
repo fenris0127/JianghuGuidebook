@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using GangHoBiGeup.Gameplay;
 using GangHoBiGeup.Data;
+using static GangHoBiGeup.Tests.TestHelper;
 
 namespace GangHoBiGeup.Tests
 {
@@ -36,10 +37,7 @@ namespace GangHoBiGeup.Tests
             deckViewUIObject.transform.SetParent(restSiteUIObject.transform);
             deckViewUIObject.AddComponent<DeckViewUI>();
 
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
-            player.maxHealth = 100;
-            player.currentHealth = 100;
+            var player = CreatePlayer(maxHealth: 100, currentHealth: 100);
 
             // 경지 돌파 준비 상태 설정
             player.IsReadyToAscend = true;
@@ -53,18 +51,14 @@ namespace GangHoBiGeup.Tests
             Assert.IsTrue(player.IsReadyToAscend, "플레이어가 경지 돌파 준비 상태여야 합니다");
             Assert.IsNotNull(ascendButton, "폐관수련 버튼이 존재해야 합니다");
 
-            Object.DestroyImmediate(restSiteUIObject);
-            Object.DestroyImmediate(playerObject);
+            Cleanup(restSiteUI, player);
         }
 
         [Test]
         public void 폐관수련_선택_시_심마와의_전투가_시작된다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
-            player.maxHealth = 100;
-            player.currentHealth = 100;
+            var player = CreatePlayer(maxHealth: 100, currentHealth: 100);
             player.CurrentRealm = Realm.Samryu;
             player.IsReadyToAscend = true;
 
@@ -76,17 +70,14 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual("Ascension_Samryu", expectedEncounterID, "삼류 경지의 심마 전투가 시작되어야 합니다");
             Assert.IsTrue(player.IsReadyToAscend, "경지 돌파 준비 상태여야 합니다");
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
 
         [Test]
         public void 심마_전투에서_승리하면_경지가_상승한다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
-            player.maxHealth = 100;
-            player.currentHealth = 100;
+            var player = CreatePlayer(maxHealth: 100, currentHealth: 100);
 
             // 삼류 경지에서 시작
             Realm initialRealm = Realm.Samryu;
@@ -104,22 +95,19 @@ namespace GangHoBiGeup.Tests
             Assert.IsFalse(player.IsReadyToAscend, "경지 상승 후 준비 상태가 해제되어야 합니다");
             Assert.Greater(player.MaxNaegong, initialMaxNaegong, "경지 상승 시 최대 내공이 증가해야 합니다");
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
 
         [Test]
         public void 심마_전투에서_패배하면_주화입마_상태가_된다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
-            player.maxHealth = 100;
-            player.currentHealth = 100;
+            var player = CreatePlayer(maxHealth: 100, currentHealth: 100);
             player.CurrentRealm = Realm.Samryu;
 
             // Act - 심마 전투 패배 시 주화입마(디버프) 적용
             // 주화입마는 StatusEffect로 처리됨
-            var demonicPossession = new StatusEffect(StatusEffectType.Weak, 3, 5); // 5턴 동안 약화 3
+            var demonicPossession = Weak(3, 5); // 5턴 동안 약화 3
             player.ApplyStatusEffect(demonicPossession);
 
             // Assert
@@ -129,15 +117,14 @@ namespace GangHoBiGeup.Tests
             // 경지는 상승하지 않음
             Assert.AreEqual(Realm.Samryu, player.CurrentRealm, "패배 시 경지가 상승하지 않아야 합니다");
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
 
         [Test]
         public void 경지가_상승하면_최대_내공이_증가한다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
+            var player = CreatePlayer();
 
             // Act & Assert - 각 경지별 최대 내공 확인
             player.AscendRealm(Realm.Samryu);
@@ -158,15 +145,14 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual(4, naegongIllyu, "일류는 최대 내공 4여야 합니다");
             Assert.AreEqual(5, naegongJeoljeong, "절정은 최대 내공 5여야 합니다");
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
 
         [Test]
         public void 경험치가_충분하면_경지_돌파_준비_상태가_된다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
+            var player = CreatePlayer();
             player.CurrentRealm = Realm.Samryu;
             player.XpToNextRealm = 10;
 
@@ -180,15 +166,14 @@ namespace GangHoBiGeup.Tests
             // Assert
             Assert.IsTrue(player.IsReadyToAscend, "경험치가 충분하면 경지 돌파 준비 상태가 되어야 합니다");
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
 
         [Test]
         public void 최고_경지에서는_더_이상_상승하지_않는다()
         {
             // Arrange
-            var playerObject = new GameObject("Player");
-            var player = playerObject.AddComponent<Player>();
+            var player = CreatePlayer();
 
             // Act - 최고 경지로 설정
             player.AscendRealm(Realm.Saengsagyeong);
@@ -203,7 +188,7 @@ namespace GangHoBiGeup.Tests
             Assert.AreEqual(Realm.Saengsagyeong, player.CurrentRealm, "최고 경지는 생사경이어야 합니다");
             Assert.IsFalse(player.IsReadyToAscend, "최고 경지에서는 더 이상 돌파할 수 없어야 합니다");
 
-            Object.DestroyImmediate(playerObject);
+            Cleanup(player);
         }
     }
 }
