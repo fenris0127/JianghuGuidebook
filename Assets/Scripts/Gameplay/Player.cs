@@ -15,6 +15,7 @@ namespace GangHoBiGeup.Gameplay
         private RealmComponent _realm;
         private ComboComponent _combo;
         private InventoryComponent _inventory;
+        private StatusEffectContainer _statusEffects;
 
         // Lazy initialization for components
         private HealthComponent health => _health ?? (_health = GetComponent<HealthComponent>() ?? gameObject.AddComponent<HealthComponent>());
@@ -22,6 +23,7 @@ namespace GangHoBiGeup.Gameplay
         private RealmComponent realm => _realm ?? (_realm = GetComponent<RealmComponent>() ?? gameObject.AddComponent<RealmComponent>());
         private ComboComponent combo => _combo ?? (_combo = GetComponent<ComboComponent>() ?? gameObject.AddComponent<ComboComponent>());
         private InventoryComponent inventory => _inventory ?? (_inventory = GetComponent<InventoryComponent>() ?? gameObject.AddComponent<InventoryComponent>());
+        private StatusEffectContainer statusEffectContainer => _statusEffects ?? (_statusEffects = GetComponent<StatusEffectContainer>() ?? gameObject.AddComponent<StatusEffectContainer>());
         #endregion
 
         #region TDD Test Properties
@@ -187,7 +189,6 @@ namespace GangHoBiGeup.Gameplay
 
         // Growth
         public List<RelicData> relics => inventory.Relics;
-        private List<StatusEffectBehavior> statusEffects = new List<StatusEffectBehavior>();
 
         // Realm System
         public Realm currentRealm => realm.CurrentRealm;
@@ -210,6 +211,7 @@ namespace GangHoBiGeup.Gameplay
             // Lazy initialization으로 컴포넌트는 자동 생성되므로, 이벤트만 구독
             // 컴포넌트 접근 시 자동으로 생성됨을 보장
             var _ = health; // Force initialization
+            var __ = statusEffectContainer;
 
             // 이벤트 구독
             health.OnStatsChanged += (curHP, maxHP, def) =>
@@ -228,6 +230,11 @@ namespace GangHoBiGeup.Gameplay
                 currentNaegong = maxN;
                 NotifyStatsChanged();
             };
+
+            statusEffectContainer.OnStatusEffectsChanged += (effects) =>
+            {
+                OnStatusEffectsChanged?.Invoke(effects);
+            };
         }
 
         public void Setup(List<CardData> startingDeck, int bonusHealth)
@@ -237,9 +244,9 @@ namespace GangHoBiGeup.Gameplay
             realm.Initialize(Realm.Samryu);
             combo.ResetComboHistory();
             inventory.Initialize(0);
+            statusEffectContainer.Initialize(this);
 
             currentNaegong = realm.MaxNaegong;
-            statusEffects.Clear();
 
             NotifyAllEvents();
         }
@@ -335,41 +342,17 @@ namespace GangHoBiGeup.Gameplay
         #region Status Effect
         public void ApplyStatusEffect(StatusEffect effectToApply)
         {
-            var existingEffect = statusEffects.Find(e => e.Effect.Data != null && e.Effect.Data.type == effectToApply.Data.type);
-            if (existingEffect != null)
-                existingEffect.Effect.Value += effectToApply.Value;
-            else
-            {
-                StatusEffectBehavior newBehavior = StatusEffectFactory.Create(effectToApply);
-                newBehavior.Setup(effectToApply, this);
-                statusEffects.Add(newBehavior);
-                newBehavior.OnApplied();
-            }
-
-            OnStatusEffectsChanged?.Invoke(statusEffects.Select(b => b.Effect).ToList());
+            statusEffectContainer.ApplyStatusEffect(effectToApply);
         }
 
         public int GetStatusEffectValue(StatusEffectType type)
         {
-            var behavior = statusEffects.Find(b => b.Effect.Data.type == type);
-            return behavior?.Effect.Value ?? 0;
+            return statusEffectContainer.GetStatusEffectValue(type);
         }
 
         public void ProcessStatusEffectsOnTurnStart()
         {
-            bool changed = false;
-            for (int i = statusEffects.Count - 1; i >= 0; i--)
-            {
-                statusEffects[i].OnTurnStart();
-                if (statusEffects[i].IsFinished())
-                {
-                    statusEffects.RemoveAt(i);
-                    changed = true;
-                }
-            }
-
-            if (changed)
-                OnStatusEffectsChanged?.Invoke(statusEffects.Select(b => b.Effect).ToList());
+            statusEffectContainer.ProcessStatusEffectsOnTurnStart();
         }
 
         public void ProcessStatusEffectsOnTurnEnd()
@@ -377,19 +360,7 @@ namespace GangHoBiGeup.Gameplay
             if (!wasDamagedThisTurn)
                 realm.RecordEvent(EventConstants.ZERO_DAMAGE_TURN);
 
-            bool changed = false;
-            for (int i = statusEffects.Count - 1; i >= 0; i--)
-            {
-                statusEffects[i].OnTurnEnd();
-                if (statusEffects[i].IsFinished())
-                {
-                    statusEffects.RemoveAt(i);
-                    changed = true;
-                }
-            }
-
-            if (changed)
-                OnStatusEffectsChanged?.Invoke(statusEffects.Select(b => b.Effect).ToList());
+            statusEffectContainer.ProcessStatusEffectsOnTurnEnd();
         }
         #endregion
 
@@ -481,7 +452,7 @@ namespace GangHoBiGeup.Gameplay
             OnPilesChanged?.Invoke(drawPile.Count, discardPile.Count, exhaustPile.Count);
             OnGoldChanged?.Invoke(gold);
             OnRelicsChanged?.Invoke(relics);
-            OnStatusEffectsChanged?.Invoke(statusEffects.Select(b => b.Effect).ToList());
+            OnStatusEffectsChanged?.Invoke(statusEffectContainer.GetAllStatusEffects());
         }
         #endregion
     }
