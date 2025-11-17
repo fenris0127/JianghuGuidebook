@@ -3,13 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using GangHoBiGeup.Data;
+using GangHoBiGeup.Core;
 
 // 전투의 모든 과정을 통제하는 '심판' 클래스입니다.
 // BattleConfig를 통해 타이밍 설정값을 가져옵니다.
-public class BattleManager : MonoBehaviour
+public class BattleManager : Singleton<BattleManager>
 {
-    public static BattleManager Instance;
-
     [Header("설정")]
     [SerializeField] private BattleConfig battleConfig;
 
@@ -21,10 +20,8 @@ public class BattleManager : MonoBehaviour
 
     private EncounterData currentEncounter;
 
-    void Awake()
+    protected override void OnAwake()
     {
-        Instance = this;
-
         // BattleConfig가 없으면 Resources에서 로드 시도
         if (battleConfig == null)
         {
