@@ -175,7 +175,7 @@ namespace GangHoBiGeup.Gameplay
             // 취약 상태 적용
             float multiplier = 1f;
             if (GetStatusEffectValue(StatusEffectType.Vulnerable) > 0)
-                multiplier = 1.5f;
+                multiplier = GangHoBiGeup.Managers.ConfigManager.Instance?.GetVulnerableMultiplier() ?? 1.5f;
 
             int actualDamage = health.TakeDamage(finalDamage, multiplier);
 

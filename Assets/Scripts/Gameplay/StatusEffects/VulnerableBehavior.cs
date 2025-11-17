@@ -5,7 +5,11 @@ using UnityEngine;
 /// </summary>
 public class VulnerableBehavior : StatusEffectBehavior
 {
-    public override int OnDamageTaken(int damage) => Mathf.RoundToInt(damage * 1.5f);
-    
+    public override int OnDamageTaken(int damage)
+    {
+        float multiplier = GangHoBiGeup.Managers.ConfigManager.Instance?.GetVulnerableMultiplier() ?? 1.5f;
+        return Mathf.RoundToInt(damage * multiplier);
+    }
+
     public override void OnTurnEnd() => Effect.Value--;
 }

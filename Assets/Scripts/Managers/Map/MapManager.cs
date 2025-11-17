@@ -1,32 +1,38 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
+using GangHoBiGeup.Data;
 
 // 맵의 생성과 노드 간의 상호작용을 관리하는 클래스입니다.
+// MapConfig를 통해 설정값을 가져옵니다.
 public class MapManager : MonoBehaviour
 {
     public static MapManager Instance;
-    public const int FINAL_FLOOR = 3;
+    public static int FINAL_FLOOR => Instance?.mapConfig?.finalFloor ?? 3;
 
     [Header("맵 생성 설정")]
+    [SerializeField] private MapConfig mapConfig;
     [SerializeField] private List<GameObject> nodePrefabs;
     [SerializeField] private GameObject bossNodePrefab;
     [SerializeField] private GameObject finalBossNodePrefab;
     [SerializeField] private LineRenderer pathPrefab;
     [SerializeField] private Transform mapContainer;
 
-    [Header("맵 구조")]
-    [SerializeField] private int mapLength = 10;
-    [SerializeField] private int nodesPerLayer = 4;
-    [SerializeField] private float layerSpacing = 3.5f;
-    [SerializeField] private float nodeVerticalSpacing = 2.0f;
-    [SerializeField] private int pathDensity = 2;
-
     private List<List<MapNode>> mapLayers = new List<List<MapNode>>();
 
-    void Awake() 
+    void Awake()
     {
-        Instance = this; 
+        Instance = this;
+
+        // MapConfig가 없으면 Resources에서 로드 시도
+        if (mapConfig == null)
+        {
+            mapConfig = Resources.Load<MapConfig>("Config/MapConfig");
+            if (mapConfig == null)
+            {
+                Debug.LogWarning("MapConfig를 찾을 수 없습니다. 기본값을 사용합니다.");
+            }
+        }
     }
 
     public void GenerateMap(int floor)
@@ -34,7 +40,8 @@ public class MapManager : MonoBehaviour
         foreach (Transform child in mapContainer) Destroy(child.gameObject);
         mapLayers.Clear();
 
-        if (floor >= FINAL_FLOOR)
+        int finalFloorNum = mapConfig?.finalFloor ?? 3;
+        if (floor >= finalFloorNum)
         {
             GameObject nodeObj = Instantiate(finalBossNodePrefab, Vector2.zero, Quaternion.identity, mapContainer);
             MapNode node = nodeObj.GetComponent<MapNode>();
@@ -44,18 +51,25 @@ public class MapManager : MonoBehaviour
             return;
         }
 
+        int length = mapConfig?.mapLength ?? 10;
+        int minNodes = mapConfig?.minNodesPerLayer ?? 2;
+        int maxNodes = mapConfig?.maxNodesPerLayer ?? 4;
+        float spacing = mapConfig?.layerSpacing ?? 3.5f;
+        float verticalSpacing = mapConfig?.nodeVerticalSpacing ?? 2.0f;
+        int maxPaths = mapConfig?.maxPathDensity ?? 2;
+
         // 노드 생성
-        for (int i = 0; i < mapLength; i++)
+        for (int i = 0; i < length; i++)
         {
             List<MapNode> layerNodes = new List<MapNode>();
-            int nodeCount = Random.Range(2, nodesPerLayer + 1);
-            List<float> yPositions = Enumerable.Range(0, nodeCount).Select(n => (n - (nodeCount - 1) / 2f) * nodeVerticalSpacing).ToList();
+            int nodeCount = Random.Range(minNodes, maxNodes + 1);
+            List<float> yPositions = Enumerable.Range(0, nodeCount).Select(n => (n - (nodeCount - 1) / 2f) * verticalSpacing).ToList();
             yPositions.Shuffle();
 
             for (int j = 0; j < nodeCount; j++)
             {
-                GameObject prefab = (i == mapLength - 1) ? bossNodePrefab : nodePrefabs[Random.Range(0, nodePrefabs.Count)];
-                GameObject nodeObj = Instantiate(prefab, new Vector3(i * layerSpacing, yPositions[j], 0), Quaternion.identity, mapContainer);
+                GameObject prefab = (i == length - 1) ? bossNodePrefab : nodePrefabs[Random.Range(0, nodePrefabs.Count)];
+                GameObject nodeObj = Instantiate(prefab, new Vector3(i * spacing, yPositions[j], 0), Quaternion.identity, mapContainer);
                 MapNode node = nodeObj.GetComponent<MapNode>();
                 node.Setup(i);
                 layerNodes.Add(node);
@@ -65,7 +79,7 @@ public class MapManager : MonoBehaviour
                 else if (node.nodeType == NodeType.Event)
                     node.eventData = ResourceManager.Instance.GetAllEvents().OrderBy(e => Random.value).First();
             }
-            
+
             mapLayers.Add(layerNodes);
         }
 
@@ -74,7 +88,7 @@ public class MapManager : MonoBehaviour
         {
             foreach (MapNode fromNode in mapLayers[i])
             {
-                int pathsToMake = Random.Range(1, pathDensity + 1);
+                int pathsToMake = Random.Range(1, maxPaths + 1);
                 var potentialTargets = mapLayers[i + 1].OrderBy(n => Vector3.Distance(fromNode.transform.position, n.transform.position)).Take(pathsToMake);
                 foreach (MapNode toNode in potentialTargets)
                 {
@@ -83,7 +97,7 @@ public class MapManager : MonoBehaviour
                 }
             }
         }
-        
+
         // 첫 층 활성화
         foreach (var node in mapLayers[0])
             node.SetClickable(true);
@@ -135,10 +149,13 @@ public class MapManager : MonoBehaviour
 
     private EventRarity GetRandomEventRarity()
     {
-        float roll = Random.value; // 0.0 ~ 1.0
-        // 카드와 유사하게 확률 설정 (에픽/레전드리는 특수 조건이므로 일반 맵에서는 제외)
-        if (roll <= 0.15f) return EventRarity.Rare;      // 15%
-        if (roll <= 0.50f) return EventRarity.Uncommon;  // 35%
-        return EventRarity.Common;                     // 50%
+        if (mapConfig != null)
+            return mapConfig.GetRandomEventRarity();
+
+        // Fallback: MapConfig가 없을 때 기본값
+        float roll = Random.value;
+        if (roll <= 0.15f) return EventRarity.Rare;
+        if (roll <= 0.50f) return EventRarity.Uncommon;
+        return EventRarity.Common;
     }
 }
