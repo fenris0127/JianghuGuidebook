@@ -9,6 +9,7 @@ public enum GameState { MainMenu, MapView, Battle, Reward, Shop, Event, RestSite
 
 // 게임의 전체적인 흐름과 상태를 관리하는 최고 관리자 클래스입니다.
 // 보상 생성 로직은 RewardManager로 분리되었습니다.
+// UI 상태 관리는 Dictionary 기반으로 선언적으로 처리합니다.
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
@@ -40,6 +41,9 @@ public class GameManager : MonoBehaviour
     private Player cachedPlayer;
     private BattleManager cachedBattleManager;
 
+    // UI 상태 매핑
+    private Dictionary<GameState, GameObject> uiPanels;
+
     private Player Player => cachedPlayer != null ? cachedPlayer : (cachedPlayer = FindObjectOfType<Player>(true));
     private BattleManager BattleManager => cachedBattleManager != null ? cachedBattleManager : (cachedBattleManager = FindObjectOfType<BattleManager>(true));
 
@@ -54,11 +58,28 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        InitializeUIPanels();
     }
 
     void Start()
     {
         ChangeState(GameState.MainMenu);
+    }
+
+    private void InitializeUIPanels()
+    {
+        uiPanels = new Dictionary<GameState, GameObject>
+        {
+            { GameState.MainMenu, mainMenuUI },
+            { GameState.MapView, mapUI },
+            { GameState.Battle, battleUI },
+            { GameState.Shop, shopUI },
+            { GameState.Event, eventUI },
+            { GameState.RestSite, restSiteUI },
+            { GameState.Victory, victoryUI },
+            { GameState.GameOver, gameOverUI }
+        };
     }
 
     public void StartNewGame(FactionData faction)
@@ -223,26 +244,45 @@ public class GameManager : MonoBehaviour
     public void ChangeState(GameState newState)
     {
         CurrentState = newState;
-        mainMenuUI?.SetActive(CurrentState == GameState.MainMenu);
-        mapUI?.SetActive(CurrentState == GameState.MapView);
-        battleUI?.SetActive(CurrentState == GameState.Battle);
-        cardRewardUI?.SetActive(CurrentState == GameState.Reward && !relicRewardUI.activeSelf);
-        relicRewardUI?.SetActive(CurrentState == GameState.Reward && relicRewardUI.activeSelf);
-        shopUI?.SetActive(CurrentState == GameState.Shop);
-        eventUI?.SetActive(CurrentState == GameState.Event);
-        restSiteUI?.SetActive(CurrentState == GameState.RestSite);
-        victoryUI?.SetActive(CurrentState == GameState.Victory);
-        gameOverUI?.SetActive(CurrentState == GameState.GameOver);
 
-        if (AudioManager.Instance != null)
+        // 모든 UI 패널 비활성화
+        foreach (var panel in uiPanels.Values)
         {
-            switch (newState)
-            {
-                case GameState.MainMenu: AudioManager.Instance.PlayMusic(AudioManager.Instance.mainMenuTheme); break;
-                case GameState.MapView: AudioManager.Instance.PlayMusic(AudioManager.Instance.mapTheme); break;
-                case GameState.Battle: AudioManager.Instance.PlayMusic(AudioManager.Instance.battleTheme); break;
-                case GameState.Victory: AudioManager.Instance.PlayMusic(AudioManager.Instance.victoryTheme); break;
-            }
+            if (panel != null)
+                panel.SetActive(false);
+        }
+
+        // 현재 상태에 맞는 UI 패널 활성화
+        if (uiPanels.TryGetValue(newState, out GameObject activePanel) && activePanel != null)
+        {
+            activePanel.SetActive(true);
+        }
+
+        // Reward 상태는 특별 처리 (cardRewardUI 또는 relicRewardUI)
+        // 이미 ShowCardRewardScreen()이나 ShowRelicRewardScreen()에서 처리됨
+
+        // 음악 재생
+        PlayMusicForState(newState);
+    }
+
+    private void PlayMusicForState(GameState state)
+    {
+        if (AudioManager.Instance == null) return;
+
+        switch (state)
+        {
+            case GameState.MainMenu:
+                AudioManager.Instance.PlayMusic(AudioManager.Instance.mainMenuTheme);
+                break;
+            case GameState.MapView:
+                AudioManager.Instance.PlayMusic(AudioManager.Instance.mapTheme);
+                break;
+            case GameState.Battle:
+                AudioManager.Instance.PlayMusic(AudioManager.Instance.battleTheme);
+                break;
+            case GameState.Victory:
+                AudioManager.Instance.PlayMusic(AudioManager.Instance.victoryTheme);
+                break;
         }
     }
 }

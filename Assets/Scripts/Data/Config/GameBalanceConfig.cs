@@ -61,6 +61,13 @@ namespace GangHoBiGeup.Data
         [Tooltip("승리 시 기본 깨달음 포인트")]
         public int victoryBaseEnlightenmentPoints = 100;
 
+        [Header("=== 상태이상 배율 ===")]
+        [Tooltip("취약 상태일 때 받는 피해 배율 (기본 1.5배)")]
+        public float vulnerableDamageMultiplier = 1.5f;
+
+        [Tooltip("약화 상태일 때 주는 피해 배율 (기본 0.75배)")]
+        public float weakDamageMultiplier = 0.75f;
+
         /// <summary>
         /// 카드 희귀도를 랜덤으로 결정합니다.
         /// </summary>

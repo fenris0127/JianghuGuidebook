@@ -301,7 +301,7 @@ namespace GangHoBiGeup.Gameplay
         {
             float multiplier = 1f;
             if (GetStatusEffectValue(StatusEffectType.Vulnerable) > 0)
-                multiplier = 1.5f;
+                multiplier = GangHoBiGeup.Managers.ConfigManager.Instance?.GetVulnerableMultiplier() ?? 1.5f;
 
             int actualDamage = health.TakeDamage(damage, multiplier);
             wasDamagedThisTurn = actualDamage > 0;

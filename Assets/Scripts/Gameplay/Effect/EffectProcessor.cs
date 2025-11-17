@@ -53,7 +53,10 @@ public static class EffectProcessor
 
                     // 2. '약화' 상태라면 피해량 25% 감소
                     if (caster.GetStatusEffectValue(StatusEffectType.Weak) > 0)
-                        finalDamage = Mathf.RoundToInt(finalDamage * 0.75f);
+                    {
+                        float weakMultiplier = GangHoBiGeup.Managers.ConfigManager.Instance?.GetWeakMultiplier() ?? 0.75f;
+                        finalDamage = Mathf.RoundToInt(finalDamage * weakMultiplier);
+                    }
                 }
                 
                 target.TakeDamage(finalDamage);
