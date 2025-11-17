@@ -113,21 +113,10 @@ public class BattleManager : MonoBehaviour
 
         foreach (var effect in card.effects)
         {
-            if (card.farRangeDamageMultiplier > 1f)
-            {
-                // if (currentRange == Range.Far) // BattleManager가 현재 거리를 알고 있어야 함
-                // {
-                //     // TODO: GameEffect의 피해량 값을 임시로 증폭시키는 로직
-                // }
-            }
+            // TODO: 거리 기반 데미지 증폭 시스템 (farRangeDamageMultiplier)
+            // TODO: 적 밀어내기/당기기 메커닉 (pushAmount, pullAmount)
             EffectProcessor.Process(effect, player, primaryTarget);
         }
-
-        // if (card.pushAmount > 0)
-        //     PushEnemy(card.pushAmount); // 적을 밀어내는 메서드 호출
-
-        // if (card.pullAmount > 0)
-        //     PullEnemy(card.pullAmount); // 적을 당겨오는 메서드 호출
     }
 
     public void OnEnemyDied(Enemy deadEnemy)
