@@ -2,12 +2,12 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using GangHoBiGeup.Data;
+using GangHoBiGeup.Core;
 
 // 맵의 생성과 노드 간의 상호작용을 관리하는 클래스입니다.
 // MapConfig를 통해 설정값을 가져옵니다.
-public class MapManager : MonoBehaviour
+public class MapManager : Singleton<MapManager>
 {
-    public static MapManager Instance;
     public static int FINAL_FLOOR => Instance?.mapConfig?.finalFloor ?? 3;
 
     [Header("맵 생성 설정")]
@@ -20,10 +20,8 @@ public class MapManager : MonoBehaviour
 
     private List<List<MapNode>> mapLayers = new List<List<MapNode>>();
 
-    void Awake()
+    protected override void OnAwake()
     {
-        Instance = this;
-
         // MapConfig가 없으면 Resources에서 로드 시도
         if (mapConfig == null)
         {

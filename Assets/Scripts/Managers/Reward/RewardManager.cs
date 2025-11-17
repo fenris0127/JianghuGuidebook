@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using GangHoBiGeup.Data;
+using GangHoBiGeup.Core;
 
 namespace GangHoBiGeup.Managers
 {
@@ -9,24 +10,9 @@ namespace GangHoBiGeup.Managers
     /// 보상(카드, 유물, 골드) 생성을 담당하는 매니저
     /// GameManager에서 보상 로직을 분리했습니다.
     /// </summary>
-    public class RewardManager : MonoBehaviour
+    public class RewardManager : Singleton<RewardManager>
     {
-        public static RewardManager Instance;
-
         [SerializeField] private GameBalanceConfig balanceConfig;
-
-        void Awake()
-        {
-            if (Instance == null)
-            {
-                Instance = this;
-                DontDestroyOnLoad(gameObject);
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
-        }
 
         /// <summary>
         /// 카드 보상 선택지를 생성합니다.
