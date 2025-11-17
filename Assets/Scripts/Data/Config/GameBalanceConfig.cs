@@ -61,10 +61,6 @@ namespace GangHoBiGeup.Data
         [Tooltip("승리 시 기본 깨달음 포인트")]
         public int victoryBaseEnlightenmentPoints = 100;
 
-        [Header("=== 맵 설정 ===")]
-        [Tooltip("최종 층 (보스 층)")]
-        public int finalFloor = 3; // MapManager.FINAL_FLOOR와 동일
-
         /// <summary>
         /// 카드 희귀도를 랜덤으로 결정합니다.
         /// </summary>

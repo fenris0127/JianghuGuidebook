@@ -2,11 +2,16 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using GangHoBiGeup.Data;
 
 // 전투의 모든 과정을 통제하는 '심판' 클래스입니다.
+// BattleConfig를 통해 타이밍 설정값을 가져옵니다.
 public class BattleManager : MonoBehaviour
 {
     public static BattleManager Instance;
+
+    [Header("설정")]
+    [SerializeField] private BattleConfig battleConfig;
 
     [Header("참조")]
     [SerializeField] private Player player;
@@ -19,6 +24,16 @@ public class BattleManager : MonoBehaviour
     void Awake()
     {
         Instance = this;
+
+        // BattleConfig가 없으면 Resources에서 로드 시도
+        if (battleConfig == null)
+        {
+            battleConfig = Resources.Load<BattleConfig>("Config/BattleConfig");
+            if (battleConfig == null)
+            {
+                Debug.LogWarning("BattleConfig를 찾을 수 없습니다. 기본값을 사용합니다.");
+            }
+        }
     }
 
     public Player GetPlayer() => player;
@@ -53,7 +68,8 @@ public class BattleManager : MonoBehaviour
 
     private IEnumerator BattleRoutine()
     {
-        yield return new WaitForSeconds(0.5f);
+        float delay = battleConfig?.battleStartDelay ?? 0.5f;
+        yield return new WaitForSeconds(delay);
         yield return StartCoroutine(StartPlayerTurn());
     }
 
@@ -72,18 +88,21 @@ public class BattleManager : MonoBehaviour
 
     private IEnumerator EnemyTurn()
     {
+        float startDelay = battleConfig?.enemyTurnStartDelay ?? 0.5f;
+        float endDelay = battleConfig?.enemyTurnEndDelay ?? 1f;
+
         foreach (Enemy enemy in enemies)
         {
             if (enemy != null && enemy.currentHealth > 0)
             {
-                yield return new WaitForSeconds(0.5f);
+                yield return new WaitForSeconds(startDelay);
                 enemy.TakeTurn(player);
                 enemy.ProcessStatusEffectsOnTurnEnd();
             }
         }
-        
-        yield return new WaitForSeconds(1f);
-        
+
+        yield return new WaitForSeconds(endDelay);
+
         if (player.currentHealth > 0)
             StartCoroutine(StartPlayerTurn());
     }
