@@ -6,9 +6,12 @@ namespace GangHoBiGeup.Gameplay
 {
     /// <summary>
     /// 경지 시스템과 검법 경지 시스템을 관리하는 컴포넌트
+    /// RealmConfig를 통해 설정값을 가져옵니다.
     /// </summary>
     public class RealmComponent : MonoBehaviour
     {
+        [SerializeField] private RealmConfig realmConfig;
+
         public event Action<int> OnMaxNaegongChanged;
         public event Action<Realm, int, int, bool> OnRealmChanged; // currentRealm, currentXp, xpToNext, isReadyToAscend
         public event Action<SwordRealm> OnSwordRealmChanged;
@@ -24,6 +27,19 @@ namespace GangHoBiGeup.Gameplay
         private int attacksThisCombat;
         private int zeroDamageTurns;
         private int zeroCostCardsThisCombat;
+
+        void Awake()
+        {
+            // RealmConfig가 없으면 Resources에서 로드 시도
+            if (realmConfig == null)
+            {
+                realmConfig = Resources.Load<RealmConfig>("Config/RealmConfig");
+                if (realmConfig == null)
+                {
+                    Debug.LogWarning("RealmConfig를 찾을 수 없습니다. 기본값을 사용합니다.");
+                }
+            }
+        }
 
         /// <summary>
         /// 경지 시스템을 초기화합니다.
@@ -122,16 +138,12 @@ namespace GangHoBiGeup.Gameplay
         /// </summary>
         private void CheckForSwordRealmAscension()
         {
-            switch (CurrentSwordRealm)
+            if (realmConfig == null) return;
+
+            if (realmConfig.CheckSwordRealmAscension(CurrentSwordRealm, attacksThisCombat, zeroDamageTurns))
             {
-                case SwordRealm.None:
-                    if (attacksThisCombat >= 10)
-                        AscendSwordRealm(SwordRealm.Geomgi);
-                    break;
-                case SwordRealm.Geomgi:
-                    if (zeroDamageTurns >= 3)
-                        AscendSwordRealm(SwordRealm.Geomsa);
-                    break;
+                SwordRealm nextRealm = realmConfig.GetNextSwordRealm(CurrentSwordRealm);
+                AscendSwordRealm(nextRealm);
             }
         }
 
@@ -153,35 +165,28 @@ namespace GangHoBiGeup.Gameplay
         }
 
         #region Configuration Methods
-        // TODO: 이 부분을 나중에 ScriptableObject 설정 파일로 리팩토링
+        /// <summary>
+        /// RealmConfig를 통해 경지별 최대 내공을 가져옵니다.
+        /// </summary>
         private int GetMaxNaegongForRealm(Realm realm)
         {
-            switch (realm)
-            {
-                case Realm.Samryu: return 3;
-                case Realm.Iryu: return 4;
-                case Realm.Illyu: return 4;
-                case Realm.Jeoljeong: return 5;
-                case Realm.Chojeoljeong: return 5;
-                case Realm.Hwagyeong: return 6;
-                case Realm.Saengsagyeong: return 7;
-                default: return 3;
-            }
+            if (realmConfig != null)
+                return realmConfig.GetMaxNaegongForRealm(realm);
+
+            // Fallback: RealmConfig가 없을 때 기본값
+            return 3;
         }
 
+        /// <summary>
+        /// RealmConfig를 통해 다음 경지 필요 경험치를 가져옵니다.
+        /// </summary>
         private int GetXpRequiredForNextRealm(Realm realm)
         {
-            switch (realm)
-            {
-                case Realm.Samryu: return 10;
-                case Realm.Iryu: return 15;
-                case Realm.Illyu: return 20;
-                case Realm.Jeoljeong: return 30;
-                case Realm.Chojeoljeong: return 40;
-                case Realm.Hwagyeong: return 50;
-                case Realm.Saengsagyeong: return 0; // 최고 경지
-                default: return 10;
-            }
+            if (realmConfig != null)
+                return realmConfig.GetXpRequiredForNextRealm(realm);
+
+            // Fallback: RealmConfig가 없을 때 기본값
+            return 10;
         }
         #endregion
 

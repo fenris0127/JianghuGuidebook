@@ -239,7 +239,9 @@ namespace GangHoBiGeup.Gameplay
 
         public void Setup(List<CardData> startingDeck, int bonusHealth)
         {
-            health.Initialize(80 + bonusHealth);
+            // RewardManager를 통해 기본 체력 가져오기
+            int baseMaxHealth = RewardManager.Instance?.GetBaseMaxHealth() ?? 80;
+            health.Initialize(baseMaxHealth + bonusHealth);
             deck.Initialize(startingDeck);
             realm.Initialize(Realm.Samryu);
             combo.ResetComboHistory();

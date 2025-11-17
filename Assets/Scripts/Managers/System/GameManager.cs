@@ -24,7 +24,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject restSiteUI;
     [SerializeField] private GameObject victoryUI;
     [SerializeField] private GameObject gameOverUI;
-    
+
     [Header("Reward UI Components")]
     [SerializeField] private GameObject cardRewardSlotPrefab;
     [SerializeField] private Transform cardRewardContainer;
@@ -35,6 +35,13 @@ public class GameManager : MonoBehaviour
     public FactionData SelectedFaction { get; private set; }
     public List<CardData> PlayerDeck { get; private set; }
     public int currentFloor { get; private set; } = 1;
+
+    // 성능 최적화: 자주 사용하는 컴포넌트 캐싱
+    private Player cachedPlayer;
+    private BattleManager cachedBattleManager;
+
+    private Player Player => cachedPlayer != null ? cachedPlayer : (cachedPlayer = FindObjectOfType<Player>(true));
+    private BattleManager BattleManager => cachedBattleManager != null ? cachedBattleManager : (cachedBattleManager = FindObjectOfType<BattleManager>(true));
 
     void Awake()
     {
@@ -61,17 +68,17 @@ public class GameManager : MonoBehaviour
         PlayerDeck = new List<CardData>(faction.startingDeck);
         currentFloor = 1;
 
-        Player player = FindObjectOfType<Player>(true);
+        // 캐싱된 Player 사용
         MetaProgress progress = MetaManager.Instance.Progress;
 
         // RewardManager를 통해 보너스 계산
         int bonusHealth = RewardManager.Instance.CalculateBonusHealth(progress.bonusHealthLevel);
-        player.Setup(new List<CardData>(faction.startingDeck), bonusHealth);
+        Player.Setup(new List<CardData>(faction.startingDeck), bonusHealth);
 
         // RewardManager를 통해 시작 골드 계산
         int startingGold = RewardManager.Instance.CalculateStartingGold(progress.startingGoldLevel);
         if (startingGold > 0)
-            player.GainGold(startingGold);
+            Player.GainGold(startingGold);
 
         MapManager.Instance.GenerateMap(currentFloor);
         ChangeState(GameState.MapView);
@@ -81,7 +88,7 @@ public class GameManager : MonoBehaviour
     public void StartBattle(EncounterData encounter)
     {
         ChangeState(GameState.Battle);
-        FindObjectOfType<BattleManager>(true).StartBattle(encounter);
+        BattleManager.StartBattle(encounter);
     }
     
     public void StartAscensionBattle(Realm currentRealm)
@@ -97,7 +104,7 @@ public class GameManager : MonoBehaviour
         {
             // RewardManager를 통해 전투 보상 골드 생성
             int goldReward = RewardManager.Instance.GenerateCombatRewardGold();
-            FindObjectOfType<Player>().GainGold(goldReward);
+            Player.GainGold(goldReward);
 
             if (wasBossFight && currentFloor == MapManager.FINAL_FLOOR)
                 ShowVictoryScreen();
@@ -137,7 +144,7 @@ public class GameManager : MonoBehaviour
 
     public void SelectCardReward(CardData chosenCard)
     {
-        FindObjectOfType<Player>().AddCardToDeck(chosenCard);
+        Player.AddCardToDeck(chosenCard);
         ChangeState(GameState.MapView);
     }
 
@@ -161,7 +168,7 @@ public class GameManager : MonoBehaviour
     
     public void SelectRelicReward(RelicData chosenRelic)
     {
-        FindObjectOfType<Player>().AddRelic(chosenRelic);
+        Player.AddRelic(chosenRelic);
         relicRewardUI.SetActive(false);
         MapManager.Instance.GenerateMap(currentFloor);
         ChangeState(GameState.MapView);
@@ -186,33 +193,32 @@ public class GameManager : MonoBehaviour
     }
 
     public void SaveCurrentRun()
-{
-    Player player = FindObjectOfType<Player>();
-    if (player == null) return;
-
-    RunData data = new RunData
     {
-        currentFloor = this.currentFloor,
+        if (Player == null) return;
 
-        playerMaxHealth = player.maxHealth,
-        playerCurrentHealth = player.currentHealth,
-        playerGold = player.gold,
-        
-        relicIDs = player.relics.Select(r => r.assetID).ToList(),
-        
-        drawPileIDs = player.drawPile.Select(c => c.assetID).ToList(),
-        discardPileIDs = player.discardPile.Select(c => c.assetID).ToList(),
-        handIDs = player.hand.Select(c => c.assetID).ToList(),
-        exhaustPileIDs = player.exhaustPile.Select(c => c.assetID).ToList(),
+        RunData data = new RunData
+        {
+            currentFloor = this.currentFloor,
 
-        currentRealm = player.currentRealm,
-        currentXp = player.currentXp,
-        xpToNextRealm = player.xpToNextRealm,
-        currentSwordRealm = player.currentSwordRealm
-    };
+            playerMaxHealth = Player.maxHealth,
+            playerCurrentHealth = Player.currentHealth,
+            playerGold = Player.gold,
 
-    SaveLoadManager.Instance.SaveRun(data);
-}
+            relicIDs = Player.relics.Select(r => r.assetID).ToList(),
+
+            drawPileIDs = Player.drawPile.Select(c => c.assetID).ToList(),
+            discardPileIDs = Player.discardPile.Select(c => c.assetID).ToList(),
+            handIDs = Player.hand.Select(c => c.assetID).ToList(),
+            exhaustPileIDs = Player.exhaustPile.Select(c => c.assetID).ToList(),
+
+            currentRealm = Player.currentRealm,
+            currentXp = Player.currentXp,
+            xpToNextRealm = Player.xpToNextRealm,
+            currentSwordRealm = Player.currentSwordRealm
+        };
+
+        SaveLoadManager.Instance.SaveRun(data);
+    }
 
     public void ChangeState(GameState newState)
     {
