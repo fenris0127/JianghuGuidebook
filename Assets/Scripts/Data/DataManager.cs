@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using JianghuGuidebook.Events;
 using JianghuGuidebook.Combat;
+using JianghuGuidebook.Meta;
 
 namespace JianghuGuidebook.Data
 {
@@ -36,18 +37,21 @@ namespace JianghuGuidebook.Data
         [SerializeField] private string enemyDatabasePath = "EnemyDatabase";
         [SerializeField] private string eventDatabasePath = "EventDatabase";
         [SerializeField] private string bossDatabasePath = "BossDatabase";
+        [SerializeField] private string upgradeDatabasePath = "UpgradeDatabase";
 
         // 로드된 데이터
         private Dictionary<string, CardData> cardDictionary;
         private Dictionary<string, EnemyData> enemyDictionary;
         private Dictionary<string, EventData> eventDictionary;
         private Dictionary<string, BossData> bossDictionary;
+        private Dictionary<string, PermanentUpgrade> upgradeDictionary;
 
         // 데이터베이스
         private CardDatabase cardDatabase;
         private EnemyDatabase enemyDatabase;
         private EventDatabase eventDatabase;
         private BossDatabase bossDatabase;
+        private UpgradeDatabase upgradeDatabase;
 
         // 로드 상태
         public bool IsDataLoaded { get; private set; } = false;
@@ -77,8 +81,9 @@ namespace JianghuGuidebook.Data
             bool enemyLoadSuccess = LoadEnemyData();
             bool eventLoadSuccess = LoadEventData();
             bool bossLoadSuccess = LoadBossData();
+            bool upgradeLoadSuccess = LoadUpgradeData();
 
-            IsDataLoaded = cardLoadSuccess && enemyLoadSuccess && eventLoadSuccess && bossLoadSuccess;
+            IsDataLoaded = cardLoadSuccess && enemyLoadSuccess && eventLoadSuccess && bossLoadSuccess && upgradeLoadSuccess;
 
             if (IsDataLoaded)
             {
@@ -346,6 +351,70 @@ namespace JianghuGuidebook.Data
             }
         }
 
+        /// <summary>
+        /// 업그레이드 데이터베이스를 로드합니다
+        /// </summary>
+        private bool LoadUpgradeData()
+        {
+            try
+            {
+                // Resources 폴더에서 JSON 파일 로드
+                TextAsset jsonFile = Resources.Load<TextAsset>(upgradeDatabasePath);
+
+                if (jsonFile == null)
+                {
+                    Debug.LogError($"업그레이드 데이터 파일을 찾을 수 없습니다: Resources/{upgradeDatabasePath}");
+                    Debug.LogError("Assets/Resources/UpgradeDatabase.json 파일이 존재하는지 확인하세요");
+                    return false;
+                }
+
+                // JSON 역직렬화
+                upgradeDatabase = JsonUtility.FromJson<UpgradeDatabase>(jsonFile.text);
+
+                if (upgradeDatabase == null || upgradeDatabase.upgrades == null)
+                {
+                    Debug.LogError("업그레이드 데이터베이스 역직렬화 실패");
+                    return false;
+                }
+
+                // Dictionary 생성
+                upgradeDictionary = new Dictionary<string, PermanentUpgrade>();
+
+                int validCount = 0;
+                int invalidCount = 0;
+
+                foreach (var upgrade in upgradeDatabase.upgrades)
+                {
+                    if (upgrade.Validate())
+                    {
+                        if (!upgradeDictionary.ContainsKey(upgrade.id))
+                        {
+                            upgradeDictionary.Add(upgrade.id, upgrade);
+                            validCount++;
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"중복된 업그레이드 ID: {upgrade.id}");
+                            invalidCount++;
+                        }
+                    }
+                    else
+                    {
+                        invalidCount++;
+                    }
+                }
+
+                Debug.Log($"업그레이드 데이터 로드 완료: {validCount}개 성공, {invalidCount}개 실패");
+                return validCount > 0;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"업그레이드 데이터 로드 중 오류 발생: {e.Message}");
+                Debug.LogError($"StackTrace: {e.StackTrace}");
+                return false;
+            }
+        }
+
         // ===== Public API =====
 
         /// <summary>
@@ -518,6 +587,40 @@ namespace JianghuGuidebook.Data
             }
 
             return bossDatabase.bosses.ToArray();
+        }
+
+        /// <summary>
+        /// ID로 업그레이드 데이터를 가져옵니다
+        /// </summary>
+        public PermanentUpgrade GetUpgradeById(string upgradeId)
+        {
+            if (upgradeDictionary == null)
+            {
+                Debug.LogError("업그레이드 데이터가 로드되지 않았습니다");
+                return null;
+            }
+
+            if (upgradeDictionary.TryGetValue(upgradeId, out PermanentUpgrade upgrade))
+            {
+                return upgrade;
+            }
+
+            Debug.LogWarning($"업그레이드를 찾을 수 없습니다: {upgradeId}");
+            return null;
+        }
+
+        /// <summary>
+        /// 모든 업그레이드 데이터를 가져옵니다
+        /// </summary>
+        public PermanentUpgrade[] GetAllUpgrades()
+        {
+            if (upgradeDatabase == null || upgradeDatabase.upgrades == null)
+            {
+                Debug.LogError("업그레이드 데이터가 로드되지 않았습니다");
+                return new PermanentUpgrade[0];
+            }
+
+            return upgradeDatabase.upgrades.ToArray();
         }
     }
 }
