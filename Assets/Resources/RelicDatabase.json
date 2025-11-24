@@ -1,0 +1,204 @@
+{
+  "relics": [
+    {
+      "id": "relic_old_scabbard",
+      "name": "낡은 검집",
+      "description": "전투 시작 시 방어도 6을 얻는다.",
+      "rarity": 0,
+      "effectType": 0,
+      "effectValue1": 6,
+      "effectValue2": 0,
+      "specialData": ""
+    },
+    {
+      "id": "relic_qi_pill",
+      "name": "기혈환",
+      "description": "턴 시작 시 체력 2를 회복한다.",
+      "rarity": 0,
+      "effectType": 1,
+      "effectValue1": 2,
+      "effectValue2": 0,
+      "specialData": ""
+    },
+    {
+      "id": "relic_meditation_beads",
+      "name": "참선 염주",
+      "description": "전투 시작 시 카드 2장을 추가로 뽑는다.",
+      "rarity": 0,
+      "effectType": 0,
+      "effectValue1": 2,
+      "effectValue2": 0,
+      "specialData": ""
+    },
+    {
+      "id": "relic_broken_mirror",
+      "name": "깨진 거울",
+      "description": "피해를 받을 때마다 내공 1을 얻는다.",
+      "rarity": 0,
+      "effectType": 6,
+      "effectValue1": 1,
+      "effectValue2": 0,
+      "specialData": ""
+    },
+    {
+      "id": "relic_lucky_coin",
+      "name": "행운의 동전",
+      "description": "전투 승리 시 골드를 25% 더 획득한다.",
+      "rarity": 0,
+      "effectType": 14,
+      "effectValue1": 25,
+      "effectValue2": 0,
+      "specialData": ""
+    },
+    {
+      "id": "relic_training_weights",
+      "name": "수련용 추",
+      "description": "공격 카드 사용 시 2 피해를 추가로 입힌다.",
+      "rarity": 0,
+      "effectType": 3,
+      "effectValue1": 2,
+      "effectValue2": 0,
+      "specialData": "attack"
+    },
+    {
+      "id": "relic_iron_ring",
+      "name": "철제 팔찌",
+      "description": "방어 카드 사용 시 방어도 2를 추가로 얻는다.",
+      "rarity": 0,
+      "effectType": 3,
+      "effectValue1": 2,
+      "effectValue2": 0,
+      "specialData": "defense"
+    },
+    {
+      "id": "relic_torn_scroll",
+      "name": "찢어진 서책",
+      "description": "턴 종료 시 패에 카드가 없으면 카드 1장을 뽑는다.",
+      "rarity": 0,
+      "effectType": 2,
+      "effectValue1": 1,
+      "effectValue2": 0,
+      "specialData": ""
+    },
+    {
+      "id": "relic_wooden_sword",
+      "name": "목검",
+      "description": "매 턴 첫 번째 공격의 피해가 4 증가한다.",
+      "rarity": 0,
+      "effectType": 4,
+      "effectValue1": 4,
+      "effectValue2": 0,
+      "specialData": ""
+    },
+    {
+      "id": "relic_incense_burner",
+      "name": "향로",
+      "description": "휴식 시 체력을 10 추가로 회복한다.",
+      "rarity": 0,
+      "effectType": 11,
+      "effectValue1": 10,
+      "effectValue2": 0,
+      "specialData": ""
+    },
+    {
+      "id": "relic_century_ginseng",
+      "name": "백년인삼",
+      "description": "최대 체력이 15 증가한다. 전투 시작 시 체력을 최대치까지 회복한다.",
+      "rarity": 1,
+      "effectType": 10,
+      "effectValue1": 15,
+      "effectValue2": 0,
+      "specialData": ""
+    },
+    {
+      "id": "relic_millennium_ice_pill",
+      "name": "천년빙백단",
+      "description": "전투 시작 시 내공 1을 추가로 얻는다.",
+      "rarity": 1,
+      "effectType": 0,
+      "effectValue1": 1,
+      "effectValue2": 0,
+      "specialData": ""
+    },
+    {
+      "id": "relic_iron_sword",
+      "name": "철검",
+      "description": "모든 공격 피해가 3 증가한다.",
+      "rarity": 1,
+      "effectType": 10,
+      "effectValue1": 3,
+      "effectValue2": 0,
+      "specialData": "damage"
+    },
+    {
+      "id": "relic_jade_pendant",
+      "name": "옥패",
+      "description": "피해를 받을 때마다 방어도 3을 얻는다.",
+      "rarity": 1,
+      "effectType": 6,
+      "effectValue1": 3,
+      "effectValue2": 0,
+      "specialData": ""
+    },
+    {
+      "id": "relic_merchants_purse",
+      "name": "상인의 주머니",
+      "description": "상점의 모든 가격이 20% 할인된다.",
+      "rarity": 1,
+      "effectType": 12,
+      "effectValue1": 20,
+      "effectValue2": 0,
+      "specialData": ""
+    },
+    {
+      "id": "relic_phoenix_feather",
+      "name": "봉황의 깃털",
+      "description": "전투에서 사망 시 1회 부활한다. (체력 50% 회복)",
+      "rarity": 1,
+      "effectType": 10,
+      "effectValue1": 50,
+      "effectValue2": 0,
+      "specialData": "revive"
+    },
+    {
+      "id": "relic_ouyang_manual",
+      "name": "구양신공 서책",
+      "description": "턴 시작 시 내공 2를 추가로 얻는다.",
+      "rarity": 2,
+      "effectType": 1,
+      "effectValue1": 2,
+      "effectValue2": 0,
+      "specialData": ""
+    },
+    {
+      "id": "relic_dragon_scale_sword",
+      "name": "용린검",
+      "description": "적 처치 시 최대 체력의 15%를 회복한다.",
+      "rarity": 2,
+      "effectType": 7,
+      "effectValue1": 15,
+      "effectValue2": 0,
+      "specialData": ""
+    },
+    {
+      "id": "relic_heavenly_demon_ring",
+      "name": "천마환",
+      "description": "턴 시작 시 무작위 카드 1장의 비용이 0이 된다.",
+      "rarity": 2,
+      "effectType": 1,
+      "effectValue1": 1,
+      "effectValue2": 0,
+      "specialData": "cost_zero"
+    },
+    {
+      "id": "relic_xiaoyao_manual",
+      "name": "소요신공 비급",
+      "description": "매 턴 첫 번째 카드의 비용이 0이 된다.",
+      "rarity": 3,
+      "effectType": 1,
+      "effectValue1": 1,
+      "effectValue2": 0,
+      "specialData": "first_free"
+    }
+  ]
+}
