@@ -123,19 +123,19 @@
   - [x] 3.9 패배 조건 체크 구현 (플레이어 체력 <= 0)
   - [x] 3.10 디버그 로그로 전투 흐름 테스트 (UI 없이)
 
-- [ ] 4.0 카드 시스템 구현 (드로우, 사용, 버리기 메커니즘)
-  - [ ] 4.1 `CardTypes.cs` 열거형 생성: Attack, Defense, Skill, Secret
-  - [ ] 4.2 ScriptableObject 또는 일반 클래스를 상속하는 `Card.cs` 클래스 생성
-  - [ ] 4.3 CardData로부터 Card 생성자 구현
-  - [ ] 4.4 리스트를 가진 `DeckManager.cs` 생성: drawPile, hand, discardPile, exhaustPile
-  - [ ] 4.5 DeckManager.InitializeDeck(List<CardData>) 구현 - drawPile 채우고 셔플
-  - [ ] 4.6 DeckManager.DrawCard() 구현 - drawPile에서 hand로 카드 이동, 필요시 버리기 더미 재셔플
-  - [ ] 4.7 패 크기 제한(10)을 가진 DeckManager.DrawCards(int count) 구현
-  - [ ] 4.8 DeckManager.PlayCard(Card card) 구현 - hand에서 제거, 효과 적용, discard에 추가
-  - [ ] 4.9 DeckManager.DiscardHand() 구현 - 모든 hand 카드를 discard로 이동
-  - [ ] 4.10 Fisher-Yates 알고리즘을 사용하여 DeckManager.Shuffle(List<Card>) 구현
-  - [ ] 4.11 메서드를 가진 `CardEffects.cs` 생성: DealDamage(int, Enemy), GainBlock(int, Player), DrawCards(int)
-  - [ ] 4.12 디버그 로그로 카드 드로우 및 사용 테스트
+- [x] 4.0 카드 시스템 구현 (드로우, 사용, 버리기 메커니즘)
+  - [x] 4.1 `CardTypes.cs` 열거형 생성: Attack, Defense, Skill, Secret
+  - [x] 4.2 ScriptableObject 또는 일반 클래스를 상속하는 `Card.cs` 클래스 생성
+  - [x] 4.3 CardData로부터 Card 생성자 구현
+  - [x] 4.4 리스트를 가진 `DeckManager.cs` 생성: drawPile, hand, discardPile, exhaustPile
+  - [x] 4.5 DeckManager.InitializeDeck(List<CardData>) 구현 - drawPile 채우고 셔플
+  - [x] 4.6 DeckManager.DrawCard() 구현 - drawPile에서 hand로 카드 이동, 필요시 버리기 더미 재셔플
+  - [x] 4.7 패 크기 제한(10)을 가진 DeckManager.DrawCards(int count) 구현
+  - [x] 4.8 DeckManager.PlayCard(Card card) 구현 - hand에서 제거, 효과 적용, discard에 추가
+  - [x] 4.9 DeckManager.DiscardHand() 구현 - 모든 hand 카드를 discard로 이동
+  - [x] 4.10 Fisher-Yates 알고리즘을 사용하여 DeckManager.Shuffle(List<Card>) 구현
+  - [x] 4.11 메서드를 가진 `CardEffects.cs` 생성: DealDamage(int, Enemy), GainBlock(int, Player), DrawCards(int)
+  - [x] 4.12 디버그 로그로 카드 드로우 및 사용 테스트
 
 - [ ] 5.0 적 AI 및 의도 시스템 구현
   - [ ] 5.1 `IntentType` 열거형 생성: Attack, Defend, Buff, Debuff, Unknown
