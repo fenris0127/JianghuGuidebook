@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(nul)",
+      "Bash(for dir in Assets/Scripts/Core Assets/Scripts/Data Assets/Scripts/Cards Assets/Scripts/Combat Assets/Scripts/AI Assets/Scripts/UI Assets/Data Assets/Tests/EditMode Assets/Tests/PlayMode)",
+      "Bash(do touch \"$dir/.gitkeep\")",
+      "Bash(done)",
+      "Bash(git add:*)",
+      "Bash(if [ -f nul ])",
+      "Bash(then rm nul)",
+      "Bash(fi)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfeat: Phase 1 프로토타입 초기 설정\n\n- feature/phase1-prototype 브랜치 생성\n- Unity 프로젝트 폴더 구조 설정\n  - Scripts 폴더 구조 (Core, Data, Cards, Combat, AI, UI)\n  - Data 폴더 (JSON 데이터용)\n  - Tests 폴더 (EditMode, PlayMode)\n- README.md 업데이트 (프로젝트 정보 및 구조 문서화)\n- 이전 스크립트 파일 정리\n\nTask 0.0 완료: 기능 브랜치 생성 및 프로젝트 설정\nEOF\n)\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
