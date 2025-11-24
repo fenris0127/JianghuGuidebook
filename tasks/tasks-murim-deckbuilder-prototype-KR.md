@@ -108,20 +108,20 @@
   - [x] 2.8 누락/유효하지 않은 데이터 파일에 대한 에러 처리 추가
   - [x] 2.9 플레이 모드에서 데이터 로딩 테스트
 
-- [ ] 3.0 핵심 전투 시스템 로직 구현
-  - [ ] 3.1 `Player.cs` 생성 (속성: currentHealth, maxHealth, currentEnergy, maxEnergy, block, statusEffects 리스트)
-  - [ ] 3.2 `Enemy.cs` 생성 (속성: currentHealth, maxHealth, currentIntent, statusEffects 리스트)
-  - [ ] 3.3 Player.TakeDamage(int amount) 구현 - 먼저 방어도로 피해 감소
-  - [ ] 3.4 Player.GainBlock(int amount) 구현 - 방어도 추가 (턴 종료 시 0으로 초기화)
-  - [ ] 3.5 Enemy.TakeDamage(int amount) 메서드 구현
-  - [ ] 3.6 가상 Apply() 및 Remove() 메서드를 가진 `StatusEffect.cs` 기본 클래스 생성
-  - [ ] 3.7 CombatManager에 턴 흐름 구현:
-    - [ ] 3.7.1 StartPlayerTurn: 내공을 최대치로 리셋, 방어도를 0으로 리셋, 카드 5장 드로우
-    - [ ] 3.7.2 EndPlayerTurn: 패 버리기, 턴 종료 효과 발동
-    - [ ] 3.7.3 StartEnemyTurn: 적 의도 실행, 다음 의도 준비
-  - [ ] 3.8 승리 조건 체크 구현 (모든 적 격파)
-  - [ ] 3.9 패배 조건 체크 구현 (플레이어 체력 <= 0)
-  - [ ] 3.10 디버그 로그로 전투 흐름 테스트 (UI 없이)
+- [x] 3.0 핵심 전투 시스템 로직 구현
+  - [x] 3.1 `Player.cs` 생성 (속성: currentHealth, maxHealth, currentEnergy, maxEnergy, block, statusEffects 리스트)
+  - [x] 3.2 `Enemy.cs` 생성 (속성: currentHealth, maxHealth, currentIntent, statusEffects 리스트)
+  - [x] 3.3 Player.TakeDamage(int amount) 구현 - 먼저 방어도로 피해 감소
+  - [x] 3.4 Player.GainBlock(int amount) 구현 - 방어도 추가 (턴 종료 시 0으로 초기화)
+  - [x] 3.5 Enemy.TakeDamage(int amount) 메서드 구현
+  - [x] 3.6 가상 Apply() 및 Remove() 메서드를 가진 `StatusEffect.cs` 기본 클래스 생성
+  - [x] 3.7 CombatManager에 턴 흐름 구현:
+    - [x] 3.7.1 StartPlayerTurn: 내공을 최대치로 리셋, 방어도를 0으로 리셋, 카드 5장 드로우
+    - [x] 3.7.2 EndPlayerTurn: 패 버리기, 턴 종료 효과 발동
+    - [x] 3.7.3 StartEnemyTurn: 적 의도 실행, 다음 의도 준비
+  - [x] 3.8 승리 조건 체크 구현 (모든 적 격파)
+  - [x] 3.9 패배 조건 체크 구현 (플레이어 체력 <= 0)
+  - [x] 3.10 디버그 로그로 전투 흐름 테스트 (UI 없이)
 
 - [ ] 4.0 카드 시스템 구현 (드로우, 사용, 버리기 메커니즘)
   - [ ] 4.1 `CardTypes.cs` 열거형 생성: Attack, Defense, Skill, Secret
