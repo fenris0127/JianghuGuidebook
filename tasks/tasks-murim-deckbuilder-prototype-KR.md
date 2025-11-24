@@ -137,15 +137,15 @@
   - [x] 4.11 메서드를 가진 `CardEffects.cs` 생성: DealDamage(int, Enemy), GainBlock(int, Player), DrawCards(int)
   - [x] 4.12 디버그 로그로 카드 드로우 및 사용 테스트
 
-- [ ] 5.0 적 AI 및 의도 시스템 구현
-  - [ ] 5.1 `IntentType` 열거형 생성: Attack, Defend, Buff, Debuff, Unknown
-  - [ ] 5.2 속성을 가진 `Intent` 클래스 생성: type, value (피해/방어도 양)
-  - [ ] 5.3 Enemy.DetermineIntent() 구현 - EnemyData의 가중치 랜덤으로 행동 선택
-  - [ ] 5.4 ExecuteIntent(Enemy enemy, Player player) 메서드를 가진 `EnemyAI.cs` 생성
-  - [ ] 5.5 공격 의도 실행 구현: 플레이어에게 피해
-  - [ ] 5.6 방어 의도 실행 구현: 방어도 획득
-  - [ ] 5.7 의도 미리보기 시스템 추가 - 적 턴 전에 다음 행동 표시
-  - [ ] 5.8 3가지 다른 적 타입으로 적 행동 테스트
+- [x] 5.0 적 AI 및 의도 시스템 구현
+  - [x] 5.1 `IntentType` 열거형 생성: Attack, Defend, Buff, Debuff, Unknown
+  - [x] 5.2 속성을 가진 `Intent` 클래스 생성: type, value (피해/방어도 양)
+  - [x] 5.3 Enemy.DetermineIntent() 구현 - EnemyData의 가중치 랜덤으로 행동 선택
+  - [x] 5.4 ExecuteIntent(Enemy enemy, Player player) 메서드를 가진 `EnemyAI.cs` 생성
+  - [x] 5.5 공격 의도 실행 구현: 플레이어에게 피해
+  - [x] 5.6 방어 의도 실행 구현: 방어도 획득
+  - [x] 5.7 의도 미리보기 시스템 추가 - 적 턴 전에 다음 행동 표시
+  - [x] 5.8 3가지 다른 적 타입으로 적 행동 테스트
 
 - [ ] 6.0 전투 UI 및 시각적 피드백 생성
   - [ ] 6.1 CardPrefab 생성: 카드 이미지 배경, 이름 텍스트, 비용 텍스트, 설명 텍스트, 타입 아이콘
