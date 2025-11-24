@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using JianghuGuidebook.Events;
+using JianghuGuidebook.Combat;
 
 namespace JianghuGuidebook.Data
 {
@@ -34,16 +35,19 @@ namespace JianghuGuidebook.Data
         [SerializeField] private string cardDatabasePath = "CardDatabase";
         [SerializeField] private string enemyDatabasePath = "EnemyDatabase";
         [SerializeField] private string eventDatabasePath = "EventDatabase";
+        [SerializeField] private string bossDatabasePath = "BossDatabase";
 
         // 로드된 데이터
         private Dictionary<string, CardData> cardDictionary;
         private Dictionary<string, EnemyData> enemyDictionary;
         private Dictionary<string, EventData> eventDictionary;
+        private Dictionary<string, BossData> bossDictionary;
 
         // 데이터베이스
         private CardDatabase cardDatabase;
         private EnemyDatabase enemyDatabase;
         private EventDatabase eventDatabase;
+        private BossDatabase bossDatabase;
 
         // 로드 상태
         public bool IsDataLoaded { get; private set; } = false;
@@ -72,8 +76,9 @@ namespace JianghuGuidebook.Data
             bool cardLoadSuccess = LoadCardData();
             bool enemyLoadSuccess = LoadEnemyData();
             bool eventLoadSuccess = LoadEventData();
+            bool bossLoadSuccess = LoadBossData();
 
-            IsDataLoaded = cardLoadSuccess && enemyLoadSuccess && eventLoadSuccess;
+            IsDataLoaded = cardLoadSuccess && enemyLoadSuccess && eventLoadSuccess && bossLoadSuccess;
 
             if (IsDataLoaded)
             {
@@ -277,6 +282,70 @@ namespace JianghuGuidebook.Data
             }
         }
 
+        /// <summary>
+        /// 보스 데이터베이스를 로드합니다
+        /// </summary>
+        private bool LoadBossData()
+        {
+            try
+            {
+                // Resources 폴더에서 JSON 파일 로드
+                TextAsset jsonFile = Resources.Load<TextAsset>(bossDatabasePath);
+
+                if (jsonFile == null)
+                {
+                    Debug.LogError($"보스 데이터 파일을 찾을 수 없습니다: Resources/{bossDatabasePath}");
+                    Debug.LogError("Assets/Resources/BossDatabase.json 파일이 존재하는지 확인하세요");
+                    return false;
+                }
+
+                // JSON 역직렬화
+                bossDatabase = JsonUtility.FromJson<BossDatabase>(jsonFile.text);
+
+                if (bossDatabase == null || bossDatabase.bosses == null)
+                {
+                    Debug.LogError("보스 데이터베이스 역직렬화 실패");
+                    return false;
+                }
+
+                // Dictionary 생성
+                bossDictionary = new Dictionary<string, BossData>();
+
+                int validCount = 0;
+                int invalidCount = 0;
+
+                foreach (var bossData in bossDatabase.bosses)
+                {
+                    if (bossData.IsValid())
+                    {
+                        if (!bossDictionary.ContainsKey(bossData.id))
+                        {
+                            bossDictionary.Add(bossData.id, bossData);
+                            validCount++;
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"중복된 보스 ID: {bossData.id}");
+                            invalidCount++;
+                        }
+                    }
+                    else
+                    {
+                        invalidCount++;
+                    }
+                }
+
+                Debug.Log($"보스 데이터 로드 완료: {validCount}개 성공, {invalidCount}개 실패");
+                return validCount > 0;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"보스 데이터 로드 중 오류 발생: {e.Message}");
+                Debug.LogError($"StackTrace: {e.StackTrace}");
+                return false;
+            }
+        }
+
         // ===== Public API =====
 
         /// <summary>
@@ -415,6 +484,40 @@ namespace JianghuGuidebook.Data
             }
 
             return eventDatabase.events.ToArray();
+        }
+
+        /// <summary>
+        /// ID로 보스 데이터를 가져옵니다
+        /// </summary>
+        public BossData GetBossById(string bossId)
+        {
+            if (bossDictionary == null)
+            {
+                Debug.LogError("보스 데이터가 로드되지 않았습니다");
+                return null;
+            }
+
+            if (bossDictionary.TryGetValue(bossId, out BossData bossData))
+            {
+                return bossData;
+            }
+
+            Debug.LogWarning($"보스를 찾을 수 없습니다: {bossId}");
+            return null;
+        }
+
+        /// <summary>
+        /// 모든 보스 데이터를 가져옵니다
+        /// </summary>
+        public BossData[] GetAllBosses()
+        {
+            if (bossDatabase == null || bossDatabase.bosses == null)
+            {
+                Debug.LogError("보스 데이터가 로드되지 않았습니다");
+                return new BossData[0];
+            }
+
+            return bossDatabase.bosses.ToArray();
         }
     }
 }
