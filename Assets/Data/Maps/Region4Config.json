@@ -1,0 +1,32 @@
+{
+  "id": "region_bukhae",
+  "name": "북해",
+  "regionType": 3,
+  "description": "얼어붙은 설원과 빙궁. 극한의 추위 속에서 빙속성 무공이 지배합니다.",
+  "theme": "설원과 빙궁",
+  "layerCount": 16,
+  "minNodesPerLayer": 3,
+  "maxNodesPerLayer": 5,
+  "bossId": "boss_ice_elder",
+  "difficultyMultiplier": 1.9,
+  "enemyHealthBonus": 60,
+  "enemyDamageBonus": 9,
+  "eventPool": [
+    "event_frozen_lake",
+    "event_ice_palace",
+    "event_blizzard",
+    "event_ice_spirit",
+    "event_frozen_warrior"
+  ],
+  "enemyPool": [
+    "enemy_ice_guardian",
+    "enemy_frost_warrior",
+    "enemy_snow_assassin",
+    "enemy_ice_sorcerer",
+    "enemy_frozen_beast"
+  ],
+  "eliteEnemyPool": [
+    "enemy_elite_ice_knight",
+    "enemy_elite_frost_dragon"
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "id": "region_seoyu",
+  "name": "서역",
+  "regionType": 2,
+  "description": "끝없는 사막과 마교의 본거지. 생명력을 빨아들이는 사악한 기운이 가득합니다.",
+  "theme": "사막과 마교",
+  "layerCount": 15,
+  "minNodesPerLayer": 3,
+  "maxNodesPerLayer": 5,
+  "bossId": "boss_demonic_guardian",
+  "difficultyMultiplier": 1.6,
+  "enemyHealthBonus": 40,
+  "enemyDamageBonus": 6,
+  "eventPool": [
+    "event_desert_oasis",
+    "event_demonic_ritual",
+    "event_sandstorm",
+    "event_ancient_ruins",
+    "event_cult_ambush"
+  ],
+  "enemyPool": [
+    "enemy_demonic_cultist",
+    "enemy_sand_assassin",
+    "enemy_corrupted_monk",
+    "enemy_blood_sorcerer",
+    "enemy_desert_bandit"
+  ],
+  "eliteEnemyPool": [
+    "enemy_elite_demonic_priest",
+    "enemy_elite_sand_demon"
+  ]
+}

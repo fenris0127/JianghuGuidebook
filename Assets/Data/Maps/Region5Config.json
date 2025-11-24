@@ -1,0 +1,32 @@
+{
+  "id": "region_cheonha",
+  "name": "천하",
+  "regionType": 4,
+  "description": "천상의 전각. 강호의 모든 고수가 모이는 최종 결전지입니다.",
+  "theme": "최종 결전",
+  "layerCount": 18,
+  "minNodesPerLayer": 3,
+  "maxNodesPerLayer": 5,
+  "bossId": "boss_supreme_master",
+  "difficultyMultiplier": 2.2,
+  "enemyHealthBonus": 80,
+  "enemyDamageBonus": 12,
+  "eventPool": [
+    "event_heaven_gate",
+    "event_supreme_challenge",
+    "event_ancient_masters",
+    "event_final_trial",
+    "event_destiny_choice"
+  ],
+  "enemyPool": [
+    "enemy_heaven_guard",
+    "enemy_supreme_warrior",
+    "enemy_legendary_swordsman",
+    "enemy_celestial_monk",
+    "enemy_ultimate_martial_artist"
+  ],
+  "eliteEnemyPool": [
+    "enemy_elite_heaven_general",
+    "enemy_elite_supreme_master"
+  ]
+}

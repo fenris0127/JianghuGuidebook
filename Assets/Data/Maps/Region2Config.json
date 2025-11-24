@@ -1,0 +1,32 @@
+{
+  "id": "region_jungwon",
+  "name": "중원",
+  "regionType": 1,
+  "description": "무림맹이 자리한 중원의 심장부. 정파와 사파의 대립이 치열합니다.",
+  "theme": "무림의 중심",
+  "layerCount": 14,
+  "minNodesPerLayer": 3,
+  "maxNodesPerLayer": 5,
+  "bossId": "boss_iron_master",
+  "difficultyMultiplier": 1.3,
+  "enemyHealthBonus": 20,
+  "enemyDamageBonus": 3,
+  "eventPool": [
+    "event_alliance_meeting",
+    "event_sect_conflict",
+    "event_martial_tournament",
+    "event_secret_manual",
+    "event_wandering_master"
+  ],
+  "enemyPool": [
+    "enemy_alliance_guard",
+    "enemy_cult_warrior",
+    "enemy_mercenary",
+    "enemy_rogue_martial_artist",
+    "enemy_wandering_swordsman"
+  ],
+  "eliteEnemyPool": [
+    "enemy_elite_sect_master",
+    "enemy_elite_cult_warrior"
+  ]
+}

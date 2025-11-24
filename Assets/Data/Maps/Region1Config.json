@@ -1,32 +1,35 @@
 {
-  "regionId": "region_1",
-  "regionName": "검림협로",
-  "description": "검객들이 모이는 험난한 협로. 산적과 마도인들이 출몰한다.",
-  "layers": 15,
+  "id": "region_gangnam",
+  "name": "강남",
+  "regionType": 0,
+  "description": "강호 유랑의 시작. 평화로운 강남 지역에서 무림의 기초를 다집니다.",
+  "theme": "강호의 낭만",
+  "layerCount": 12,
   "minNodesPerLayer": 3,
   "maxNodesPerLayer": 5,
   "bossId": "boss_blood_wolf",
-  "bossName": "혈랑도객",
-  "nodeTypeWeights": {
-    "Combat": 50,
-    "EliteCombat": 10,
-    "Shop": 10,
-    "Rest": 10,
-    "Event": 15,
-    "Treasure": 5
-  },
-  "guaranteedNodes": [
-    {
-      "layer": 5,
-      "type": "Shop"
-    },
-    {
-      "layer": 10,
-      "type": "Rest"
-    },
-    {
-      "layer": 8,
-      "type": "Treasure"
-    }
+  "difficultyMultiplier": 1.0,
+  "enemyHealthBonus": 0,
+  "enemyDamageBonus": 0,
+  "eventPool": [
+    "event_old_swordsman",
+    "event_faction_dispute",
+    "event_herb_discovery",
+    "event_mysterious_merchant",
+    "event_training_warrior",
+    "event_cliff_treasure",
+    "event_wounded_traveler",
+    "event_ancient_monument",
+    "event_gambling_den",
+    "event_mysterious_spring"
+  ],
+  "enemyPool": [
+    "enemy_bandit",
+    "enemy_magic_apprentice",
+    "enemy_iron_guard"
+  ],
+  "eliteEnemyPool": [
+    "enemy_elite_bandit",
+    "enemy_elite_guard"
   ]
 }
