@@ -1,0 +1,65 @@
+{
+  "enemies": [
+    {
+      "id": "enemy_bandit",
+      "name": "산적",
+      "maxHealth": 40,
+      "actions": [
+        {
+          "type": 0,
+          "value": 6,
+          "weight": 60
+        },
+        {
+          "type": 1,
+          "value": 8,
+          "weight": 40
+        }
+      ]
+    },
+    {
+      "id": "enemy_dark_cultivator",
+      "name": "마도수련자",
+      "maxHealth": 30,
+      "actions": [
+        {
+          "type": 0,
+          "value": 8,
+          "weight": 50
+        },
+        {
+          "type": 2,
+          "value": 2,
+          "weight": 30
+        },
+        {
+          "type": 0,
+          "value": 4,
+          "weight": 20
+        }
+      ]
+    },
+    {
+      "id": "enemy_armored_guard",
+      "name": "철갑위병",
+      "maxHealth": 50,
+      "actions": [
+        {
+          "type": 0,
+          "value": 5,
+          "weight": 40
+        },
+        {
+          "type": 1,
+          "value": 12,
+          "weight": 40
+        },
+        {
+          "type": 0,
+          "value": 15,
+          "weight": 20
+        }
+      ]
+    }
+  ]
+}

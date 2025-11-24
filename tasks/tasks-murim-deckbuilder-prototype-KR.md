@@ -97,16 +97,16 @@
   - [x] 1.6 CombatManager에 기본 상태 머신 구현 (StartCombat, PlayerTurnStart, PlayerTurnEnd, EnemyTurn, EndCombat)
   - [ ] 1.7 씬 로딩 및 기본 전투 상태 전환 테스트
 
-- [ ] 2.0 카드 및 적 데이터 관리 시스템 구현
-  - [ ] 2.1 `CardData.cs` 클래스 생성 (속성: id, name, cost, type, category, rarity, baseDamage, baseBlock, description)
-  - [ ] 2.2 `EnemyData.cs` 클래스 생성 (속성: id, name, maxHealth, actions (type, value, weight))
-  - [ ] 2.3 20장의 카드를 위한 플레이스홀더 구조로 `CardDatabase.json` 생성
-  - [ ] 2.4 3개의 적 정의로 `EnemyDatabase.json` 생성
-  - [ ] 2.5 Unity의 JsonUtility 또는 Newtonsoft.Json을 사용하여 런타임에 JSON 파일을 로드하는 `DataManager.cs` 생성
-  - [ ] 2.6 CardData 역직렬화 및 유효성 검사 구현
-  - [ ] 2.7 EnemyData 역직렬화 및 유효성 검사 구현
-  - [ ] 2.8 누락/유효하지 않은 데이터 파일에 대한 에러 처리 추가
-  - [ ] 2.9 플레이 모드에서 데이터 로딩 테스트
+- [x] 2.0 카드 및 적 데이터 관리 시스템 구현
+  - [x] 2.1 `CardData.cs` 클래스 생성 (속성: id, name, cost, type, category, rarity, baseDamage, baseBlock, description)
+  - [x] 2.2 `EnemyData.cs` 클래스 생성 (속성: id, name, maxHealth, actions (type, value, weight))
+  - [x] 2.3 20장의 카드를 위한 플레이스홀더 구조로 `CardDatabase.json` 생성
+  - [x] 2.4 3개의 적 정의로 `EnemyDatabase.json` 생성
+  - [x] 2.5 Unity의 JsonUtility 또는 Newtonsoft.Json을 사용하여 런타임에 JSON 파일을 로드하는 `DataManager.cs` 생성
+  - [x] 2.6 CardData 역직렬화 및 유효성 검사 구현
+  - [x] 2.7 EnemyData 역직렬화 및 유효성 검사 구현
+  - [x] 2.8 누락/유효하지 않은 데이터 파일에 대한 에러 처리 추가
+  - [x] 2.9 플레이 모드에서 데이터 로딩 테스트
 
 - [ ] 3.0 핵심 전투 시스템 로직 구현
   - [ ] 3.1 `Player.cs` 생성 (속성: currentHealth, maxHealth, currentEnergy, maxEnergy, block, statusEffects 리스트)

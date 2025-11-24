@@ -9,7 +9,8 @@
       "Bash(if [ -f nul ])",
       "Bash(then rm nul)",
       "Bash(fi)",
-      "Bash(git commit -m \"$(cat <<''EOF''\nfeat: Phase 1 프로토타입 초기 설정\n\n- feature/phase1-prototype 브랜치 생성\n- Unity 프로젝트 폴더 구조 설정\n  - Scripts 폴더 구조 (Core, Data, Cards, Combat, AI, UI)\n  - Data 폴더 (JSON 데이터용)\n  - Tests 폴더 (EditMode, PlayMode)\n- README.md 업데이트 (프로젝트 정보 및 구조 문서화)\n- 이전 스크립트 파일 정리\n\nTask 0.0 완료: 기능 브랜치 생성 및 프로젝트 설정\nEOF\n)\")"
+      "Bash(git commit -m \"$(cat <<''EOF''\nfeat: Phase 1 프로토타입 초기 설정\n\n- feature/phase1-prototype 브랜치 생성\n- Unity 프로젝트 폴더 구조 설정\n  - Scripts 폴더 구조 (Core, Data, Cards, Combat, AI, UI)\n  - Data 폴더 (JSON 데이터용)\n  - Tests 폴더 (EditMode, PlayMode)\n- README.md 업데이트 (프로젝트 정보 및 구조 문서화)\n- 이전 스크립트 파일 정리\n\nTask 0.0 완료: 기능 브랜치 생성 및 프로젝트 설정\nEOF\n)\")",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfeat: 카드 및 적 데이터 관리 시스템 구현\n\n- CardData.cs: 카드 데이터 구조 및 유효성 검증\n  - 20장의 카드 정의 (공격 7장, 방어 7장, 스킬 6장)\n  - CardType 열거형 (Attack, Defense, Skill, Secret)\n  - CardRarity 열거형 (Common, Uncommon, Rare, Epic, Legendary)\n- EnemyData.cs: 적 데이터 구조 및 행동 패턴\n  - 가중치 기반 랜덤 행동 선택 시스템\n  - EnemyActionType 열거형\n- DataManager.cs: JSON 데이터 로딩 및 관리\n  - Resources.Load를 통한 런타임 로딩\n  - 에러 처리 및 유효성 검증\n  - Dictionary 기반 빠른 조회\n- CardDatabase.json: 20장의 완전한 카드 데이터\n- EnemyDatabase.json: 3가지 적 타입 (산적, 마도수련자, 철갑위병)\n\nTask 2.0 완료\nEOF\n)\")"
     ],
     "deny": [],
     "ask": []
