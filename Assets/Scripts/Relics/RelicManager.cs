@@ -115,6 +115,14 @@ namespace JianghuGuidebook.Relics
         }
 
         /// <summary>
+        /// 특정 ID의 유물을 보유하고 있는지 확인합니다
+        /// </summary>
+        public bool HasRelic(string relicId)
+        {
+            return ownedRelics.Any(r => r.id == relicId);
+        }
+
+        /// <summary>
         /// 유물 효과를 등록합니다
         /// </summary>
         private void RegisterRelicEffect(Relic relic)

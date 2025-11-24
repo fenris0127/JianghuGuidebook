@@ -150,6 +150,20 @@ namespace JianghuGuidebook.Combat
         }
 
         /// <summary>
+        /// 최대 체력을 증가시킵니다
+        /// </summary>
+        public void IncreaseMaxHealth(int amount)
+        {
+            if (amount <= 0) return;
+
+            maxHealth += amount;
+            currentHealth += amount; // 현재 체력도 동일하게 증가
+
+            Debug.Log($"플레이어: 최대 체력 {amount} 증가 (현재: {currentHealth}/{maxHealth})");
+            OnHealthChanged?.Invoke(currentHealth, maxHealth);
+        }
+
+        /// <summary>
         /// 내공을 소모합니다
         /// </summary>
         public bool SpendEnergy(int amount)

@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using JianghuGuidebook.Events;
 
 namespace JianghuGuidebook.Data
 {
@@ -32,14 +33,17 @@ namespace JianghuGuidebook.Data
         [Header("데이터 파일 경로")]
         [SerializeField] private string cardDatabasePath = "CardDatabase";
         [SerializeField] private string enemyDatabasePath = "EnemyDatabase";
+        [SerializeField] private string eventDatabasePath = "EventDatabase";
 
         // 로드된 데이터
         private Dictionary<string, CardData> cardDictionary;
         private Dictionary<string, EnemyData> enemyDictionary;
+        private Dictionary<string, EventData> eventDictionary;
 
         // 데이터베이스
         private CardDatabase cardDatabase;
         private EnemyDatabase enemyDatabase;
+        private EventDatabase eventDatabase;
 
         // 로드 상태
         public bool IsDataLoaded { get; private set; } = false;
@@ -67,8 +71,9 @@ namespace JianghuGuidebook.Data
 
             bool cardLoadSuccess = LoadCardData();
             bool enemyLoadSuccess = LoadEnemyData();
+            bool eventLoadSuccess = LoadEventData();
 
-            IsDataLoaded = cardLoadSuccess && enemyLoadSuccess;
+            IsDataLoaded = cardLoadSuccess && enemyLoadSuccess && eventLoadSuccess;
 
             if (IsDataLoaded)
             {
@@ -208,6 +213,70 @@ namespace JianghuGuidebook.Data
             }
         }
 
+        /// <summary>
+        /// 이벤트 데이터베이스를 로드합니다
+        /// </summary>
+        private bool LoadEventData()
+        {
+            try
+            {
+                // Resources 폴더에서 JSON 파일 로드
+                TextAsset jsonFile = Resources.Load<TextAsset>(eventDatabasePath);
+
+                if (jsonFile == null)
+                {
+                    Debug.LogError($"이벤트 데이터 파일을 찾을 수 없습니다: Resources/{eventDatabasePath}");
+                    Debug.LogError("Assets/Resources/EventDatabase.json 파일이 존재하는지 확인하세요");
+                    return false;
+                }
+
+                // JSON 역직렬화
+                eventDatabase = JsonUtility.FromJson<EventDatabase>(jsonFile.text);
+
+                if (eventDatabase == null || eventDatabase.events == null)
+                {
+                    Debug.LogError("이벤트 데이터베이스 역직렬화 실패");
+                    return false;
+                }
+
+                // Dictionary 생성
+                eventDictionary = new Dictionary<string, EventData>();
+
+                int validCount = 0;
+                int invalidCount = 0;
+
+                foreach (var eventData in eventDatabase.events)
+                {
+                    if (eventData.Validate())
+                    {
+                        if (!eventDictionary.ContainsKey(eventData.id))
+                        {
+                            eventDictionary.Add(eventData.id, eventData);
+                            validCount++;
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"중복된 이벤트 ID: {eventData.id}");
+                            invalidCount++;
+                        }
+                    }
+                    else
+                    {
+                        invalidCount++;
+                    }
+                }
+
+                Debug.Log($"이벤트 데이터 로드 완료: {validCount}개 성공, {invalidCount}개 실패");
+                return validCount > 0;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"이벤트 데이터 로드 중 오류 발생: {e.Message}");
+                Debug.LogError($"StackTrace: {e.StackTrace}");
+                return false;
+            }
+        }
+
         // ===== Public API =====
 
         /// <summary>
@@ -312,6 +381,40 @@ namespace JianghuGuidebook.Data
             }
 
             return result.ToArray();
+        }
+
+        /// <summary>
+        /// ID로 이벤트 데이터를 가져옵니다
+        /// </summary>
+        public EventData GetEventById(string eventId)
+        {
+            if (eventDictionary == null)
+            {
+                Debug.LogError("이벤트 데이터가 로드되지 않았습니다");
+                return null;
+            }
+
+            if (eventDictionary.TryGetValue(eventId, out EventData eventData))
+            {
+                return eventData;
+            }
+
+            Debug.LogWarning($"이벤트를 찾을 수 없습니다: {eventId}");
+            return null;
+        }
+
+        /// <summary>
+        /// 모든 이벤트 데이터를 가져옵니다
+        /// </summary>
+        public EventData[] GetAllEvents()
+        {
+            if (eventDatabase == null || eventDatabase.events == null)
+            {
+                Debug.LogError("이벤트 데이터가 로드되지 않았습니다");
+                return new EventData[0];
+            }
+
+            return eventDatabase.events.ToArray();
         }
     }
 }

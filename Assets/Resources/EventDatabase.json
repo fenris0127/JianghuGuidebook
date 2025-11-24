@@ -1,0 +1,476 @@
+{
+  "events": [
+    {
+      "id": "event_old_swordsman",
+      "title": "노검객의 제안",
+      "description": "길가에서 백발의 노검객이 당신을 멈춰 세운다.\n\n\"젊은 협객이여, 내 평생의 무공을 담은 비급을 전수할까 하오. 다만, 은자 한 닢 정도는 받아야겠소이다.\"",
+      "choices": [
+        {
+          "text": "비급을 구매한다 (골드 50 소모)",
+          "resultText": "노검객이 미소를 지으며 비급을 건넨다. \"좋은 선택이오. 이 무공을 잘 익히시오.\"",
+          "requirements": [
+            {
+              "type": 1,
+              "value": 50,
+              "stringValue": ""
+            }
+          ],
+          "outcomes": [
+            {
+              "type": 1,
+              "value": 50,
+              "stringValue": ""
+            },
+            {
+              "type": 2,
+              "value": 0,
+              "stringValue": "card_common_attack_01"
+            }
+          ]
+        },
+        {
+          "text": "정중히 거절한다",
+          "resultText": "노검객은 아쉬운 표정을 지으며 떠나간다. 대신 약간의 은자를 보시한다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 0,
+              "value": 25,
+              "stringValue": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "event_faction_dispute",
+      "title": "강호의 분쟁",
+      "description": "정파 무사와 사파 무인이 격렬하게 대치하고 있다. 양측 모두 당신에게 지원을 요청한다.\n\n정파: \"협객이시라면 사도를 응징하는 것이 도리!\" \n사파: \"정파놈들의 위선을 깨부숴라!\"",
+      "choices": [
+        {
+          "text": "정파를 돕는다 (전투 발생)",
+          "resultText": "사파 무인과의 격렬한 전투 끝에 승리를 거둔다. 정파 무사가 감사의 표시로 유물을 하사한다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 8,
+              "value": 0,
+              "stringValue": "enemy_shadow_cultist"
+            },
+            {
+              "type": 4,
+              "value": 0,
+              "stringValue": "relic_righteous_blade"
+            }
+          ]
+        },
+        {
+          "text": "사파를 돕는다 (전투 발생)",
+          "resultText": "정파 무사를 물리친다. 사파 무인은 전투가 끝난 뒤 은밀히 사라지며 은자 주머니를 남긴다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 8,
+              "value": 0,
+              "stringValue": "enemy_bandit"
+            },
+            {
+              "type": 0,
+              "value": 100,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "중립을 지킨다",
+          "resultText": "양측 모두 불만스러운 표정을 짓지만, 각자의 길로 돌아간다. 싸움을 막아 내공을 보존했다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 5,
+              "value": 10,
+              "stringValue": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "event_herb_discovery",
+      "title": "약초 발견",
+      "description": "길을 걷던 중 귀한 약초를 발견한다. 직접 복용하면 상처가 치유될 것 같고, 팔면 좋은 값을 받을 수 있을 것 같다.",
+      "choices": [
+        {
+          "text": "약초를 복용한다",
+          "resultText": "약초의 효능이 온몸에 퍼진다. 상처가 치유되고 기운이 충만해진다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 5,
+              "value": 20,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "약초를 판다",
+          "resultText": "인근 마을의 약방에서 약초를 좋은 값에 팔았다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 0,
+              "value": 75,
+              "stringValue": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "event_mysterious_merchant",
+      "title": "의문의 상인",
+      "description": "수상한 행색의 상인이 비밀스럽게 다가온다.\n\n\"협객님, 특별한 물건이 있소이다. 골드 75냥만 주시면... 특별한 것을 드리지요. 물론, 무엇이 나올지는 운에 달렸소만.\"",
+      "choices": [
+        {
+          "text": "거래한다 (골드 75, 랜덤 보상)",
+          "resultText": "상인이 신비로운 상자를 건넨다. 안에는...",
+          "requirements": [
+            {
+              "type": 1,
+              "value": 75,
+              "stringValue": ""
+            },
+            {
+              "type": 4,
+              "value": 50,
+              "stringValue": ""
+            }
+          ],
+          "outcomes": [
+            {
+              "type": 1,
+              "value": 75,
+              "stringValue": ""
+            },
+            {
+              "type": 4,
+              "value": 0,
+              "stringValue": "relic_mysterious_box"
+            }
+          ]
+        },
+        {
+          "text": "거래한다 (골드 75, 위험)",
+          "resultText": "상자를 열자 독가스가 뿜어져 나온다! 상인은 이미 사라지고 없다.",
+          "requirements": [
+            {
+              "type": 1,
+              "value": 75,
+              "stringValue": ""
+            },
+            {
+              "type": 4,
+              "value": 50,
+              "stringValue": ""
+            }
+          ],
+          "outcomes": [
+            {
+              "type": 1,
+              "value": 75,
+              "stringValue": ""
+            },
+            {
+              "type": 6,
+              "value": 15,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "거절한다",
+          "resultText": "상인은 아쉬운 듯 사라진다. 현명한 선택이었을지도 모른다.",
+          "requirements": [],
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "event_training_warrior",
+      "title": "수련하는 무사",
+      "description": "나무 그늘 아래서 한 무사가 검술을 수련하고 있다. 당신을 발견한 무사가 밝게 웃으며 말한다.\n\n\"좋은 기회입니다! 제 검술을 시험해보고 싶었습니다. 한 수 겨뤄보시겠습니까?\"",
+      "choices": [
+        {
+          "text": "결투를 받아들인다",
+          "resultText": "치열한 겨루기 끝에 승리한다. 무사는 감탄하며 비급을 선물한다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 8,
+              "value": 0,
+              "stringValue": "enemy_warrior"
+            },
+            {
+              "type": 2,
+              "value": 0,
+              "stringValue": "card_uncommon_skill_01"
+            }
+          ]
+        },
+        {
+          "text": "정중히 거절한다",
+          "resultText": "무사는 아쉬워하지만 이해한다. \"다음에 또 만나면 꼭 겨뤄봅시다!\"",
+          "requirements": [],
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "event_cliff_treasure",
+      "title": "절벽의 보물",
+      "description": "험준한 절벽 아래로 반짝이는 보물상자가 보인다. 내려가면 얻을 수 있겠지만, 위험해 보인다.",
+      "choices": [
+        {
+          "text": "조심스럽게 내려간다 (체력 50% 이상 필요)",
+          "resultText": "신중하게 절벽을 내려가 보물을 획득한다! 귀한 유물이 들어있다.",
+          "requirements": [
+            {
+              "type": 0,
+              "value": 50,
+              "stringValue": ""
+            }
+          ],
+          "outcomes": [
+            {
+              "type": 4,
+              "value": 0,
+              "stringValue": "relic_cliff_treasure"
+            }
+          ]
+        },
+        {
+          "text": "무리해서 내려간다",
+          "resultText": "서둘러 내려가다 발을 헛디뎌 부상을 입었다. 보물은 얻었지만...",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 6,
+              "value": 20,
+              "stringValue": ""
+            },
+            {
+              "type": 0,
+              "value": 100,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "포기한다",
+          "resultText": "위험을 감수할 가치가 없다고 판단하고 발걸음을 돌린다.",
+          "requirements": [],
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "event_wounded_traveler",
+      "title": "부상당한 여행자",
+      "description": "길가에 쓰러진 여행자가 도움을 청한다.\n\n\"제발... 상처를 치료할 약이... 은자 30냥만 빌려주시면 꼭 갚겠습니다...\"",
+      "choices": [
+        {
+          "text": "돈을 준다 (골드 30)",
+          "resultText": "여행자는 감사하며 회복의 비법을 알려준다. \"이 은혜, 평생 잊지 않겠습니다!\"",
+          "requirements": [
+            {
+              "type": 1,
+              "value": 30,
+              "stringValue": ""
+            }
+          ],
+          "outcomes": [
+            {
+              "type": 1,
+              "value": 30,
+              "stringValue": ""
+            },
+            {
+              "type": 9,
+              "value": 5,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "무시하고 지나간다",
+          "resultText": "여행자의 애원하는 목소리가 등 뒤로 들린다. 하지만 강호는 냉혹한 곳이다.",
+          "requirements": [],
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "event_ancient_monument",
+      "title": "고대 비석",
+      "description": "오래된 비석에 무공 심법이 새겨져 있다. 내공이 깊어야만 이해할 수 있을 것 같다.",
+      "choices": [
+        {
+          "text": "비석을 연구한다 (최대 체력 필요)",
+          "resultText": "오랜 시간 비석을 연구한 끝에 고대의 무공을 깨우친다! 강력한 카드를 얻었다.",
+          "requirements": [
+            {
+              "type": 3,
+              "value": 0,
+              "stringValue": ""
+            }
+          ],
+          "outcomes": [
+            {
+              "type": 2,
+              "value": 0,
+              "stringValue": "card_rare_skill_01"
+            }
+          ]
+        },
+        {
+          "text": "무리해서 연구한다",
+          "resultText": "내공이 부족한 상태에서 무리하게 연구하다 기혈이 역류한다. 하지만 약간의 깨달음은 얻었다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 6,
+              "value": 10,
+              "stringValue": ""
+            },
+            {
+              "type": 2,
+              "value": 0,
+              "stringValue": "card_common_skill_01"
+            }
+          ]
+        },
+        {
+          "text": "포기한다",
+          "resultText": "아직 때가 아닌 것 같다. 다음 기회를 기약한다.",
+          "requirements": [],
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "event_gambling_den",
+      "title": "도박장",
+      "description": "시끌벅적한 도박장이 보인다. 주사위 게임이 한창이다.\n\n\"50냥만 걸어보시오! 운이 좋으면 두 배로 돌려드리지!\"",
+      "choices": [
+        {
+          "text": "도박을 한다 (골드 50, 50% 성공)",
+          "resultText": "운이 좋다! 판돈을 두 배로 가져간다.",
+          "requirements": [
+            {
+              "type": 1,
+              "value": 50,
+              "stringValue": ""
+            },
+            {
+              "type": 4,
+              "value": 50,
+              "stringValue": ""
+            }
+          ],
+          "outcomes": [
+            {
+              "type": 0,
+              "value": 50,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "도박을 한다 (골드 50, 실패)",
+          "resultText": "운이 나쁘다. 돈을 모두 잃어버렸다.",
+          "requirements": [
+            {
+              "type": 1,
+              "value": 50,
+              "stringValue": ""
+            }
+          ],
+          "outcomes": [
+            {
+              "type": 1,
+              "value": 50,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "참여하지 않는다",
+          "resultText": "도박은 패가망신의 지름길이다. 발걸음을 돌린다.",
+          "requirements": [],
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "event_mysterious_spring",
+      "title": "신비한 샘",
+      "description": "숲 속 깊은 곳에서 영롱하게 빛나는 샘을 발견한다. 물이 묘한 기운을 발산하고 있다.",
+      "choices": [
+        {
+          "text": "샘물을 마신다 (랜덤 효과)",
+          "resultText": "샘물이 몸속으로 스며든다. 신비한 기운이 느껴진다!",
+          "requirements": [
+            {
+              "type": 4,
+              "value": 33,
+              "stringValue": ""
+            }
+          ],
+          "outcomes": [
+            {
+              "type": 9,
+              "value": 10,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "샘물을 마신다 (치유)",
+          "resultText": "샘물의 효능으로 상처가 치유된다.",
+          "requirements": [
+            {
+              "type": 4,
+              "value": 33,
+              "stringValue": ""
+            }
+          ],
+          "outcomes": [
+            {
+              "type": 5,
+              "value": 30,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "샘물을 마신다 (독)",
+          "resultText": "샘물에 독이 있었다! 몸이 쇠약해진다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 6,
+              "value": 15,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "마시지 않는다",
+          "resultText": "의심스러운 샘물을 마시지 않기로 한다. 신중한 선택이다.",
+          "requirements": [],
+          "outcomes": []
+        }
+      ]
+    }
+  ]
+}
