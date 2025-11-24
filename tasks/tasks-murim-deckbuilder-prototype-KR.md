@@ -80,21 +80,21 @@
 
 ## 작업 목록
 
-- [ ] 0.0 기능 브랜치 생성 및 프로젝트 설정
+- [x] 0.0 기능 브랜치 생성 및 프로젝트 설정
   - [x] 0.1 새 브랜치 `feature/phase1-prototype` 생성 및 체크아웃
   - [x] 0.2 게임 엔진 선택 (Unity 또는 Godot) 및 새 프로젝트 생성
   - [x] 0.3 선택한 엔진에 맞는 .gitignore 설정
   - [x] 0.4 초기 폴더 구조 생성: `Assets/Scripts/`, `Assets/Data/`, `Assets/Prefabs/`, `Assets/Tests/`
   - [x] 0.5 README.md에 엔진 선택 및 설정 지침 문서화
-  - [ ] 0.6 초기 프로젝트 구조 커밋
+  - [x] 0.6 초기 프로젝트 구조 커밋
 
 - [ ] 1.0 Unity/Godot 프로젝트 구조 및 핵심 아키텍처 설정
-  - [ ] 1.1 `Core` 폴더 생성 및 싱글톤 패턴을 가진 `GameManager.cs` 추가
-  - [ ] 1.2 전투 흐름을 처리할 `CombatManager.cs` 생성
-  - [ ] 1.3 `CombatState` 열거형 정의 (PlayerTurn, EnemyTurn, Victory, Defeat)
-  - [ ] 1.4 게임 상수를 가진 `Constants.cs` 생성 (STARTING_ENERGY = 3, STARTING_DRAW = 5, MAX_HAND_SIZE = 10)
+  - [x] 1.1 `Core` 폴더 생성 및 싱글톤 패턴을 가진 `GameManager.cs` 추가
+  - [x] 1.2 전투 흐름을 처리할 `CombatManager.cs` 생성
+  - [x] 1.3 `CombatState` 열거형 정의 (PlayerTurn, EnemyTurn, Victory, Defeat)
+  - [x] 1.4 게임 상수를 가진 `Constants.cs` 생성 (STARTING_ENERGY = 3, STARTING_DRAW = 5, MAX_HAND_SIZE = 10)
   - [ ] 1.5 씬 구조 설정: 메인 테스트 씬으로 "CombatScene" 생성
-  - [ ] 1.6 CombatManager에 기본 상태 머신 구현 (StartCombat, PlayerTurnStart, PlayerTurnEnd, EnemyTurn, EndCombat)
+  - [x] 1.6 CombatManager에 기본 상태 머신 구현 (StartCombat, PlayerTurnStart, PlayerTurnEnd, EnemyTurn, EndCombat)
   - [ ] 1.7 씬 로딩 및 기본 전투 상태 전환 테스트
 
 - [ ] 2.0 카드 및 적 데이터 관리 시스템 구현
