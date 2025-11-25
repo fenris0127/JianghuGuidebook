@@ -14,7 +14,8 @@
       "Bash(git commit -m \"$(cat <<''EOF''\nfeat: 핵심 전투 시스템 로직 구현 완료\n\n- Player.cs: 플레이어 전투 로직\n  - 체력, 내공, 방어도 관리\n  - TakeDamage/GainBlock/Heal 메서드 구현\n  - 방어도 우선 피해 감소 시스템\n  - 턴 시작/종료 처리 (내공 리셋, 방어도 초기화)\n  - 사망 시 CombatManager에 패배 알림\n- Enemy.cs: 적 전투 로직\n  - 체력, 방어도, 의도 관리\n  - ExecuteIntent로 행동 패턴 실행\n  - DetermineIntent로 가중치 기반 행동 선택\n  - 사망 이벤트 처리\n- StatusEffect.cs: 상태 효과 기본 클래스\n  - Apply/Remove 가상 메서드\n  - OnTurnStart/OnTurnEnd 처리\n- CombatManager.cs: 완전한 턴 기반 전투 흐름\n  - Player/Enemy 초기화 및 관리\n  - 턴 순환 (플레이어 턴 -> 적 턴 -> 반복)\n  - ExecuteEnemyActions로 적 행동 실행\n  - 승리/패배 조건 자동 체크\n  - 적 사망 이벤트 구독 및 처리\n\nTask 3.0 완료\nEOF\n)\")",
       "Bash(git commit:*)",
       "Bash(git checkout:*)",
-      "Bash(for dir in Assets/Scripts/Map Assets/Scripts/Relics Assets/Scripts/Shop Assets/Scripts/Events Assets/Scripts/Meta Assets/Scripts/Rest Assets/Scripts/Save Assets/Scripts/Rewards Assets/Scripts/Economy Assets/Data/Maps Assets/Data/Relics Assets/Data/Events Assets/Data/Meta Assets/Data/Bosses)"
+      "Bash(for dir in Assets/Scripts/Map Assets/Scripts/Relics Assets/Scripts/Shop Assets/Scripts/Events Assets/Scripts/Meta Assets/Scripts/Rest Assets/Scripts/Save Assets/Scripts/Rewards Assets/Scripts/Economy Assets/Data/Maps Assets/Data/Relics Assets/Data/Events Assets/Data/Meta Assets/Data/Bosses)",
+      "Bash(for dir in \"Assets/Scripts/Progression\" \"Assets/Scripts/Faction\" \"Assets/Scripts/Achievement\" \"Assets/Scripts/Codex\" \"Assets/Scripts/Difficulty\" \"Assets/Data/Progression\" \"Assets/Data/Factions\" \"Assets/Data/Achievements\" \"Assets/Data/Difficulty\" \"Assets/Data/Bosses\")"
     ],
     "deny": [],
     "ask": []

@@ -19,6 +19,7 @@ namespace JianghuGuidebook.Combat
         // Properties
         public BossPhase CurrentPhase => currentPhase;
         public int TurnCounter => turnCounter;
+        public string DefeatDialogue { get; private set; }
 
         // Events
         public System.Action<BossPhase> OnPhaseChanged;
@@ -44,6 +45,7 @@ namespace JianghuGuidebook.Combat
 
             turnCounter = 0;
             specialAttackInterval = bossData.specialAttackInterval;
+            DefeatDialogue = bossData.defeatDialogue;
 
             Debug.Log($"보스 생성: {bossData.enemyData.name}");
             Debug.Log($"페이즈: {currentPhase}");
@@ -244,11 +246,13 @@ namespace JianghuGuidebook.Combat
         public EnemyData enemyData;             // 기본 적 데이터
         public List<BossPhase> phases;          // 페이즈 리스트
         public int specialAttackInterval;       // 특수 공격 주기 (턴)
+        public string defeatDialogue;           // 처치 시 대사
 
         public BossData()
         {
             phases = new List<BossPhase>();
             specialAttackInterval = 3;
+            defeatDialogue = "크윽... 강하구나...";
         }
 
         public bool IsValid()

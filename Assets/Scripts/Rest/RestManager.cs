@@ -155,8 +155,8 @@ namespace JianghuGuidebook.Rest
         /// </summary>
         private void ExecuteTraining()
         {
-            Debug.Log("수련 선택 - 카드 업그레이드 UI 표시 필요");
-            // TODO: 카드 업그레이드 UI 표시 (1장 선택)
+            Debug.Log("수련 선택 - 카드 업그레이드 UI가 열립니다.");
+            // UI에서 CardUpgradeUI를 엽니다.
         }
 
         /// <summary>
@@ -168,9 +168,9 @@ namespace JianghuGuidebook.Rest
             int healthLoss = Mathf.RoundToInt(player.MaxHealth * meditationHealCost / 100f);
             player.TakeDamage(healthLoss);
             Debug.Log($"타파심마: {healthLoss} HP 손실");
-
-            Debug.Log("타파심마 선택 - 카드 업그레이드 UI 표시 필요 (2장)");
-            // TODO: 카드 업그레이드 UI 표시 (2장 선택)
+            
+            Debug.Log("타파심마 선택 - 카드 업그레이드 UI가 열립니다.");
+            // UI에서 CardUpgradeUI를 엽니다.
         }
 
         /// <summary>

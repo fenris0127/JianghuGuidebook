@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JianghuGuidebook.Combat;
 using JianghuGuidebook.Cards;
+using JianghuGuidebook.UI;
 
 namespace JianghuGuidebook.Relics
 {
@@ -36,13 +37,22 @@ namespace JianghuGuidebook.Relics
         [Header("유물 효과")]
         private Dictionary<string, IRelicEffect> relicEffects = new Dictionary<string, IRelicEffect>();
 
+        [Header("시너지 시스템")]
+        private SynergyManager synergyManager;
+
+        [Header("UI 설정")]
+        [SerializeField] private bool showRewardPopup = true;
+
         // Properties
         public List<Relic> OwnedRelics => ownedRelics;
+        public SynergyManager Synergies => synergyManager;
 
         // Events
         public System.Action<Relic> OnRelicAdded;
         public System.Action<Relic> OnRelicRemoved;
         public System.Action<Relic> OnRelicTriggered;
+        public System.Action<RelicSynergy> OnSynergyActivated;
+        public System.Action<RelicSynergy> OnSynergyDeactivated;
 
         private void Awake()
         {
@@ -54,6 +64,9 @@ namespace JianghuGuidebook.Relics
 
             _instance = this;
             DontDestroyOnLoad(gameObject);
+
+            // 시너지 매니저 초기화
+            synergyManager = new SynergyManager();
         }
 
         /// <summary>
@@ -81,6 +94,15 @@ namespace JianghuGuidebook.Relics
             // 유물 효과 생성 및 등록
             RegisterRelicEffect(relic);
 
+            // 시너지 업데이트
+            UpdateSynergies();
+
+            // 유물 획득 팝업 표시
+            if (showRewardPopup && RelicRewardPopup.Instance != null)
+            {
+                RelicRewardPopup.Instance.ShowRelicReward(relic);
+            }
+
             OnRelicAdded?.Invoke(relic);
         }
 
@@ -94,6 +116,10 @@ namespace JianghuGuidebook.Relics
                 ownedRelics.Remove(relic);
                 relicEffects.Remove(relic.id);
                 Debug.Log($"유물 제거: {relic.name}");
+
+                // 시너지 업데이트
+                UpdateSynergies();
+
                 OnRelicRemoved?.Invoke(relic);
             }
         }
@@ -371,6 +397,96 @@ namespace JianghuGuidebook.Relics
             ownedRelics.Clear();
             relicEffects.Clear();
             Debug.Log("유물 초기화 완료");
+
+            // 시너지도 초기화
+            if (synergyManager != null)
+            {
+                synergyManager.UpdateSynergies(ownedRelics);
+            }
+        }
+
+        // ========== 시너지 시스템 ==========
+
+        /// <summary>
+        /// 시너지를 업데이트합니다
+        /// </summary>
+        private void UpdateSynergies()
+        {
+            if (synergyManager == null)
+            {
+                Debug.LogWarning("SynergyManager가 초기화되지 않았습니다");
+                return;
+            }
+
+            // 이전 활성 시너지 목록 저장
+            var previousActiveSynergies = new List<RelicSynergy>(synergyManager.ActiveSynergies);
+
+            // 시너지 업데이트
+            synergyManager.UpdateSynergies(ownedRelics);
+
+            // 새로 활성화된 시너지 체크
+            foreach (var synergy in synergyManager.ActiveSynergies)
+            {
+                if (!previousActiveSynergies.Any(s => s.synergyId == synergy.synergyId))
+                {
+                    Debug.Log($"[새 시너지 활성화!] {synergy.synergyName}: {synergy.description}");
+                    OnSynergyActivated?.Invoke(synergy);
+                }
+            }
+
+            // 비활성화된 시너지 체크
+            foreach (var synergy in previousActiveSynergies)
+            {
+                if (!synergyManager.ActiveSynergies.Any(s => s.synergyId == synergy.synergyId))
+                {
+                    Debug.Log($"[시너지 비활성화] {synergy.synergyName}");
+                    OnSynergyDeactivated?.Invoke(synergy);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 특정 타입의 시너지 보너스를 가져옵니다
+        /// </summary>
+        public int GetSynergyBonus(SynergyEffectType type)
+        {
+            if (synergyManager == null)
+                return 0;
+
+            return synergyManager.GetSynergyBonus(type);
+        }
+
+        /// <summary>
+        /// 특정 타입의 시너지가 활성화되어 있는지 확인합니다
+        /// </summary>
+        public bool HasActiveSynergy(SynergyEffectType type)
+        {
+            if (synergyManager == null)
+                return false;
+
+            return synergyManager.HasActiveSynergy(type);
+        }
+
+        /// <summary>
+        /// 모든 활성 시너지를 출력합니다
+        /// </summary>
+        public void PrintActiveSynergies()
+        {
+            if (synergyManager != null)
+            {
+                synergyManager.PrintActiveSynergies();
+            }
+        }
+
+        /// <summary>
+        /// 활성 시너지 리스트를 반환합니다
+        /// </summary>
+        public List<RelicSynergy> GetActiveSynergies()
+        {
+            if (synergyManager == null)
+                return new List<RelicSynergy>();
+
+            return synergyManager.ActiveSynergies;
         }
     }
 }

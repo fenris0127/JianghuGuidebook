@@ -1,6 +1,8 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 using System.Linq;
+using JianghuGuidebook.Save;
 
 namespace JianghuGuidebook.Map
 {
@@ -9,6 +11,9 @@ namespace JianghuGuidebook.Map
     /// </summary>
     public class MapManager : MonoBehaviour
     {
+        // 씬 이름 상수
+        private const string MAP_SCENE_NAME = "MapScene";
+
         private static MapManager _instance;
 
         public static MapManager Instance
@@ -33,6 +38,10 @@ namespace JianghuGuidebook.Map
         [SerializeField] private MapNode currentNode;
         [SerializeField] private int currentSeed;
 
+        [Header("자동 저장 설정")]
+        [SerializeField] private bool enableAutoSave = true;
+        [SerializeField] private int autoSaveSlot = 0;
+
         // Properties
         public List<MapNode> AllNodes => allNodes;
         public MapNode CurrentNode => currentNode;
@@ -42,6 +51,7 @@ namespace JianghuGuidebook.Map
         public System.Action<MapNode> OnNodeEntered;
         public System.Action<MapNode> OnNodeCompleted;
         public System.Action<List<MapNode>> OnMapGenerated;
+        public System.Action<MapNode> OnBossNodeReached;  // 보스 노드 도달 시
 
         private void Awake()
         {
@@ -113,13 +123,27 @@ namespace JianghuGuidebook.Map
             // 이벤트 발생
             OnNodeEntered?.Invoke(currentNode);
 
+            // 보스 노드 도달 시 강제 진입
+            if (currentNode.nodeType == NodeType.Boss)
+            {
+                Debug.Log("=== 보스 노드 도달! 자동으로 전투를 시작합니다 ===");
+                OnBossNodeReached?.Invoke(currentNode);
+
+                // 보스 전투 씬 자동 로드
+                LoadNodeScene(currentNode);
+            }
+
+            // 노드 이동 후 자동 저장
+            TriggerAutoSave();
+
             return true;
         }
 
         /// <summary>
         /// 현재 노드를 완료 처리합니다
         /// </summary>
-        public void CompleteCurrentNode()
+        /// <param name="returnToMap">완료 후 맵으로 자동 복귀할지 여부 (기본값: false)</param>
+        public void CompleteCurrentNode(bool returnToMap = false)
         {
             if (currentNode == null)
             {
@@ -136,6 +160,98 @@ namespace JianghuGuidebook.Map
                 Debug.Log("=== 지역 클리어! ===");
                 // TODO: 지역 클리어 처리
             }
+
+            // 노드 완료 후 자동 저장
+            TriggerAutoSave();
+
+            // 맵으로 복귀
+            if (returnToMap)
+            {
+                ReturnToMap();
+            }
+        }
+
+        /// <summary>
+        /// 노드에 진입하고 해당 씬을 로드합니다
+        /// </summary>
+        public void EnterNode(MapNode targetNode)
+        {
+            if (MoveToNode(targetNode))
+            {
+                // 보스 노드는 MoveToNode에서 자동으로 씬을 로드하므로 제외
+                if (targetNode.nodeType != NodeType.Boss)
+                {
+                    LoadNodeScene(targetNode);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 노드 타입에 따라 해당 씬을 로드합니다
+        /// </summary>
+        public void LoadNodeScene(MapNode node)
+        {
+            if (node == null)
+            {
+                Debug.LogError("씬을 로드할 노드가 null입니다");
+                return;
+            }
+
+            string sceneName = GetSceneNameForNodeType(node.nodeType);
+
+            if (string.IsNullOrEmpty(sceneName))
+            {
+                Debug.LogWarning($"노드 타입 {node.nodeType}에 대한 씬이 정의되지 않았습니다");
+                return;
+            }
+
+            Debug.Log($"씬 로드: {sceneName} (노드 타입: {node.nodeType})");
+            SceneManager.LoadScene(sceneName);
+        }
+
+        /// <summary>
+        /// 노드 타입에 따른 씬 이름을 반환합니다
+        /// </summary>
+        private string GetSceneNameForNodeType(NodeType nodeType)
+        {
+            switch (nodeType)
+            {
+                case NodeType.Combat:
+                case NodeType.EliteCombat:
+                    return "CombatScene";
+
+                case NodeType.Shop:
+                    return "ShopScene";
+
+                case NodeType.Rest:
+                    return "RestScene";
+
+                case NodeType.Event:
+                    return "EventScene";
+
+                case NodeType.Boss:
+                    return "BossCombatScene";
+
+                case NodeType.Treasure:
+                    return "TreasureScene";
+
+                case NodeType.Start:
+                    // 시작 노드는 씬 전환이 필요 없음
+                    return null;
+
+                default:
+                    Debug.LogWarning($"알 수 없는 노드 타입: {nodeType}");
+                    return null;
+            }
+        }
+
+        /// <summary>
+        /// 맵 씬으로 복귀합니다
+        /// </summary>
+        public void ReturnToMap()
+        {
+            Debug.Log("맵으로 복귀합니다");
+            SceneManager.LoadScene(MAP_SCENE_NAME);
         }
 
         /// <summary>
@@ -210,6 +326,121 @@ namespace JianghuGuidebook.Map
             currentNode = null;
             currentSeed = 0;
             Debug.Log("맵 리셋 완료");
+        }
+
+        // ========== 자동 저장 관련 메서드 ==========
+
+        /// <summary>
+        /// 현재 맵 상태를 RunData에 업데이트합니다
+        /// </summary>
+        public void UpdateRunDataMapState()
+        {
+            if (SaveManager.Instance == null || SaveManager.Instance.CurrentSaveData == null)
+            {
+                Debug.LogWarning("SaveManager 또는 SaveData가 없어 맵 상태를 저장할 수 없습니다");
+                return;
+            }
+
+            RunData runData = SaveManager.Instance.CurrentSaveData.currentRun;
+
+            if (runData == null)
+            {
+                Debug.LogWarning("현재 진행 중인 런이 없습니다");
+                return;
+            }
+
+            // 맵 진행 상태 업데이트
+            runData.seed = currentSeed;
+
+            if (currentNode != null)
+            {
+                runData.currentLayer = currentNode.layer;
+                runData.currentNodeId = currentNode.id.ToString();
+            }
+
+            // 방문한 노드 ID 리스트 업데이트
+            runData.visitedNodeIds.Clear();
+            foreach (var node in allNodes)
+            {
+                if (node.isVisited)
+                {
+                    runData.visitedNodeIds.Add(node.id.ToString());
+                }
+            }
+
+            Debug.Log($"맵 상태 업데이트: Layer {runData.currentLayer}, 방문한 노드: {runData.visitedNodeIds.Count}개");
+        }
+
+        /// <summary>
+        /// 자동 저장을 실행합니다
+        /// </summary>
+        private void TriggerAutoSave()
+        {
+            if (!enableAutoSave)
+            {
+                Debug.Log("자동 저장이 비활성화되어 있습니다");
+                return;
+            }
+
+            if (SaveManager.Instance == null)
+            {
+                Debug.LogWarning("SaveManager가 없어 자동 저장을 할 수 없습니다");
+                return;
+            }
+
+            // 맵 상태를 RunData에 업데이트
+            UpdateRunDataMapState();
+
+            // 자동 저장 실행
+            SaveManager.Instance.AutoSave(autoSaveSlot);
+        }
+
+        /// <summary>
+        /// RunData로부터 맵 상태를 복원합니다
+        /// </summary>
+        public void RestoreMapStateFromRunData(RunData runData)
+        {
+            if (runData == null)
+            {
+                Debug.LogWarning("복원할 RunData가 없습니다");
+                return;
+            }
+
+            // 맵 생성 (저장된 시드 사용)
+            GenerateNewMap(runData.seed);
+
+            // 방문한 노드 복원
+            if (runData.visitedNodeIds != null)
+            {
+                foreach (string nodeIdStr in runData.visitedNodeIds)
+                {
+                    if (int.TryParse(nodeIdStr, out int nodeId))
+                    {
+                        MapNode node = GetNodeById(nodeId);
+                        if (node != null)
+                        {
+                            node.isVisited = true;
+                        }
+                    }
+                }
+            }
+
+            // 현재 노드 복원
+            if (!string.IsNullOrEmpty(runData.currentNodeId))
+            {
+                if (int.TryParse(runData.currentNodeId, out int currentNodeId))
+                {
+                    MapNode node = GetNodeById(currentNodeId);
+                    if (node != null)
+                    {
+                        currentNode = node;
+                        currentNode.isCurrentNode = true;
+                        UpdateAccessibleNodes();
+                    }
+                }
+            }
+
+            Debug.Log($"맵 상태 복원 완료: Seed {runData.seed}, Layer {runData.currentLayer}");
         }
     }
 }

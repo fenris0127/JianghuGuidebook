@@ -298,13 +298,14 @@ namespace JianghuGuidebook.Rewards
                         return CardRarity.Rare;
 
                 case CombatType.Boss:
-                    // Boss: Uncommon 50%, Rare 40%, Epic 10%
-                    if (roll < 50)
-                        return CardRarity.Uncommon;
-                    else if (roll < 90)
+                    // Boss: Rare 60%, Epic 30%, Legendary 10% (Phase 2 요구사항: 진귀/전설 보장)
+                    // 여기서는 최소 Rare 이상으로 설정
+                    if (roll < 60)
                         return CardRarity.Rare;
-                    else
+                    else if (roll < 90)
                         return CardRarity.Epic;
+                    else
+                        return CardRarity.Legendary;
 
                 default:
                     return CardRarity.Common;
@@ -325,7 +326,7 @@ namespace JianghuGuidebook.Rewards
                     return Random.value < eliteRelicChance;
 
                 case CombatType.Boss:
-                    return Random.value < bossRelicChance;
+                    return true; // 보스 전투는 100% 유물
 
                 default:
                     return false;
@@ -373,10 +374,8 @@ namespace JianghuGuidebook.Rewards
                         return RelicRarity.Rare;
 
                 case CombatType.Boss:
-                    // Boss: Uncommon 30%, Rare 50%, Legendary 20%
-                    if (roll < 30)
-                        return RelicRarity.Uncommon;
-                    else if (roll < 80)
+                    // Boss: Rare 50%, Legendary 50% (Phase 2 요구사항: 진귀/전설 보장)
+                    if (roll < 50)
                         return RelicRarity.Rare;
                     else
                         return RelicRarity.Legendary;
