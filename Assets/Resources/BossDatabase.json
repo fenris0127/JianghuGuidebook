@@ -1,148 +1,100 @@
 {
   "bosses": [
     {
-      "id": "boss_blood_wolf_bandit",
-      "specialAttackInterval": 3,
       "enemyData": {
-        "id": "boss_blood_wolf_bandit_enemy",
-        "name": "혈랑도객",
-        "description": "검림협로의 지배자. 피로 물든 도를 휘두르는 흉악한 산적 두목이다.",
-        "maxHealth": 250,
-        "actions": [
-          {
-            "actionType": 0,
-            "value": 15,
-            "weight": 40
-          },
-          {
-            "actionType": 0,
-            "value": 20,
-            "weight": 30
-          },
-          {
-            "actionType": 1,
-            "value": 12,
-            "weight": 20
-          },
-          {
-            "actionType": 2,
-            "value": 3,
-            "weight": 10
-          }
-        ]
+        "id": "boss_blood_wolf",
+        "name": "혈랑왕",
+        "maxHealth": 150,
+        "intents": []
       },
       "phases": [
         {
           "phaseType": 0,
-          "healthThreshold": 1.0,
-          "phaseName": "도법 구사",
-          "phaseDescription": "혈랑도객이 피로 물든 도를 꺼내든다. \"흐음... 재미있는 놈이로군!\""
-        },
-        {
-          "phaseType": 1,
           "healthThreshold": 0.5,
           "phaseName": "광폭화",
-          "phaseDescription": "혈랑도객의 눈이 붉게 빛난다! \"죽여버리겠다!\" 공격력이 크게 증가한다!"
+          "phaseDescription": "체력이 50% 이하가 되면 공격력이 증가합니다."
         }
-      ]
-    },
-    {
-      "id": "boss_iron_guard_captain",
-      "specialAttackInterval": 4,
-      "enemyData": {
-        "id": "boss_iron_guard_enemy",
-        "name": "철갑위병대장",
-        "description": "철갑으로 무장한 정예 부대의 대장. 강력한 방어력과 조직적인 전투를 자랑한다.",
-        "maxHealth": 200,
-        "actions": [
-          {
-            "actionType": 0,
-            "value": 12,
-            "weight": 35
-          },
-          {
-            "actionType": 1,
-            "value": 15,
-            "weight": 40
-          },
-          {
-            "actionType": 2,
-            "value": 4,
-            "weight": 15
-          },
-          {
-            "actionType": 3,
-            "value": 2,
-            "weight": 10
-          }
-        ]
-      },
-      "phases": [
-        {
-          "phaseType": 0,
-          "healthThreshold": 1.0,
-          "phaseName": "철벽 진형",
-          "phaseDescription": "철갑위병대장이 방패를 들어올린다. \"우리의 철벽을 뚫어보아라!\""
-        },
-        {
-          "phaseType": 1,
-          "healthThreshold": 0.5,
-          "phaseName": "총공세",
-          "phaseDescription": "철갑위병대장이 명령을 내린다! \"전군 돌격!\" 공격 패턴이 공격적으로 변한다!"
-        }
-      ]
-    },
-    {
-      "id": "boss_shadow_cult_master",
+      ],
       "specialAttackInterval": 3,
+      "defeatDialogue": "크윽... 강하구나..."
+    },
+    {
       "enemyData": {
-        "id": "boss_shadow_cult_enemy",
-        "name": "암영교주",
-        "description": "사교의 교주. 사악한 무공과 독을 다루는 강대한 적이다.",
-        "maxHealth": 220,
-        "actions": [
-          {
-            "actionType": 0,
-            "value": 10,
-            "weight": 35
-          },
-          {
-            "actionType": 0,
-            "value": 18,
-            "weight": 25
-          },
-          {
-            "actionType": 3,
-            "value": 3,
-            "weight": 25
-          },
-          {
-            "actionType": 2,
-            "value": 4,
-            "weight": 15
-          }
-        ]
+        "id": "boss_iron_master",
+        "name": "철장문주",
+        "maxHealth": 300,
+        "intents": []
       },
       "phases": [
         {
           "phaseType": 0,
-          "healthThreshold": 1.0,
-          "phaseName": "암영술법",
-          "phaseDescription": "암영교주가 어둠의 기운을 모은다. \"어둠 속에서 죽음을 맛보거라...\""
+          "healthThreshold": 0.5,
+          "phaseName": "철벽 태세",
+          "phaseDescription": "체력이 50% 이하가 되면 방어도가 대폭 증가합니다."
+        }
+      ],
+      "specialAttackInterval": 4,
+      "defeatDialogue": "내 철장이... 깨지다니..."
+    },
+    {
+      "enemyData": {
+        "id": "boss_demonic_guardian",
+        "name": "마교 호법",
+        "maxHealth": 350,
+        "intents": []
+      },
+      "phases": [
+        {
+          "phaseType": 0,
+          "healthThreshold": 0.4,
+          "phaseName": "마기 폭주",
+          "phaseDescription": "체력이 40% 이하가 되면 매 턴 플레이어의 생명력을 흡수합니다."
+        }
+      ],
+      "specialAttackInterval": 3,
+      "defeatDialogue": "마교의... 부활은... 멈출 수 없다..."
+    },
+    {
+      "enemyData": {
+        "id": "boss_ice_elder",
+        "name": "빙궁장로",
+        "maxHealth": 400,
+        "intents": []
+      },
+      "phases": [
+        {
+          "phaseType": 0,
+          "healthThreshold": 0.3,
+          "phaseName": "절대영도",
+          "phaseDescription": "체력이 30% 이하가 되면 모든 공격에 빙결 효과가 추가됩니다."
+        }
+      ],
+      "specialAttackInterval": 5,
+      "defeatDialogue": "차가운... 죽음이여..."
+    },
+    {
+      "enemyData": {
+        "id": "boss_supreme_master",
+        "name": "천하제일인",
+        "maxHealth": 600,
+        "intents": []
+      },
+      "phases": [
+        {
+          "phaseType": 0,
+          "healthThreshold": 0.6,
+          "phaseName": "진심 모드",
+          "phaseDescription": "체력이 60% 이하가 되면 검술과 권법을 혼합하여 사용합니다."
         },
         {
           "phaseType": 1,
-          "healthThreshold": 0.6,
-          "phaseName": "독마혈공",
-          "phaseDescription": "암영교주가 독기를 방출한다! \"모두 독에 물들어라!\" 약화 효과가 증가한다!"
-        },
-        {
-          "phaseType": 2,
           "healthThreshold": 0.3,
-          "phaseName": "최후의 광기",
-          "phaseDescription": "암영교주가 모든 내공을 폭발시킨다! \"함께 죽자!\" 피해량이 극대화된다!"
+          "phaseName": "천인합일",
+          "phaseDescription": "체력이 30% 이하가 되면 비기를 난사합니다."
         }
-      ]
+      ],
+      "specialAttackInterval": 5,
+      "defeatDialogue": "훌륭하다... 자네가 진정한 천하제일이다..."
     }
   ]
 }

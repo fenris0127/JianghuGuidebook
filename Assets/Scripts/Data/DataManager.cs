@@ -38,6 +38,7 @@ namespace JianghuGuidebook.Data
         [SerializeField] private string eventDatabasePath = "EventDatabase";
         [SerializeField] private string bossDatabasePath = "BossDatabase";
         [SerializeField] private string upgradeDatabasePath = "UpgradeDatabase";
+        [SerializeField] private string factionDatabasePath = "FactionDatabase";
 
         // 로드된 데이터
         private Dictionary<string, CardData> cardDictionary;
@@ -45,6 +46,7 @@ namespace JianghuGuidebook.Data
         private Dictionary<string, EventData> eventDictionary;
         private Dictionary<string, BossData> bossDictionary;
         private Dictionary<string, PermanentUpgrade> upgradeDictionary;
+        private Dictionary<string, FactionData> factionDictionary;
 
         // 데이터베이스
         private CardDatabase cardDatabase;
@@ -52,6 +54,7 @@ namespace JianghuGuidebook.Data
         private EventDatabase eventDatabase;
         private BossDatabase bossDatabase;
         private UpgradeDatabase upgradeDatabase;
+        private FactionDatabase factionDatabase;
 
         // 로드 상태
         public bool IsDataLoaded { get; private set; } = false;
@@ -82,8 +85,9 @@ namespace JianghuGuidebook.Data
             bool eventLoadSuccess = LoadEventData();
             bool bossLoadSuccess = LoadBossData();
             bool upgradeLoadSuccess = LoadUpgradeData();
+            bool factionLoadSuccess = LoadFactionData();
 
-            IsDataLoaded = cardLoadSuccess && enemyLoadSuccess && eventLoadSuccess && bossLoadSuccess && upgradeLoadSuccess;
+            IsDataLoaded = cardLoadSuccess && enemyLoadSuccess && eventLoadSuccess && bossLoadSuccess && upgradeLoadSuccess && factionLoadSuccess;
 
             if (IsDataLoaded)
             {
@@ -621,6 +625,91 @@ namespace JianghuGuidebook.Data
             }
 
             return upgradeDatabase.upgrades.ToArray();
+        }
+
+        // ===== 분파 데이터 =====
+
+        /// <summary>
+        /// 분파 데이터베이스를 로드합니다
+        /// </summary>
+        private bool LoadFactionData()
+        {
+            Debug.Log("분파 데이터베이스 로딩 시작...");
+
+            TextAsset jsonFile = Resources.Load<TextAsset>(factionDatabasePath);
+
+            if (jsonFile == null)
+            {
+                Debug.LogError($"분파 데이터베이스 파일을 찾을 수 없습니다: {factionDatabasePath}");
+                return false;
+            }
+
+            try
+            {
+                factionDatabase = JsonUtility.FromJson<FactionDatabase>(jsonFile.text);
+
+                if (factionDatabase == null || factionDatabase.factions == null)
+                {
+                    Debug.LogError("분파 데이터베이스 역직렬화 실패");
+                    return false;
+                }
+
+                // Dictionary 생성
+                factionDictionary = new Dictionary<string, FactionData>();
+
+                foreach (var faction in factionDatabase.factions)
+                {
+                    if (!faction.Validate())
+                    {
+                        Debug.LogWarning($"분파 데이터 검증 실패: {faction.id}");
+                        continue;
+                    }
+
+                    factionDictionary[faction.id] = faction;
+                }
+
+                Debug.Log($"분파 데이터 로드 완료: {factionDictionary.Count}개");
+                return true;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"분파 데이터 로드 중 오류 발생: {e.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// ID로 분파 데이터를 가져옵니다
+        /// </summary>
+        public FactionData GetFactionById(string factionId)
+        {
+            if (factionDictionary == null)
+            {
+                Debug.LogError("분파 데이터가 로드되지 않았습니다");
+                return null;
+            }
+
+            if (factionDictionary.TryGetValue(factionId, out FactionData faction))
+            {
+                return faction;
+            }
+
+            Debug.LogWarning($"분파를 찾을 수 없습니다: {factionId}");
+            return null;
+        }
+
+        /// <summary>
+        /// 모든 분파 데이터를 가져옵니다
+        /// </summary>
+        public FactionData[] GetAllFactions()
+        {
+            if (factionDatabase == null || factionDatabase.factions == null)
+            {
+                Debug.LogError("분파 데이터가 로드되지 않았습니다");
+                return new FactionData[0];
+            }
+
+            return factionDatabase.factions;
         }
     }
 }

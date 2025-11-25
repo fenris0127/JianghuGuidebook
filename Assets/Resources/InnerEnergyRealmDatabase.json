@@ -1,0 +1,54 @@
+{
+    "realms": [
+        {
+            "stage": 0,
+            "name": "후천",
+            "description": "무공의 기초를 닦는 단계",
+            "conditionDescription": "기본 단계",
+            "maxEnergyBonus": 0,
+            "drawBonus": 0,
+            "damageMultiplier": 1.0,
+            "energyRefundChance": 0.0
+        },
+        {
+            "stage": 1,
+            "name": "선천",
+            "description": "내공이 자연스럽게 흐르는 단계",
+            "conditionDescription": "내공 카드 20회 사용",
+            "maxEnergyBonus": 1,
+            "drawBonus": 0,
+            "damageMultiplier": 1.0,
+            "energyRefundChance": 0.0
+        },
+        {
+            "stage": 2,
+            "name": "화경",
+            "description": "내공을 자유자재로 다루는 단계",
+            "conditionDescription": "한 전투에서 내공 50 이상 소모",
+            "maxEnergyBonus": 1,
+            "drawBonus": 1,
+            "damageMultiplier": 1.0,
+            "energyRefundChance": 0.0
+        },
+        {
+            "stage": 3,
+            "name": "종사",
+            "description": "일가를 이루어 존경받는 단계",
+            "conditionDescription": "누적 내공 500 소모",
+            "maxEnergyBonus": 2,
+            "drawBonus": 1,
+            "damageMultiplier": 1.5,
+            "energyRefundChance": 0.0
+        },
+        {
+            "stage": 4,
+            "name": "천인합일",
+            "description": "자연과 하나가 된 신의 경지",
+            "conditionDescription": "내공 비기 10종 사용",
+            "maxEnergyBonus": 3,
+            "drawBonus": 2,
+            "damageMultiplier": 2.0,
+            "energyRefundChance": 0.5
+        }
+    ]
+}

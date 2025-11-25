@@ -211,10 +211,19 @@ namespace JianghuGuidebook.Rest
         /// <summary>
         /// 휴식 노드를 나갑니다
         /// </summary>
-        public void ExitRest()
+        public void ReturnToMap()
         {
-            Debug.Log("휴식 노드 퇴장");
-            // TODO: 맵으로 복귀
+            Debug.Log("맵으로 복귀");
+            
+            // 맵 매니저를 통해 맵 씬으로 이동
+            if (Map.MapManager.Instance != null)
+            {
+                Map.MapManager.Instance.ReturnToMap();
+            }
+            else
+            {
+                UnityEngine.SceneManagement.SceneManager.LoadScene("MapScene");
+            }
         }
 
         /// <summary>

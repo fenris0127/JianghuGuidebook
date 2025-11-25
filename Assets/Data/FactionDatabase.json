@@ -1,0 +1,29 @@
+{
+  "factions": [
+    {
+      "id": "faction_huashan",
+      "name": "화산파",
+      "description": "화산의 정기를 받아 검술에 능한 정파 문파입니다. 빠르고 정확한 검법으로 적을 제압합니다.",
+      "specialty": "검술",
+      "startingHealth": 70,
+      "startingGold": 100,
+      "startingMaxEnergy": 3,
+      "startingDeck": [
+        "card_strike",
+        "card_strike",
+        "card_strike",
+        "card_strike",
+        "card_strike",
+        "card_iron_guard",
+        "card_iron_guard",
+        "card_iron_guard",
+        "card_iron_guard",
+        "card_qi_circulation",
+        "card_clear_mind"
+      ],
+      "startingRelics": [],
+      "iconPath": "Sprites/Factions/Huashan",
+      "backgroundPath": "Sprites/Backgrounds/Huashan"
+    }
+  ]
+}

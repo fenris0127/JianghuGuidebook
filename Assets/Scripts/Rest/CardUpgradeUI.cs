@@ -55,24 +55,6 @@ namespace JianghuGuidebook.Rest
         {
             foreach (Transform child in cardContainer)
             {
-                Destroy(child.gameObject);
-            }
-
-            // 덱 가져오기
-            if (DeckManager.Instance != null)
-            {
-                // TODO: DeckManager에서 전체 덱 가져오기
-                // List<Card> deck = DeckManager.Instance.GetAllCards();
-                // 임시 코드
-                List<Card> deck = new List<Card>(); 
-
-                foreach (Card card in deck)
-                {
-                    // 이미 업그레이드된 카드는 제외할 수도 있음 (기획에 따라 다름)
-                    // 여기서는 모든 카드 표시
-
-                    GameObject cardObj = Instantiate(cardPrefab, cardContainer);
-                    
                     // CardUI 초기화
                     // CardUI cardUI = cardObj.GetComponent<CardUI>();
                     // cardUI.Initialize(card);
@@ -82,24 +64,6 @@ namespace JianghuGuidebook.Rest
                     if (btn == null) btn = cardObj.AddComponent<Button>();
                     
                     btn.onClick.AddListener(() => ToggleCardSelection(card, cardObj));
-                }
-            }
-        }
-
-        private void ToggleCardSelection(Card card, GameObject cardObj)
-        {
-            if (selectedCards.Contains(card))
-            {
-                selectedCards.Remove(card);
-                // 선택 해제 시각 효과 (예: 테두리 제거)
-            }
-            else
-            {
-                if (selectedCards.Count < requiredSelectionCount)
-                {
-                    selectedCards.Add(card);
-                    // 선택 시각 효과 (예: 테두리 강조)
-                }
             }
 
             UpdateUIState();

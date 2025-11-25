@@ -89,6 +89,28 @@ namespace JianghuGuidebook.Map
                 regionOrder = regionOrder.OrderBy(r => r.regionType).ToList();
             }
 
+            // Fallback: Resources 폴더에서 로드
+            if (regionOrder.Count == 0)
+            {
+                Debug.Log("Inspector에 할당된 지역 파일이 없습니다. Resources 폴더에서 로드 시도...");
+                TextAsset[] resources = Resources.LoadAll<TextAsset>("Data/Maps");
+                
+                if (resources != null && resources.Length > 0)
+                {
+                    foreach (var configFile in resources)
+                    {
+                        Region region = JsonUtility.FromJson<Region>(configFile.text);
+                        if (region != null && region.Validate())
+                        {
+                            regionDatabase[region.id] = region;
+                            regionOrder.Add(region);
+                            Debug.Log($"Resources에서 지역 로드 완료: {region}");
+                        }
+                    }
+                    regionOrder = regionOrder.OrderBy(r => r.regionType).ToList();
+                }
+            }
+
             if (regionOrder.Count == 0)
             {
                 Debug.LogWarning("로드된 지역 데이터가 없습니다. 기본 지역 생성");
@@ -216,6 +238,12 @@ namespace JianghuGuidebook.Map
 
             OnRegionTransition?.Invoke(previousRegion, nextRegion);
             EnterRegion(nextRegion);
+
+            // 새 지역 맵 생성
+            if (MapManager.Instance != null)
+            {
+                MapManager.Instance.GenerateNewMap();
+            }
         }
 
         /// <summary>

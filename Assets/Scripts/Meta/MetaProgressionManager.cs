@@ -154,6 +154,14 @@ namespace JianghuGuidebook.Meta
         }
 
         /// <summary>
+        /// 모든 해금된 업그레이드 목록을 반환합니다
+        /// </summary>
+        public List<PermanentUpgrade> GetUnlockedUpgrades()
+        {
+            return new List<PermanentUpgrade>(unlockedUpgrades);
+        }
+
+        /// <summary>
         /// 게임 시작 시 해금된 업그레이드를 플레이어에 적용합니다
         /// </summary>
         public void ApplyUpgradesToPlayer(Player player)
@@ -181,38 +189,58 @@ namespace JianghuGuidebook.Meta
                     break;
 
                 case UpgradeType.IncreaseStartingGold:
-                    // TODO: 시작 골드 증가 (GameManager에서 처리)
-                    Debug.Log($"업그레이드 적용: 시작 골드 +{upgrade.value * upgrade.timesPurchased}");
+                    // 시작 골드 증가
+                    if (Economy.GoldManager.Instance != null)
+                    {
+                        int goldAmount = upgrade.value * upgrade.timesPurchased;
+                        Economy.GoldManager.Instance.AddGold(goldAmount);
+                        Debug.Log($"업그레이드 적용: 시작 골드 +{goldAmount}");
+                    }
                     break;
 
                 case UpgradeType.UnlockStartingCard:
-                    // TODO: 시작 카드 해금 (DeckManager에서 처리)
-                    Debug.Log($"업그레이드 적용: 시작 카드 해금 ({upgrade.stringValue})");
+                    // 시작 카드 해금 (DeckManager에 추가)
+                    if (DeckManager.Instance != null && !string.IsNullOrEmpty(upgrade.stringValue))
+                    {
+                        // DataManager에서 카드 데이터 가져오기
+                        var cardData = DataManager.Instance.GetCardById(upgrade.stringValue);
+                        if (cardData != null)
+                        {
+                            DeckManager.Instance.AddCardToDeck(cardData);
+                            Debug.Log($"업그레이드 적용: 시작 카드 추가 ({cardData.name})");
+                        }
+                    }
                     break;
 
                 case UpgradeType.IncreaseMaxEnergy:
-                    // TODO: 최대 내공 증가 (Player에서 처리)
-                    Debug.Log($"업그레이드 적용: 최대 내공 +{upgrade.value}");
+                    // 최대 내공 증가
+                    player.IncreaseMaxEnergy(upgrade.value * upgrade.timesPurchased);
+                    Debug.Log($"업그레이드 적용: 최대 내공 +{upgrade.value * upgrade.timesPurchased}");
                     break;
 
                 case UpgradeType.StartWithRelic:
-                    // TODO: 시작 유물 (RelicManager에서 처리)
-                    Debug.Log($"업그레이드 적용: 시작 유물 ({upgrade.stringValue})");
+                    // 시작 유물 (RelicManager에서 처리)
+                    if (Relics.RelicManager.Instance != null && !string.IsNullOrEmpty(upgrade.stringValue))
+                    {
+                        Relics.RelicManager.Instance.AddRelic(upgrade.stringValue);
+                        Debug.Log($"업그레이드 적용: 시작 유물 ({upgrade.stringValue})");
+                    }
                     break;
 
                 case UpgradeType.IncreaseCardRewards:
-                    // TODO: 카드 보상 개수 증가 (RewardManager에서 처리)
-                    Debug.Log($"업그레이드 적용: 카드 보상 +{upgrade.value}");
+                    // 카드 보상 개수 증가 (RewardManager에서 처리)
+                    // RewardManager는 런타임에 값을 참조하도록 수정 필요
+                    Debug.Log($"업그레이드 적용: 카드 보상 +{upgrade.value} (RewardManager에서 참조)");
                     break;
 
                 case UpgradeType.IncreaseGoldRewards:
-                    // TODO: 골드 보상 증가 (GoldManager에서 처리)
-                    Debug.Log($"업그레이드 적용: 골드 보상 +{upgrade.value}%");
+                    // 골드 보상 증가 (GoldManager에서 처리)
+                    Debug.Log($"업그레이드 적용: 골드 보상 +{upgrade.value}% (GoldManager에서 참조)");
                     break;
 
                 case UpgradeType.ReduceShopPrices:
-                    // TODO: 상점 가격 할인 (ShopManager에서 처리)
-                    Debug.Log($"업그레이드 적용: 상점 가격 -{upgrade.value}%");
+                    // 상점 가격 할인 (ShopManager에서 처리)
+                    Debug.Log($"업그레이드 적용: 상점 가격 -{upgrade.value}% (ShopManager에서 참조)");
                     break;
             }
         }

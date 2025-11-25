@@ -291,10 +291,20 @@ namespace JianghuGuidebook.Shop
         /// <summary>
         /// 상점을 나갑니다
         /// </summary>
-        public void ExitShop()
+        public void ReturnToMap()
         {
-            Debug.Log("상점 퇴장");
-            // TODO: 맵으로 복귀
+            Debug.Log("맵으로 복귀");
+            
+            // 맵 매니저를 통해 맵 씬으로 이동
+            if (Map.MapManager.Instance != null)
+            {
+                Map.MapManager.Instance.ReturnToMap();
+            }
+            else
+            {
+                // 맵 매니저가 없으면 직접 씬 로드 (비상용)
+                UnityEngine.SceneManagement.SceneManager.LoadScene("MapScene");
+            }
         }
 
         /// <summary>

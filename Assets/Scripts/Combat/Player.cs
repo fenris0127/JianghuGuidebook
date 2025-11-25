@@ -50,7 +50,17 @@ namespace JianghuGuidebook.Combat
         {
             maxHealth = Constants.PLAYER_MAX_HEALTH;
             currentHealth = maxHealth;
-            maxEnergy = Constants.MAX_ENERGY;
+            
+            // 경지 보너스 적용
+            if (Progression.RealmManager.Instance != null)
+            {
+                Progression.RealmManager.Instance.ApplyRealmBonuses(this);
+            }
+            else
+            {
+                maxEnergy = Constants.MAX_ENERGY;
+            }
+
             currentEnergy = maxEnergy;
             block = 0;
             statusEffects.Clear();
@@ -183,6 +193,14 @@ namespace JianghuGuidebook.Combat
             currentEnergy -= amount;
             Debug.Log($"플레이어: 내공 {amount} 소모 (현재 내공: {currentEnergy}/{maxEnergy})");
             OnEnergyChanged?.Invoke(currentEnergy, maxEnergy);
+
+            // 경지 진행도 업데이트
+            if (Progression.RealmManager.Instance != null)
+            {
+                Progression.RealmManager.Instance.UpdateProgress(Progression.RealmConditionType.SpendEnergyInBattle, amount);
+                Progression.RealmManager.Instance.UpdateProgress(Progression.RealmConditionType.TotalEnergySpent, amount);
+            }
+
             return true;
         }
 
@@ -249,6 +267,34 @@ namespace JianghuGuidebook.Combat
             {
                 CombatManager.Instance.Defeat();
             }
+        }
+
+        [Header("내공 경지 보너스")]
+        [SerializeField] private int realmMaxEnergyBonus = 0;
+        [SerializeField] private int realmDrawBonus = 0;
+        [SerializeField] private float realmDamageMultiplier = 1.0f;
+        [SerializeField] private float realmEnergyRefundChance = 0.0f;
+
+        public int RealmDrawBonus => realmDrawBonus;
+        public float RealmDamageMultiplier => realmDamageMultiplier;
+
+        /// <summary>
+        /// 경지 보너스를 설정합니다
+        /// </summary>
+        public void SetRealmBonuses(Progression.InnerEnergyRealm realmData)
+        {
+            if (realmData == null) return;
+
+            realmMaxEnergyBonus = realmData.maxEnergyBonus;
+            realmDrawBonus = realmData.drawBonus;
+            realmDamageMultiplier = realmData.damageMultiplier;
+            realmEnergyRefundChance = realmData.energyRefundChance;
+
+            // 최대 내공 업데이트
+            maxEnergy = Constants.MAX_ENERGY + realmMaxEnergyBonus;
+            OnEnergyChanged?.Invoke(currentEnergy, maxEnergy);
+
+            Debug.Log($"플레이어 경지 보너스 적용: 최대내공+{realmMaxEnergyBonus}, 드로우+{realmDrawBonus}, 피해배율{realmDamageMultiplier}x");
         }
 
         /// <summary>

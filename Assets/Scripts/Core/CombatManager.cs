@@ -123,6 +123,50 @@ namespace JianghuGuidebook.Core
         }
 
         /// <summary>
+        /// 전투 중에 적을 소환합니다
+        /// </summary>
+        public void SpawnEnemy(string enemyId)
+        {
+            GameObject enemyObj = new GameObject($"Enemy_{enemyId}");
+            Enemy enemy = enemyObj.AddComponent<Enemy>();
+            enemy.Initialize(enemyId);
+            enemies.Add(enemy);
+
+            // 적 사망 이벤트 구독
+            enemy.OnDeath += () => OnEnemyDeath(enemy);
+
+            Debug.Log($"적 소환: {enemyId}");
+        }
+
+        /// <summary>
+        /// 카드를 사용합니다
+        /// </summary>
+        public void PlayCard(Cards.Card card, Enemy target)
+        {
+            if (card == null) return;
+
+            Debug.Log($"카드 사용: {card.Name}");
+
+            // 무기술 경지 경험치 획득
+            if (Progression.WeaponMasteryManager.Instance != null)
+            {
+                Progression.WeaponMasteryManager.Instance.AddMasteryXP(card.Data.weaponType, 1);
+            }
+
+            // 내공 경지 진행도 업데이트 (내공 소모 시)
+            if (card.Cost > 0 && Progression.RealmManager.Instance != null)
+            {
+                Progression.RealmManager.Instance.UpdateProgress(Progression.RealmConditionType.UseEnergyCard, 1);
+            }
+
+            // TODO: 실제 카드 효과 적용 (CardEffectManager 등을 통해)
+        }
+
+        /// <summary>
+        /// 플레이어 턴을 시작합니다
+        /// </summary>
+
+        /// <summary>
         /// 플레이어 턴을 시작합니다
         /// </summary>
         public void StartPlayerTurn()

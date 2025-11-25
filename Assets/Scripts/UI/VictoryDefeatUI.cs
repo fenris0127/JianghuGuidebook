@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+using JianghuGuidebook.Core;
+using JianghuGuidebook.Save;
 
 namespace JianghuGuidebook.UI
 {
@@ -17,12 +19,14 @@ namespace JianghuGuidebook.UI
         [Header("Victory UI")]
         [SerializeField] private TextMeshProUGUI victoryTitleText;
         [SerializeField] private TextMeshProUGUI victoryMessageText;
+        [SerializeField] private TextMeshProUGUI victoryEssenceText;
         [SerializeField] private Button continueButton;
         [SerializeField] private Button victoryRetryButton;
 
         [Header("Defeat UI")]
         [SerializeField] private TextMeshProUGUI defeatTitleText;
         [SerializeField] private TextMeshProUGUI defeatMessageText;
+        [SerializeField] private TextMeshProUGUI defeatEssenceText;
         [SerializeField] private Button retryButton;
         [SerializeField] private Button mainMenuButton;
 
@@ -138,6 +142,15 @@ namespace JianghuGuidebook.UI
             // 지연
             yield return new WaitForSeconds(delayBeforeShow);
 
+            // GameManager를 통해 런 완료 처리 (무공 정수 지급)
+            int essenceEarned = 0;
+            if (GameManager.Instance != null)
+            {
+                essenceEarned = GameManager.Instance.GetEstimatedEssence(true); // 승리 보너스 포함
+                // 실제로 런 완료 처리는 보상 수령 후에 하는 것이 맞지만,
+                // 여기서는 예상 정수만 계산
+            }
+
             // 승리 사운드 재생
             if (victorySound != null && audioSource != null)
             {
@@ -162,6 +175,12 @@ namespace JianghuGuidebook.UI
                         $"가한 피해: {damageDealt}";
                 }
 
+                // 무공 정수 표시
+                if (victoryEssenceText != null)
+                {
+                    victoryEssenceText.text = $"<color=#FFD700>예상 무공 정수: {essenceEarned}</color>";
+                }
+
                 // 페이드 인 애니메이션
                 yield return StartCoroutine(FadeIn(victoryCanvasGroup));
             }
@@ -179,6 +198,14 @@ namespace JianghuGuidebook.UI
         {
             // 지연
             yield return new WaitForSeconds(delayBeforeShow);
+
+            // GameManager를 통해 런 완료 처리 (무공 정수 지급)
+            int essenceEarned = 0;
+            if (GameManager.Instance != null)
+            {
+                essenceEarned = GameManager.Instance.GetEstimatedEssence(false); // 패배 (승리 보너스 없음)
+                GameManager.Instance.CompleteRun(false); // 패배 처리
+            }
 
             // 패배 사운드 재생
             if (defeatSound != null && audioSource != null)
@@ -202,6 +229,13 @@ namespace JianghuGuidebook.UI
                     defeatMessageText.text = $"전투에서 패배했습니다.\n" +
                         $"생존한 턴: {turnsSurvived}\n\n" +
                         $"다시 도전해보세요!";
+                }
+
+                // 무공 정수 표시
+                if (defeatEssenceText != null)
+                {
+                    defeatEssenceText.text = $"<b>획득 무공 정수</b>\n" +
+                                            $"<color=#FFA500>{essenceEarned}</color> 정수";
                 }
 
                 // 페이드 인 애니메이션
@@ -278,10 +312,19 @@ namespace JianghuGuidebook.UI
         /// </summary>
         private void OnMainMenuClicked()
         {
-            Debug.Log("Main menu button clicked - Loading main menu");
+            Debug.Log("Main menu button clicked - Returning to main menu");
 
-            // 메인 메뉴 씬 로드 (씬 이름은 프로젝트에 맞게 수정)
-            SceneManager.LoadScene("MainMenu");
+            // GameManager를 통해 메인 메뉴로 복귀
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.ReturnToMainMenu();
+            }
+            else
+            {
+                // GameManager가 없으면 직접 씬 로드
+                Debug.LogWarning("GameManager가 없습니다. 직접 MainMenuScene 로드");
+                SceneManager.LoadScene("MainMenuScene");
+            }
         }
 
         /// <summary>

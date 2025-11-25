@@ -131,16 +131,98 @@ namespace JianghuGuidebook.Combat
         }
 
         /// <summary>
-        /// 특수 공격 발동
+        /// 특수 공격 실행
         /// </summary>
         private void TriggerSpecialAttack()
         {
-            Debug.Log($"=== 보스 특수 공격 발동! (턴 {turnCounter}) ===");
-
+            Debug.Log($"보스 특수 공격 발동! (ID: {EnemyData.id})");
             OnSpecialAttackTriggered?.Invoke();
 
-            // TODO: 특수 공격 로직 구현
-            // 현재는 기본 공격보다 강력한 공격 의도로 설정
+            // 보스별 특수 패턴 구현
+            switch (EnemyData.id)
+            {
+                case "boss_blood_wolf": // 1지역 보스
+                    ApplyBuffToSelf("buff_enrage"); // 분노: 공격력 증가
+                    break;
+
+                case "boss_iron_master": // 2지역 보스: 철장문주
+                    if (turnCounter % 6 == 0) // 6턴마다 소환
+                    {
+                        SummonMinion("minion_iron_disciple");
+                        SummonMinion("minion_iron_disciple");
+                    }
+                    else
+                    {
+                        ApplyBuffToSelf("buff_counter"); // 반격 태세
+                    }
+                    break;
+
+                case "boss_demonic_guardian": // 3지역 보스: 마교 호법
+                    // 생명력 흡수 (플레이어에게 피해를 주고 회복)
+                    // TODO: 실제 흡혈 로직은 Intent 시스템에서 처리하거나 여기서 직접 구현
+                    Heal(20);
+                    ApplyDebuffToPlayer("debuff_weak"); // 약화
+                    break;
+
+                case "boss_ice_elder": // 4지역 보스: 빙궁장로
+                    if (turnCounter % 5 == 0)
+                    {
+                        ApplyBuffToSelf("buff_ice_wall"); // 빙벽: 방어도 대량 획득
+                    }
+                    else
+                    {
+                        ApplyDebuffToPlayer("debuff_freeze"); // 빙결
+                    }
+                    break;
+
+                case "boss_supreme_master": // 5지역 보스: 천하제일인
+                    // 페이즈에 따른 패턴 변화
+                    if (currentPhase.phaseType == BossPhaseType.Phase3)
+                    {
+                        // 필살기: 천하무적
+                        ApplyBuffToSelf("buff_invincible");
+                    }
+                    else
+                    {
+                        // 일반 필살기
+                        ApplyDebuffToPlayer("debuff_vulnerable");
+                    }
+                    break;
+
+                default:
+                    Debug.LogWarning($"알 수 없는 보스 ID: {EnemyData.id}");
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// 하수인 소환
+        /// </summary>
+        private void SummonMinion(string enemyId)
+        {
+            if (Core.CombatManager.Instance != null)
+            {
+                Core.CombatManager.Instance.SpawnEnemy(enemyId);
+                Debug.Log($"보스가 하수인 소환: {enemyId}");
+            }
+        }
+
+        /// <summary>
+        /// 자신에게 버프 적용
+        /// </summary>
+        private void ApplyBuffToSelf(string buffId)
+        {
+            // TODO: StatusEffectManager를 통해 버프 적용
+            Debug.Log($"보스 버프 적용: {buffId}");
+        }
+
+        /// <summary>
+        /// 플레이어에게 디버프 적용
+        /// </summary>
+        private void ApplyDebuffToPlayer(string debuffId)
+        {
+            // TODO: StatusEffectManager를 통해 디버프 적용
+            Debug.Log($"플레이어에게 디버프 적용: {debuffId}");
         }
 
         /// <summary>

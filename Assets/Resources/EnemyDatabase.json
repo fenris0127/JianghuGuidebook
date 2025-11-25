@@ -3,7 +3,7 @@
     {
       "id": "enemy_bandit",
       "name": "산적",
-      "maxHealth": 40,
+      "maxHealth": 45,
       "actions": [
         {
           "type": 0,
@@ -42,7 +42,7 @@
     {
       "id": "enemy_armored_guard",
       "name": "철갑위병",
-      "maxHealth": 50,
+      "maxHealth": 60,
       "actions": [
         {
           "type": 0,
@@ -58,6 +58,57 @@
           "type": 0,
           "value": 15,
           "weight": 20
+        }
+      ]
+    },
+    {
+      "id": "minion_iron_disciple",
+      "name": "철장 제자",
+      "maxHealth": 20,
+      "actions": [
+        {
+          "type": 0,
+          "value": 5,
+          "weight": 70
+        },
+        {
+          "type": 1,
+          "value": 5,
+          "weight": 30
+        }
+      ]
+    },
+    {
+      "id": "minion_demonic_shade",
+      "name": "마교 그림자",
+      "maxHealth": 15,
+      "actions": [
+        {
+          "type": 0,
+          "value": 4,
+          "weight": 50
+        },
+        {
+          "type": 2,
+          "value": 1,
+          "weight": 50
+        }
+      ]
+    },
+    {
+      "id": "minion_ice_spirit",
+      "name": "빙정",
+      "maxHealth": 10,
+      "actions": [
+        {
+          "type": 0,
+          "value": 3,
+          "weight": 50
+        },
+        {
+          "type": 2,
+          "value": 1,
+          "weight": 50
         }
       ]
     }

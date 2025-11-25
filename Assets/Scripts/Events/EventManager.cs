@@ -5,6 +5,7 @@ using JianghuGuidebook.Data;
 using JianghuGuidebook.Combat;
 using JianghuGuidebook.Relics;
 using JianghuGuidebook.Economy;
+using JianghuGuidebook.Save;
 
 namespace JianghuGuidebook.Events
 {
@@ -40,6 +41,11 @@ namespace JianghuGuidebook.Events
         public System.Action<EventChoice> OnChoiceSelected;
         public System.Action<List<EventOutcome>> OnOutcomesApplied;
         public System.Action OnEventCompleted;
+
+        // 특수 결과 이벤트 (UI가 처리해야 함)
+        public System.Action<int> OnCardRemovalRequested;      // 제거할 카드 수
+        public System.Action<int> OnCardUpgradeRequested;      // 업그레이드할 카드 수
+        public System.Action<string> OnCombatRequested;        // 전투할 적 ID
 
         private void Awake()
         {
@@ -222,55 +228,180 @@ namespace JianghuGuidebook.Events
             switch (outcome.type)
             {
                 case OutcomeType.GainGold:
-                    GoldManager.Instance.GainGold(outcome.value);
-                    Debug.Log($"골드 +{outcome.value} (현재: {GoldManager.Instance.CurrentGold})");
+                    if (GoldManager.Instance != null)
+                    {
+                        GoldManager.Instance.GainGold(outcome.value);
+                        Debug.Log($"[이벤트] 골드 +{outcome.value} (현재: {GoldManager.Instance.CurrentGold})");
+                    }
                     break;
 
                 case OutcomeType.LoseGold:
-                    GoldManager.Instance.SpendGold(outcome.value);
-                    Debug.Log($"골드 -{outcome.value} (현재: {GoldManager.Instance.CurrentGold})");
+                    if (GoldManager.Instance != null)
+                    {
+                        GoldManager.Instance.SpendGold(outcome.value);
+                        Debug.Log($"[이벤트] 골드 -{outcome.value} (현재: {GoldManager.Instance.CurrentGold})");
+                    }
                     break;
 
                 case OutcomeType.GainCard:
-                    // TODO: 덱에 카드 추가
-                    Debug.Log($"카드 획득: {outcome.stringValue} (덱 추가 필요)");
+                    AddCardToDeck(outcome.stringValue);
                     break;
 
                 case OutcomeType.RemoveCard:
-                    // TODO: 카드 제거 UI 표시
-                    Debug.Log("카드 제거 선택 UI 표시 필요");
+                    RequestCardRemoval(outcome.value > 0 ? outcome.value : 1);
                     break;
 
                 case OutcomeType.GainRelic:
-                    // TODO: 유물 데이터 로드 후 추가
-                    Debug.Log($"유물 획득: {outcome.stringValue} (RelicManager 추가 필요)");
+                    AddRelic(outcome.stringValue);
                     break;
 
                 case OutcomeType.Heal:
-                    player.Heal(outcome.value);
-                    Debug.Log($"체력 회복 +{outcome.value} (현재: {player.CurrentHealth}/{player.MaxHealth})");
+                    if (player != null)
+                    {
+                        player.Heal(outcome.value);
+                        Debug.Log($"[이벤트] 체력 회복 +{outcome.value} (현재: {player.CurrentHealth}/{player.MaxHealth})");
+                    }
                     break;
 
                 case OutcomeType.TakeDamage:
-                    player.TakeDamage(outcome.value);
-                    Debug.Log($"피해 -{outcome.value} (현재: {player.CurrentHealth}/{player.MaxHealth})");
+                    if (player != null)
+                    {
+                        player.TakeDamage(outcome.value);
+                        Debug.Log($"[이벤트] 피해 -{outcome.value} (현재: {player.CurrentHealth}/{player.MaxHealth})");
+                    }
                     break;
 
                 case OutcomeType.UpgradeCard:
-                    // TODO: 카드 업그레이드 UI 표시
-                    Debug.Log("카드 업그레이드 선택 UI 표시 필요");
+                    RequestCardUpgrade(outcome.value > 0 ? outcome.value : 1);
                     break;
 
                 case OutcomeType.StartCombat:
-                    // TODO: 전투 시작 (적 ID로 적 로드)
-                    Debug.Log($"전투 발생: {outcome.stringValue} (CombatManager 시작 필요)");
+                    RequestCombat(outcome.stringValue);
                     break;
 
                 case OutcomeType.GainMaxHealth:
-                    player.IncreaseMaxHealth(outcome.value);
-                    Debug.Log($"최대 체력 +{outcome.value} (현재: {player.CurrentHealth}/{player.MaxHealth})");
+                    if (player != null)
+                    {
+                        player.IncreaseMaxHealth(outcome.value);
+                        Debug.Log($"[이벤트] 최대 체력 +{outcome.value} (현재: {player.CurrentHealth}/{player.MaxHealth})");
+                    }
+                    break;
+
+                default:
+                    Debug.LogWarning($"처리되지 않은 결과 타입: {outcome.type}");
                     break;
             }
+        }
+
+        /// <summary>
+        /// 덱에 카드를 추가합니다
+        /// </summary>
+        private void AddCardToDeck(string cardId)
+        {
+            if (string.IsNullOrEmpty(cardId))
+            {
+                Debug.LogWarning("[이벤트] 카드 ID가 비어있습니다");
+                return;
+            }
+
+            // 카드 데이터 검증
+            CardData cardData = DataManager.Instance?.GetCardData(cardId);
+            if (cardData == null)
+            {
+                Debug.LogError($"[이벤트] 카드를 찾을 수 없습니다: {cardId}");
+                return;
+            }
+
+            // RunData에 카드 추가
+            if (SaveManager.Instance != null && SaveManager.Instance.CurrentSaveData != null)
+            {
+                RunData runData = SaveManager.Instance.CurrentSaveData.currentRun;
+                if (runData != null)
+                {
+                    runData.deckCardIds.Add(cardId);
+                    runData.cardsCollected++;
+
+                    Debug.Log($"[이벤트] 카드 획득: {cardData.name} (덱: {runData.deckCardIds.Count}장)");
+                }
+                else
+                {
+                    Debug.LogError("[이벤트] 현재 런 데이터가 없습니다");
+                }
+            }
+            else
+            {
+                Debug.LogError("[이벤트] SaveManager 또는 SaveData가 없습니다");
+            }
+        }
+
+        /// <summary>
+        /// 유물을 추가합니다
+        /// </summary>
+        private void AddRelic(string relicId)
+        {
+            if (string.IsNullOrEmpty(relicId))
+            {
+                Debug.LogWarning("[이벤트] 유물 ID가 비어있습니다");
+                return;
+            }
+
+            // 유물 데이터 로드
+            Relic relic = DataManager.Instance?.GetRelicById(relicId);
+            if (relic == null)
+            {
+                Debug.LogError($"[이벤트] 유물을 찾을 수 없습니다: {relicId}");
+                return;
+            }
+
+            // RelicManager에 유물 추가
+            if (RelicManager.Instance != null)
+            {
+                RelicManager.Instance.AddRelic(relic);
+                Debug.Log($"[이벤트] 유물 획득: {relic.name}");
+            }
+            else
+            {
+                Debug.LogError("[이벤트] RelicManager가 없습니다");
+            }
+
+            // RunData에도 기록
+            if (SaveManager.Instance != null && SaveManager.Instance.CurrentSaveData != null)
+            {
+                RunData runData = SaveManager.Instance.CurrentSaveData.currentRun;
+                if (runData != null && !runData.relicIds.Contains(relicId))
+                {
+                    runData.relicIds.Add(relicId);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 카드 제거 요청 (UI가 처리)
+        /// </summary>
+        private void RequestCardRemoval(int count)
+        {
+            Debug.Log($"[이벤트] 카드 제거 요청: {count}장");
+            OnCardRemovalRequested?.Invoke(count);
+        }
+
+        /// <summary>
+        /// 카드 업그레이드 요청 (UI가 처리)
+        /// </summary>
+        private void RequestCardUpgrade(int count)
+        {
+            Debug.Log($"[이벤트] 카드 업그레이드 요청: {count}장");
+            OnCardUpgradeRequested?.Invoke(count);
+        }
+
+        /// <summary>
+        /// 전투 요청 (CombatManager나 EventUI가 처리)
+        /// </summary>
+        private void RequestCombat(string enemyId)
+        {
+            Debug.Log($"[이벤트] 전투 요청: {enemyId}");
+            OnCombatRequested?.Invoke(enemyId);
+            // TODO: CombatManager 통합 시 구현
+            // CombatManager.Instance.StartEventCombat(enemyId);
         }
 
         /// <summary>
@@ -310,6 +441,72 @@ namespace JianghuGuidebook.Events
             currentEvent = null;
             lastChoice = null;
             Debug.Log("이벤트 시스템 리셋 완료");
+        }
+
+        // ===== 외부에서 호출하는 완료 메서드 =====
+
+        /// <summary>
+        /// 카드 제거가 완료되었음을 알립니다
+        /// </summary>
+        public void CompleteCardRemoval(List<string> removedCardIds)
+        {
+            if (removedCardIds == null || removedCardIds.Count == 0)
+            {
+                Debug.Log("[이벤트] 카드 제거를 건너뛰었습니다");
+                return;
+            }
+
+            // RunData에서 카드 제거
+            if (SaveManager.Instance != null && SaveManager.Instance.CurrentSaveData != null)
+            {
+                RunData runData = SaveManager.Instance.CurrentSaveData.currentRun;
+                if (runData != null)
+                {
+                    foreach (string cardId in removedCardIds)
+                    {
+                        runData.deckCardIds.Remove(cardId);
+                        Debug.Log($"[이벤트] 덱에서 카드 제거: {cardId}");
+                    }
+
+                    Debug.Log($"[이벤트] 카드 제거 완료: {removedCardIds.Count}장 (덱: {runData.deckCardIds.Count}장)");
+                }
+            }
+        }
+
+        /// <summary>
+        /// 카드 업그레이드가 완료되었음을 알립니다
+        /// </summary>
+        public void CompleteCardUpgrade(List<string> upgradedCardIds)
+        {
+            if (upgradedCardIds == null || upgradedCardIds.Count == 0)
+            {
+                Debug.Log("[이벤트] 카드 업그레이드를 건너뛰었습니다");
+                return;
+            }
+
+            // 업그레이드된 카드 로그 (실제 업그레이드 로직은 CardUpgradeManager에서 처리)
+            Debug.Log($"[이벤트] 카드 업그레이드 완료: {upgradedCardIds.Count}장");
+            foreach (string cardId in upgradedCardIds)
+            {
+                Debug.Log($"  - {cardId}");
+            }
+        }
+
+        /// <summary>
+        /// 이벤트 전투가 완료되었음을 알립니다
+        /// </summary>
+        public void CompleteCombat(bool victory)
+        {
+            if (victory)
+            {
+                Debug.Log("[이벤트] 이벤트 전투 승리!");
+            }
+            else
+            {
+                Debug.Log("[이벤트] 이벤트 전투 패배...");
+            }
+
+            // 전투 결과에 따른 추가 처리는 여기서 가능
         }
     }
 }

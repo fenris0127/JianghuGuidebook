@@ -5,6 +5,20 @@ using JianghuGuidebook.Meta;
 namespace JianghuGuidebook.Save
 {
     /// <summary>
+    /// 세이브 파일 손상 유형
+    /// </summary>
+    public enum SaveCorruptionType
+    {
+        None,                   // 손상 없음
+        FileNotFound,          // 파일이 존재하지 않음
+        JsonParseError,        // JSON 파싱 실패
+        ChecksumMismatch,      // 체크섬 불일치
+        ValidationFailed,      // 데이터 검증 실패
+        DeserializationFailed, // 역직렬화 실패
+        Unknown                // 알 수 없는 오류
+    }
+
+    /// <summary>
     /// 세이브/로드 시스템을 관리하는 매니저
     /// </summary>
     public class SaveManager : MonoBehaviour
@@ -30,6 +44,7 @@ namespace JianghuGuidebook.Save
 
         [Header("세이브 설정")]
         [SerializeField] private string saveFileName = "savegame";
+        [SerializeField] private string metaSaveFileName = "metadata";
         [SerializeField] private string saveFileExtension = ".json";
         [SerializeField] private int maxSaveSlots = 3;
         [SerializeField] private bool useEncryption = false; // 간단한 난독화 (실제 암호화 아님)
@@ -39,11 +54,14 @@ namespace JianghuGuidebook.Save
         // Properties
         public SaveData CurrentSaveData => currentSaveData;
         public bool HasSaveData => currentSaveData != null;
+        public MetaSaveData MetaData => currentSaveData?.metaData;
 
         // Events
         public System.Action<SaveData> OnGameSaved;
         public System.Action<SaveData> OnGameLoaded;
         public System.Action<int> OnAutoSaveTriggered;
+        public System.Action<MetaSaveData> OnMetaDataSaved;
+        public System.Action<MetaSaveData> OnMetaDataLoaded;
 
         private void Awake()
         {
@@ -65,6 +83,13 @@ namespace JianghuGuidebook.Save
         private void InitializeSaveData()
         {
             currentSaveData = new SaveData();
+
+            // 메타 데이터 자동 로드 (있으면)
+            if (MetaSaveFileExists())
+            {
+                LoadMetaData();
+            }
+
             Debug.Log("SaveManager 초기화 완료");
         }
 
@@ -87,6 +112,15 @@ namespace JianghuGuidebook.Save
 
             try
             {
+                // 파일 경로
+                string filePath = GetSaveFilePath(slotIndex);
+
+                // 기존 파일이 있으면 백업 생성
+                if (File.Exists(filePath))
+                {
+                    CreateBackupFile(filePath);
+                }
+
                 // 타임스탬프 업데이트
                 currentSaveData.UpdateSaveTimestamp();
 
@@ -114,9 +148,6 @@ namespace JianghuGuidebook.Save
                 {
                     json = ObfuscateString(json);
                 }
-
-                // 파일 경로
-                string filePath = GetSaveFilePath(slotIndex);
 
                 // 디렉토리 생성
                 string directory = Path.GetDirectoryName(filePath);
@@ -162,6 +193,8 @@ namespace JianghuGuidebook.Save
                 return false;
             }
 
+            SaveCorruptionType corruptionType = SaveCorruptionType.None;
+
             try
             {
                 // 파일 읽기
@@ -170,30 +203,50 @@ namespace JianghuGuidebook.Save
                 // 난독화 해제 (옵션)
                 if (useEncryption)
                 {
-                    json = DeobfuscateString(json);
+                    try
+                    {
+                        json = DeobfuscateString(json);
+                    }
+                    catch (System.Exception)
+                    {
+                        corruptionType = SaveCorruptionType.JsonParseError;
+                        throw;
+                    }
                 }
 
                 // JSON 역직렬화
-                SaveData loadedData = JsonUtility.FromJson<SaveData>(json);
+                SaveData loadedData = null;
+                try
+                {
+                    loadedData = JsonUtility.FromJson<SaveData>(json);
+                }
+                catch (System.Exception)
+                {
+                    corruptionType = SaveCorruptionType.DeserializationFailed;
+                    throw;
+                }
 
                 if (loadedData == null)
                 {
-                    Debug.LogError("세이브 파일 역직렬화 실패");
-                    return false;
+                    corruptionType = SaveCorruptionType.DeserializationFailed;
+                    Debug.LogError("세이브 파일 역직렬화 실패 - null 반환");
+                    throw new System.Exception("역직렬화 결과가 null입니다");
                 }
 
                 // 데이터 검증
                 if (!loadedData.Validate())
                 {
+                    corruptionType = SaveCorruptionType.ValidationFailed;
                     Debug.LogError("로드된 세이브 데이터 유효성 검증 실패");
-                    return false;
+                    throw new System.Exception("데이터 검증 실패");
                 }
 
                 // 체크섬 검증
                 if (!loadedData.ValidateChecksum())
                 {
+                    corruptionType = SaveCorruptionType.ChecksumMismatch;
                     Debug.LogWarning("세이브 파일 무결성 검증 실패 (체크섬 불일치)");
-                    // 경고만 하고 로드는 진행 (선택적으로 실패 처리 가능)
+                    throw new System.Exception("체크섬 불일치");
                 }
 
                 currentSaveData = loadedData;
@@ -210,8 +263,12 @@ namespace JianghuGuidebook.Save
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"게임 로드 중 오류 발생: {e.Message}");
+                Debug.LogError($"게임 로드 중 오류 발생 ({corruptionType}): {e.Message}");
                 Debug.LogError($"StackTrace: {e.StackTrace}");
+
+                // 손상된 파일 처리
+                HandleCorruptedSaveFile(filePath, slotIndex, corruptionType);
+
                 return false;
             }
         }
@@ -371,6 +428,507 @@ namespace JianghuGuidebook.Save
             }
 
             Debug.Log($"메타 데이터: {currentSaveData.metaData}");
+        }
+
+        // ===== 메타 데이터 별도 저장/로드 =====
+
+        /// <summary>
+        /// 메타 데이터를 별도 파일로 저장합니다
+        /// </summary>
+        public bool SaveMetaData()
+        {
+            if (currentSaveData == null || currentSaveData.metaData == null)
+            {
+                Debug.LogError("저장할 메타 데이터가 없습니다");
+                return false;
+            }
+
+            try
+            {
+                // 파일 경로
+                string filePath = GetMetaSaveFilePath();
+
+                // 기존 파일이 있으면 백업 생성
+                if (File.Exists(filePath))
+                {
+                    CreateBackupFile(filePath);
+                }
+
+                // 메타 데이터 검증
+                if (!currentSaveData.metaData.Validate())
+                {
+                    Debug.LogError("메타 데이터 유효성 검증 실패");
+                    return false;
+                }
+
+                // JSON 직렬화
+                string json = JsonUtility.ToJson(currentSaveData.metaData, true);
+
+                // 난독화 (옵션)
+                if (useEncryption)
+                {
+                    json = ObfuscateString(json);
+                }
+
+                // 디렉토리 생성
+                string directory = Path.GetDirectoryName(filePath);
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                // 파일 저장
+                File.WriteAllText(filePath, json);
+
+                Debug.Log($"[SaveManager] 메타 데이터 저장 완료: {filePath}");
+                Debug.Log($"[SaveManager] {currentSaveData.metaData}");
+
+                OnMetaDataSaved?.Invoke(currentSaveData.metaData);
+
+                return true;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"메타 데이터 저장 중 오류 발생: {e.Message}");
+                Debug.LogError($"StackTrace: {e.StackTrace}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 메타 데이터를 별도 파일에서 로드합니다
+        /// </summary>
+        public bool LoadMetaData()
+        {
+            string filePath = GetMetaSaveFilePath();
+
+            if (!File.Exists(filePath))
+            {
+                Debug.LogWarning($"메타 데이터 파일이 없습니다: {filePath}");
+                return false;
+            }
+
+            SaveCorruptionType corruptionType = SaveCorruptionType.None;
+
+            try
+            {
+                // 파일 읽기
+                string json = File.ReadAllText(filePath);
+
+                // 난독화 해제 (옵션)
+                if (useEncryption)
+                {
+                    try
+                    {
+                        json = DeobfuscateString(json);
+                    }
+                    catch (System.Exception)
+                    {
+                        corruptionType = SaveCorruptionType.JsonParseError;
+                        throw;
+                    }
+                }
+
+                // JSON 역직렬화
+                MetaSaveData loadedMetaData = null;
+                try
+                {
+                    loadedMetaData = JsonUtility.FromJson<MetaSaveData>(json);
+                }
+                catch (System.Exception)
+                {
+                    corruptionType = SaveCorruptionType.DeserializationFailed;
+                    throw;
+                }
+
+                if (loadedMetaData == null)
+                {
+                    corruptionType = SaveCorruptionType.DeserializationFailed;
+                    Debug.LogError("메타 데이터 파일 역직렬화 실패 - null 반환");
+                    throw new System.Exception("역직렬화 결과가 null입니다");
+                }
+
+                // 데이터 검증
+                if (!loadedMetaData.Validate())
+                {
+                    corruptionType = SaveCorruptionType.ValidationFailed;
+                    Debug.LogError("로드된 메타 데이터 유효성 검증 실패");
+                    throw new System.Exception("데이터 검증 실패");
+                }
+
+                // 현재 세이브 데이터에 메타 데이터 적용
+                if (currentSaveData == null)
+                {
+                    currentSaveData = new SaveData();
+                }
+
+                currentSaveData.metaData = loadedMetaData;
+
+                Debug.Log($"[SaveManager] 메타 데이터 로드 완료: {filePath}");
+                Debug.Log($"[SaveManager] {loadedMetaData}");
+
+                // 메타 데이터 시스템에 적용
+                ApplyMetaData();
+
+                OnMetaDataLoaded?.Invoke(loadedMetaData);
+
+                return true;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"메타 데이터 로드 중 오류 발생 ({corruptionType}): {e.Message}");
+                Debug.LogError($"StackTrace: {e.StackTrace}");
+
+                // 손상된 파일 처리
+                HandleCorruptedMetaFile(filePath, corruptionType);
+
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 메타 세이브 파일이 존재하는지 확인합니다
+        /// </summary>
+        public bool MetaSaveFileExists()
+        {
+            string filePath = GetMetaSaveFilePath();
+            return File.Exists(filePath);
+        }
+
+        /// <summary>
+        /// 메타 세이브 파일을 삭제합니다
+        /// </summary>
+        public bool DeleteMetaSaveFile()
+        {
+            string filePath = GetMetaSaveFilePath();
+
+            if (!File.Exists(filePath))
+            {
+                Debug.LogWarning($"삭제할 메타 데이터 파일이 없습니다: {filePath}");
+                return false;
+            }
+
+            try
+            {
+                File.Delete(filePath);
+                Debug.Log($"메타 데이터 파일 삭제 완료: {filePath}");
+                return true;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"메타 데이터 파일 삭제 중 오류 발생: {e.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 메타 세이브 파일 경로를 반환합니다
+        /// </summary>
+        private string GetMetaSaveFilePath()
+        {
+            string fileName = $"{metaSaveFileName}{saveFileExtension}";
+            return Path.Combine(Application.persistentDataPath, fileName);
+        }
+
+        /// <summary>
+        /// 현재 게임 상태에서 메타 데이터를 업데이트합니다
+        /// </summary>
+        public void UpdateMetaDataFromGameState()
+        {
+            if (currentSaveData == null || currentSaveData.metaData == null)
+            {
+                Debug.LogWarning("메타 데이터가 초기화되지 않았습니다");
+                return;
+            }
+
+            // MugongEssence에서 정수 정보 가져오기
+            if (MugongEssence.Instance != null)
+            {
+                currentSaveData.metaData.currentEssence = MugongEssence.Instance.CurrentEssence;
+                currentSaveData.metaData.totalEssence = MugongEssence.Instance.TotalEssence;
+            }
+
+            // MetaProgressionManager에서 업그레이드 정보 가져오기
+            if (MetaProgressionManager.Instance != null)
+            {
+                currentSaveData.metaData.unlockedUpgrades.Clear();
+
+                var upgrades = MetaProgressionManager.Instance.GetUnlockedUpgrades();
+                foreach (var upgrade in upgrades)
+                {
+                    currentSaveData.metaData.AddUpgradeUnlock(
+                        upgrade.id,
+                        upgrade.timesPurchased
+                    );
+                }
+            }
+
+            Debug.Log("[SaveManager] 메타 데이터 업데이트 완료");
+        }
+
+        /// <summary>
+        /// 메타 데이터 정보를 출력합니다
+        /// </summary>
+        public void PrintMetaInfo()
+        {
+            Debug.Log("=== 메타 데이터 정보 ===");
+            if (currentSaveData == null || currentSaveData.metaData == null)
+            {
+                Debug.Log("메타 데이터 없음");
+                return;
+            }
+
+            MetaSaveData meta = currentSaveData.metaData;
+            Debug.Log($"무공 정수: {meta.currentEssence} / {meta.totalEssence}");
+            Debug.Log($"업그레이드: {meta.unlockedUpgrades.Count}개");
+            Debug.Log($"런 통계:");
+            Debug.Log($"  - 완료: {meta.totalRunsCompleted}회");
+            Debug.Log($"  - 승리: {meta.totalVictories}회");
+            Debug.Log($"  - 사망: {meta.totalDeaths}회");
+            Debug.Log($"  - 적 처치: {meta.totalEnemiesKilled}명");
+            Debug.Log($"  - 보스 처치: {meta.totalBossesDefeated}명");
+        }
+
+        // ===== 세이브 파일 손상 처리 =====
+
+        /// <summary>
+        /// 손상된 세이브 파일을 처리합니다
+        /// </summary>
+        private void HandleCorruptedSaveFile(string filePath, int slotIndex, SaveCorruptionType corruptionType)
+        {
+            Debug.LogWarning($"=== 세이브 파일 손상 감지 ({corruptionType}) ===");
+            Debug.LogWarning($"파일: {filePath}");
+
+            // 손상된 파일 이동
+            MoveCorruptedFile(filePath, corruptionType);
+
+            // 백업 파일 로드 시도
+            bool backupLoaded = TryLoadBackup(slotIndex);
+
+            if (backupLoaded)
+            {
+                Debug.Log("백업 파일에서 복구 성공!");
+            }
+            else
+            {
+                Debug.LogError("백업 파일도 손상되었거나 없습니다. 새 게임을 시작해야 합니다.");
+            }
+        }
+
+        /// <summary>
+        /// 손상된 메타 데이터 파일을 처리합니다
+        /// </summary>
+        private void HandleCorruptedMetaFile(string filePath, SaveCorruptionType corruptionType)
+        {
+            Debug.LogWarning($"=== 메타 데이터 파일 손상 감지 ({corruptionType}) ===");
+            Debug.LogWarning($"파일: {filePath}");
+
+            // 손상된 파일 이동
+            MoveCorruptedFile(filePath, corruptionType);
+
+            // 백업 파일 로드 시도
+            bool backupLoaded = TryLoadMetaBackup();
+
+            if (backupLoaded)
+            {
+                Debug.Log("메타 데이터 백업 파일에서 복구 성공!");
+            }
+            else
+            {
+                Debug.LogWarning("메타 데이터 백업 파일도 손상되었거나 없습니다. 새 메타 데이터를 생성합니다.");
+
+                // 새 메타 데이터 생성
+                if (currentSaveData == null)
+                {
+                    currentSaveData = new SaveData();
+                }
+                currentSaveData.metaData = new MetaSaveData();
+            }
+        }
+
+        /// <summary>
+        /// 백업 파일을 로드합니다
+        /// </summary>
+        private bool TryLoadBackup(int slotIndex)
+        {
+            string backupPath = GetBackupFilePath(GetSaveFilePath(slotIndex));
+
+            if (!File.Exists(backupPath))
+            {
+                Debug.LogWarning($"백업 파일이 없습니다: {backupPath}");
+                return false;
+            }
+
+            Debug.Log($"백업 파일 로드 시도: {backupPath}");
+
+            try
+            {
+                // 파일 읽기
+                string json = File.ReadAllText(backupPath);
+
+                // 난독화 해제 (옵션)
+                if (useEncryption)
+                {
+                    json = DeobfuscateString(json);
+                }
+
+                // JSON 역직렬화
+                SaveData loadedData = JsonUtility.FromJson<SaveData>(json);
+
+                if (loadedData == null || !loadedData.Validate())
+                {
+                    Debug.LogError("백업 파일도 손상되었습니다");
+                    return false;
+                }
+
+                currentSaveData = loadedData;
+
+                Debug.Log($"백업 파일 로드 성공: {backupPath}");
+
+                // 메타 데이터 적용
+                ApplyMetaData();
+
+                // 백업을 메인 파일로 복원
+                string mainPath = GetSaveFilePath(slotIndex);
+                File.Copy(backupPath, mainPath, true);
+                Debug.Log("백업 파일을 메인 파일로 복원했습니다");
+
+                return true;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"백업 파일 로드 실패: {e.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 메타 데이터 백업 파일을 로드합니다
+        /// </summary>
+        private bool TryLoadMetaBackup()
+        {
+            string backupPath = GetBackupFilePath(GetMetaSaveFilePath());
+
+            if (!File.Exists(backupPath))
+            {
+                Debug.LogWarning($"메타 데이터 백업 파일이 없습니다: {backupPath}");
+                return false;
+            }
+
+            Debug.Log($"메타 데이터 백업 파일 로드 시도: {backupPath}");
+
+            try
+            {
+                // 파일 읽기
+                string json = File.ReadAllText(backupPath);
+
+                // 난독화 해제 (옵션)
+                if (useEncryption)
+                {
+                    json = DeobfuscateString(json);
+                }
+
+                // JSON 역직렬화
+                MetaSaveData loadedMetaData = JsonUtility.FromJson<MetaSaveData>(json);
+
+                if (loadedMetaData == null || !loadedMetaData.Validate())
+                {
+                    Debug.LogError("메타 데이터 백업 파일도 손상되었습니다");
+                    return false;
+                }
+
+                if (currentSaveData == null)
+                {
+                    currentSaveData = new SaveData();
+                }
+
+                currentSaveData.metaData = loadedMetaData;
+
+                Debug.Log($"메타 데이터 백업 파일 로드 성공: {backupPath}");
+
+                // 메타 데이터 적용
+                ApplyMetaData();
+
+                // 백업을 메인 파일로 복원
+                string mainPath = GetMetaSaveFilePath();
+                File.Copy(backupPath, mainPath, true);
+                Debug.Log("메타 데이터 백업 파일을 메인 파일로 복원했습니다");
+
+                return true;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"메타 데이터 백업 파일 로드 실패: {e.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 백업 파일을 생성합니다
+        /// </summary>
+        private void CreateBackupFile(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                return;
+            }
+
+            try
+            {
+                string backupPath = GetBackupFilePath(filePath);
+                File.Copy(filePath, backupPath, true);
+                Debug.Log($"백업 파일 생성: {backupPath}");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"백업 파일 생성 실패: {e.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 백업 파일 경로를 반환합니다
+        /// </summary>
+        private string GetBackupFilePath(string originalPath)
+        {
+            return originalPath + ".bak";
+        }
+
+        /// <summary>
+        /// 손상된 파일을 별도 폴더로 이동합니다
+        /// </summary>
+        private void MoveCorruptedFile(string filePath, SaveCorruptionType corruptionType)
+        {
+            if (!File.Exists(filePath))
+            {
+                return;
+            }
+
+            try
+            {
+                // 손상된 파일 보관 폴더 생성
+                string corruptedDir = Path.Combine(Application.persistentDataPath, "CorruptedSaves");
+                if (!Directory.Exists(corruptedDir))
+                {
+                    Directory.CreateDirectory(corruptedDir);
+                }
+
+                // 타임스탬프 추가
+                string timestamp = System.DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                string fileName = Path.GetFileNameWithoutExtension(filePath);
+                string extension = Path.GetExtension(filePath);
+                string corruptedFileName = $"{fileName}_{corruptionType}_{timestamp}{extension}.corrupted";
+                string corruptedPath = Path.Combine(corruptedDir, corruptedFileName);
+
+                // 파일 이동
+                File.Move(filePath, corruptedPath);
+
+                Debug.LogWarning($"손상된 파일 이동 완료: {corruptedPath}");
+                Debug.LogWarning("디버깅을 위해 손상된 파일을 보관했습니다.");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"손상된 파일 이동 실패: {e.Message}");
+            }
         }
     }
 }

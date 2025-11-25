@@ -27,6 +27,20 @@ namespace JianghuGuidebook.Data
     }
 
     /// <summary>
+    /// 무기 타입 열거형
+    /// </summary>
+    public enum WeaponType
+    {
+        None,           // 없음 (기본)
+        Sword,          // 검 (Sword)
+        Blade,          // 도 (Blade)
+        Spear,          // 창 (Spear)
+        Palm,           // 장 (Palm)
+        Fist,           // 권 (Fist)
+        HiddenWeapon    // 암기 (Hidden Weapon)
+    }
+
+    /// <summary>
     /// 카드 데이터 클래스
     /// JSON에서 로드될 카드 정보를 저장합니다
     /// </summary>
@@ -37,6 +51,7 @@ namespace JianghuGuidebook.Data
         public string name;             // 카드 이름 (예: "일검")
         public int cost;                // 내공 비용
         public CardType type;           // 카드 타입
+        public WeaponType weaponType;   // 무기 타입 (추가됨)
         public CardRarity rarity;       // 희귀도
         public int baseDamage;          // 기본 피해량 (공격 카드용)
         public int baseBlock;           // 기본 방어도 (방어 카드용)

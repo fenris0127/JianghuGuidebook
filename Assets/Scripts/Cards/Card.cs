@@ -51,6 +51,17 @@ namespace JianghuGuidebook.Cards
             Block = data.baseBlock;
             IsPlayable = true;
             IsExhausted = false;
+
+            // 무기술 경지 보너스 적용
+            if (Progression.WeaponMasteryManager.Instance != null)
+            {
+                int bonus = Progression.WeaponMasteryManager.Instance.GetDamageBonus(data.weaponType);
+                if (bonus > 0)
+                {
+                    Damage += bonus;
+                    // Debug.Log($"[{Name}] 무기술 보너스 적용: +{bonus}");
+                }
+            }
         }
 
         /// <summary>

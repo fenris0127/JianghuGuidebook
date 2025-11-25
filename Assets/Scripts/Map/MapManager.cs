@@ -42,6 +42,10 @@ namespace JianghuGuidebook.Map
         [SerializeField] private bool enableAutoSave = true;
         [SerializeField] private int autoSaveSlot = 0;
 
+        [Header("첫 노드 자동 시작")]
+        [SerializeField] private bool autoStartFirstNode = true;
+        [SerializeField] private float autoStartDelay = 0.5f; // 씬 로드 후 대기 시간
+
         // Properties
         public List<MapNode> AllNodes => allNodes;
         public MapNode CurrentNode => currentNode;
@@ -52,6 +56,8 @@ namespace JianghuGuidebook.Map
         public System.Action<MapNode> OnNodeCompleted;
         public System.Action<List<MapNode>> OnMapGenerated;
         public System.Action<MapNode> OnBossNodeReached;  // 보스 노드 도달 시
+
+        private bool hasAutoStarted = false;
 
         private void Awake()
         {
@@ -65,6 +71,51 @@ namespace JianghuGuidebook.Map
             DontDestroyOnLoad(gameObject);
         }
 
+        private void Start()
+        {
+            // 맵 씬에서만 동작
+            if (SceneManager.GetActiveScene().name == MAP_SCENE_NAME)
+            {
+                CheckAndAutoStartFirstNode();
+            }
+        }
+
+        /// <summary>
+        /// 첫 노드 자동 시작 확인 및 실행
+        /// </summary>
+        private void CheckAndAutoStartFirstNode()
+        {
+            if (!autoStartFirstNode || hasAutoStarted)
+            {
+                return;
+            }
+
+            // 현재 노드가 시작 노드이고 아직 방문하지 않았다면 자동 진입
+            if (currentNode != null &&
+                currentNode.nodeType == NodeType.Start &&
+                !currentNode.isVisited)
+            {
+                Debug.Log($"[MapManager] 첫 노드 자동 시작: {currentNode.nodeType}");
+                hasAutoStarted = true;
+
+                // 약간의 딜레이 후 진입 (UI 준비 시간)
+                Invoke(nameof(AutoEnterFirstNode), autoStartDelay);
+            }
+        }
+
+        /// <summary>
+        /// 첫 노드에 자동으로 진입합니다
+        /// </summary>
+        private void AutoEnterFirstNode()
+        {
+            if (currentNode != null && !currentNode.isVisited)
+            {
+                // 시작 노드는 즉시 완료 처리하고 다음 레이어로 이동
+                CompleteNode(currentNode);
+                Debug.Log("[MapManager] 첫 노드(Start) 자동 완료");
+            }
+        }
+
         /// <summary>
         /// 새 맵을 생성합니다
         /// </summary>
@@ -73,6 +124,22 @@ namespace JianghuGuidebook.Map
             Debug.Log("=== MapManager: 새 맵 생성 ===");
 
             MapGenerator generator = new MapGenerator();
+            // 현재 지역 정보로 맵 설정
+            Region currentRegion = RegionManager.Instance.CurrentRegion;
+            if (currentRegion != null)
+            {
+                Debug.Log($"지역 설정 적용: {currentRegion.name} (Layers: {currentRegion.layerCount})");
+                generator.ConfigureMap(
+                    currentRegion.layerCount,
+                    currentRegion.minNodesPerLayer,
+                    currentRegion.maxNodesPerLayer
+                );
+            }
+            else
+            {
+                Debug.LogWarning("현재 지역 정보가 없습니다. 기본 설정 사용.");
+            }
+
             allNodes = generator.GenerateMap(seed);
             currentSeed = seed;
 
@@ -158,7 +225,7 @@ namespace JianghuGuidebook.Map
             if (currentNode.nodeType == NodeType.Boss)
             {
                 Debug.Log("=== 지역 클리어! ===");
-                // TODO: 지역 클리어 처리
+                RegionManager.Instance.CompleteCurrentRegion();
             }
 
             // 노드 완료 후 자동 저장

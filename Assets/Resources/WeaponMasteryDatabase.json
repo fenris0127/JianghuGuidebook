@@ -1,0 +1,68 @@
+{
+    "masteries": [
+        {
+            "weaponType": 1,
+            "stage": 1,
+            "name": "검기상인",
+            "damageBonus": 1,
+            "effectDescription": "검 공격력 +1",
+            "requiredXP": 10
+        },
+        {
+            "weaponType": 1,
+            "stage": 2,
+            "name": "검기종횡",
+            "damageBonus": 2,
+            "effectDescription": "검 공격력 +2",
+            "requiredXP": 30
+        },
+        {
+            "weaponType": 2,
+            "stage": 1,
+            "name": "도법입문",
+            "damageBonus": 1,
+            "effectDescription": "도 공격력 +1",
+            "requiredXP": 10
+        },
+        {
+            "weaponType": 2,
+            "stage": 2,
+            "name": "광도",
+            "damageBonus": 2,
+            "effectDescription": "도 공격력 +2",
+            "requiredXP": 30
+        },
+        {
+            "weaponType": 3,
+            "stage": 1,
+            "name": "창술입문",
+            "damageBonus": 1,
+            "effectDescription": "창 공격력 +1",
+            "requiredXP": 10
+        },
+        {
+            "weaponType": 4,
+            "stage": 1,
+            "name": "장법입문",
+            "damageBonus": 1,
+            "effectDescription": "장 공격력 +1",
+            "requiredXP": 10
+        },
+        {
+            "weaponType": 5,
+            "stage": 1,
+            "name": "권법입문",
+            "damageBonus": 1,
+            "effectDescription": "권 공격력 +1",
+            "requiredXP": 10
+        },
+        {
+            "weaponType": 6,
+            "stage": 1,
+            "name": "암기입문",
+            "damageBonus": 1,
+            "effectDescription": "암기 공격력 +1",
+            "requiredXP": 10
+        }
+    ]
+}

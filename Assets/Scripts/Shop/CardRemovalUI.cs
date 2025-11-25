@@ -51,25 +51,6 @@ namespace JianghuGuidebook.Shop
 
             // 덱 가져오기 (DeckManager가 싱글톤이라고 가정)
             // 실제로는 DeckManager.Instance.Deck 또는 유사한 방식으로 접근해야 함
-            // 여기서는 DeckManager가 있다고 가정하고 구현
-            if (DeckManager.Instance != null)
-            {
-                // DeckManager의 전체 덱 리스트를 가져와야 함 (현재 DeckManager 구조 확인 필요)
-                // 임시로 빈 리스트 사용
-                currentDeck = new List<Card>(); 
-                // TODO: DeckManager에서 전체 덱 가져오기 구현 필요
-                // currentDeck = DeckManager.Instance.GetAllCards();
-            }
-
-            if (currentDeck == null) return;
-
-            foreach (Card card in currentDeck)
-            {
-                GameObject cardObj = Instantiate(cardPrefab, cardContainer);
-                
-                // CardUI 컴포넌트 설정
-                // CardUI cardUI = cardObj.GetComponent<CardUI>();
-                // cardUI.Initialize(card);
                 
                 // 클릭 이벤트 추가
                 Button btn = cardObj.GetComponent<Button>();
@@ -81,24 +62,6 @@ namespace JianghuGuidebook.Shop
 
         /// <summary>
         /// 카드가 선택되었을 때 호출됩니다.
-        /// </summary>
-        private void OnCardSelected(Card card)
-        {
-            // 카드 제거 로직
-            Debug.Log($"카드 제거 선택됨: {card.Name}");
-            
-            // DeckManager에서 카드 제거
-            // DeckManager.Instance.RemoveCard(card);
-            
-            // UI 닫기
-            Close();
-            
-            // 상점 UI 갱신 (필요하다면)
-            shopUI.OnCardRemoved();
-        }
-
-        public void Close()
-        {
             panel.SetActive(false);
         }
     }

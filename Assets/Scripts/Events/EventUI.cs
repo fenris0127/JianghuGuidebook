@@ -119,22 +119,6 @@ namespace JianghuGuidebook.Events
                 resultText.text = choice.resultText;
                 // 결과에 따른 추가 정보 표시 가능
             }
-
-            // 계속하기 버튼 표시
-            if (continueButton != null)
-                continueButton.gameObject.SetActive(true);
-        }
-
-        private void OnContinueClicked()
-        {
-            EventManager.Instance.CompleteEvent();
-            // TODO: 맵으로 복귀
-            // MapManager.Instance.ReturnToMap(); // EventManager.CompleteEvent에서 호출하거나 여기서 호출
-            // 현재 구조상 EventManager는 로직만 처리하므로, 여기서 맵 복귀 호출이 적절할 수 있음
-            // 하지만 MapManager 의존성을 줄이기 위해 EventManager가 이벤트를 통해 알리는 방식이 좋음
-            // 일단은 여기서 직접 호출하거나 EventManager가 처리하도록 둠
-            
-            // 임시로 맵 복귀 호출
             JianghuGuidebook.Map.MapManager.Instance.ReturnToMap();
         }
     }
