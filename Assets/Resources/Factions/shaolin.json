@@ -1,0 +1,26 @@
+{
+  "id": "faction_shaolin",
+  "name": "소림사",
+  "description": "권법의 정통. 금강불괴의 몸으로 적의 공격을 막아내며, 강력한 주먹으로 적을 제압한다.",
+  "startingDeck": [
+    "card_strike",
+    "card_strike",
+    "card_strike",
+    "card_fist_punch",
+    "card_fist_palm_strike",
+    "card_iron_fist",
+    "card_defend",
+    "card_defend",
+    "card_defend",
+    "card_defend",
+    "card_golden_bell",
+    "card_diamond_body"
+  ],
+  "startingRelic": "relic_golden_beads",
+  "passive": {
+    "type": 2,
+    "value": 2,
+    "description": "권법 카드 사용 시 방어도 2 획득"
+  },
+  "primaryWeapon": 5
+}

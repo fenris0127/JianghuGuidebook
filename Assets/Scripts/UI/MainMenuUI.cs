@@ -18,6 +18,8 @@ namespace JianghuGuidebook.UI
         [SerializeField] private Button continueButton;
         [SerializeField] private Button metaProgressionButton;
         [SerializeField] private Button settingsButton;
+        [SerializeField] private Button achievementsButton;
+        [SerializeField] private Button codexButton;
         [SerializeField] private Button quitButton;
 
         [Header("세이브 슬롯 선택 (이어하기)")]
@@ -33,8 +35,10 @@ namespace JianghuGuidebook.UI
         [SerializeField] private TextMeshProUGUI[] newGameSlotInfoTexts = new TextMeshProUGUI[3];
         [SerializeField] private Button closeNewGameSlotsButton;
 
-        [Header("분파 선택")]
+        [Header("서브 UI")]
         [SerializeField] private FactionSelectionUI factionSelectionUI;
+        [SerializeField] private AchievementUI achievementUI;
+        [SerializeField] private CodexUI codexUI;
 
         [Header("씬 설정")]
         [SerializeField] private string mapSceneName = "MapScene";
@@ -60,6 +64,16 @@ namespace JianghuGuidebook.UI
 
             if (settingsButton != null)
                 settingsButton.onClick.AddListener(OnSettingsClicked);
+
+            if (achievementsButton != null)
+            {
+                achievementsButton.onClick.AddListener(OnAchievementsClicked);
+            }
+
+            if (codexButton != null)
+            {
+                codexButton.onClick.AddListener(OnCodexClicked);
+            }
 
             if (quitButton != null)
                 quitButton.onClick.AddListener(OnQuitClicked);
@@ -219,6 +233,22 @@ namespace JianghuGuidebook.UI
         }
 
         /// <summary>
+        /// 업적 버튼 클릭
+        /// </summary>
+        private void OnAchievementsClicked()
+        {
+            Debug.Log("[MainMenuUI] 업적 버튼 클릭");
+            if (achievementUI != null)
+            {
+                achievementUI.Open();
+            }
+            else
+            {
+                Debug.LogWarning("AchievementUI가 설정되지 않았습니다");
+            }
+        }
+
+        /// <summary>
         /// 종료 버튼 클릭
         /// </summary>
         private void OnQuitClicked()
@@ -333,13 +363,19 @@ namespace JianghuGuidebook.UI
             // 분파 선택 화면 표시
             if (factionSelectionUI != null)
             {
-                factionSelectionUI.Show(slotIndex);
+                // FactionSelectionUI 초기화 및 표시
+                factionSelectionUI.gameObject.SetActive(true);
+                factionSelectionUI.Initialize();
+                
+                // 선택 완료 콜백 설정 (익명 함수로 슬롯 인덱스 전달)
+                // 기존 이벤트 리스너 제거 후 새로 등록
+                factionSelectionUI.OnFactionConfirmed = (faction) => OnFactionSelected(faction, slotIndex);
             }
             else
             {
                 Debug.LogWarning("FactionSelectionUI가 설정되지 않았습니다. 기본 분파로 시작합니다.");
                 // 기본 분파 (화산파)로 시작
-                FactionData defaultFaction = DataManager.Instance?.GetFactionById("faction_huashan");
+                FactionData defaultFaction = FactionManager.Instance?.GetFactionById("hwasan");
                 if (defaultFaction != null)
                 {
                     StartNewGameWithFaction(defaultFaction, slotIndex);

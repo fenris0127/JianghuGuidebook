@@ -471,6 +471,1299 @@
           "outcomes": []
         }
       ]
+    },
+    {
+      "id": "event_sword_master",
+      "title": "검법 고수",
+      "description": "검을 닦고 있는 백발의 검사가 당신의 검술 실력을 알아본다.\n\n\"오호, 검술의 기본은 갖춘 것 같군. 더 높은 경지에 이르고 싶다면, 내 비급을 전수해주지.\"",
+      "choices": [
+        {
+          "text": "비급을 전수받는다 (검술 소성 이상)",
+          "resultText": "검사는 만족스러운 표정으로 비급을 전수한다. 검술의 오묘함이 한층 깊어진다!",
+          "requirements": [
+            {
+              "type": 5,
+              "value": 1,
+              "stringValue": "Sword"
+            }
+          ],
+          "outcomes": [
+            {
+              "type": 2,
+              "value": 0,
+              "stringValue": "card_rare_sword_technique"
+            }
+          ]
+        },
+        {
+          "text": "정중히 거절한다",
+          "resultText": "검사는 아쉬워하며 돌아간다. \"언젠가 검술을 더 갈고 닦거든 다시 찾아오게.\"",
+          "requirements": [],
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "event_inner_energy_test",
+      "title": "내공 시험",
+      "description": "도사가 당신 앞을 가로막는다.\n\n\"내공의 깊이를 시험해보겠네. 후천 경지를 넘어섰다면, 이 시험을 통과할 수 있을 것이야.\"",
+      "choices": [
+        {
+          "text": "시험에 응한다 (선천 이상)",
+          "resultText": "도사가 감탄한다. \"훌륭하네! 이 보물을 받게나.\"",
+          "requirements": [
+            {
+              "type": 6,
+              "value": 1,
+              "stringValue": ""
+            }
+          ],
+          "outcomes": [
+            {
+              "type": 4,
+              "value": 0,
+              "stringValue": "relic_inner_pearl"
+            }
+          ]
+        },
+        {
+          "text": "무리해서 시험받는다",
+          "resultText": "내공이 부족한 상태에서 무리했다. 기혈이 역류하여 상처를 입었다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 6,
+              "value": 15,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "거절한다",
+          "resultText": "\"아직 때가 아닌 것 같습니다.\" 도사는 고개를 끄덕이고 떠난다.",
+          "requirements": [],
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "event_minimalist_reward",
+      "title": "검소한 수행자",
+      "description": "수행자가 당신의 덱을 보더니 감탄한다.\n\n\"적은 카드로 많은 것을 이루는구나. 진정한 고수의 길이로다!\"",
+      "choices": [
+        {
+          "text": "가르침을 받는다 (덱 20장 이하)",
+          "resultText": "수행자가 정제된 무공을 전수한다. 적은 것이 많은 것이다!",
+          "requirements": [
+            {
+              "type": 10,
+              "value": 20,
+              "stringValue": ""
+            }
+          ],
+          "outcomes": [
+            {
+              "type": 4,
+              "value": 0,
+              "stringValue": "relic_minimalist_pouch"
+            },
+            {
+              "type": 0,
+              "value": 100,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "그냥 지나간다",
+          "resultText": "수행자는 조용히 명상을 계속한다.",
+          "requirements": [],
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "event_heavy_deck_burden",
+      "title": "과중한 짐",
+      "description": "길을 가다 무릎이 아파온다. 너무 많은 무공 비급을 익히려 하는 것은 아닐까?\n\n한 현자가 다가와 말한다. \"많은 것을 버리고 정수만 남기는 것이 진정한 강함이니라.\"",
+      "choices": [
+        {
+          "text": "카드를 제거한다 (덱 30장 초과)",
+          "resultText": "불필요한 무공을 버리니 몸이 가벼워진다. 현자가 선물을 준다.",
+          "requirements": [
+            {
+              "type": 9,
+              "value": 30,
+              "stringValue": ""
+            }
+          ],
+          "outcomes": [
+            {
+              "type": 3,
+              "value": 2,
+              "stringValue": ""
+            },
+            {
+              "type": 5,
+              "value": 20,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "그대로 간다",
+          "resultText": "현자는 고개를 가로젓으며 떠난다.",
+          "requirements": [],
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "event_bandit_ambush_2",
+      "title": "2지역: 산적 매복",
+      "description": "중원의 험한 산길에서 산적 무리가 매복하고 있다. 다수를 상대하려면 실력이 필요하다.",
+      "choices": [
+        {
+          "text": "정면 돌파한다 (고난이도 전투)",
+          "resultText": "치열한 전투 끝에 승리한다. 산적들이 숨겨둔 보물을 획득했다!",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 8,
+              "value": 0,
+              "stringValue": "enemy_elite_bandit"
+            },
+            {
+              "type": 0,
+              "value": 150,
+              "stringValue": ""
+            },
+            {
+              "type": 4,
+              "value": 0,
+              "stringValue": "relic_bandit_treasure"
+            }
+          ]
+        },
+        {
+          "text": "은밀히 우회한다 (골드 50 소모)",
+          "resultText": "산적들에게 뇌물을 주고 지나간다. 불필요한 전투는 피했다.",
+          "requirements": [
+            {
+              "type": 1,
+              "value": 50,
+              "stringValue": ""
+            }
+          ],
+          "outcomes": [
+            {
+              "type": 1,
+              "value": 50,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "도망친다",
+          "resultText": "황급히 도망치다 몇 대 얻어맞았다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 6,
+              "value": 10,
+              "stringValue": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "event_martial_alliance",
+      "title": "2지역: 무림맹 시험",
+      "description": "무림맹 시험관이 당신의 실력을 시험하고자 한다.\n\n\"무림맹에 가입하려면 일정 수준의 실력이 필요하오. 한 수 가르쳐주시겠소?\"",
+      "choices": [
+        {
+          "text": "시험에 응한다",
+          "resultText": "시험관과의 대결에서 승리한다. 무림맹에서 인정받아 보상을 받는다!",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 8,
+              "value": 0,
+              "stringValue": "enemy_alliance_examiner"
+            },
+            {
+              "type": 2,
+              "value": 0,
+              "stringValue": "card_uncommon_righteous_strike"
+            },
+            {
+              "type": 0,
+              "value": 75,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "정중히 거절한다",
+          "resultText": "\"아직 준비가 덜 되었습니다.\" 시험관은 이해하며 물러난다.",
+          "requirements": [],
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "event_poison_master",
+      "title": "2지역: 독공 고수",
+      "description": "당문의 독술사가 기문병기의 경지에 대해 이야기를 나누고 싶어한다.",
+      "choices": [
+        {
+          "text": "독술을 전수받는다 (기문병기 소성 이상)",
+          "resultText": "독술사는 흡족한 표정으로 비급을 전수한다. 독의 오묘함을 깨달았다!",
+          "requirements": [
+            {
+              "type": 5,
+              "value": 1,
+              "stringValue": "ExoticWeapon"
+            }
+          ],
+          "outcomes": [
+            {
+              "type": 2,
+              "value": 0,
+              "stringValue": "card_rare_poison_technique"
+            }
+          ]
+        },
+        {
+          "text": "거절한다",
+          "resultText": "\"독은 제 길이 아닙니다.\" 독술사는 아쉬워하며 떠난다.",
+          "requirements": [],
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "event_righteous_sect",
+      "title": "2지역: 정파의 도움",
+      "description": "정파 무사들이 부상을 입은 당신을 발견한다.\n\n\"협객이시여, 도움이 필요하신 것 같소. 저희가 치료해드리겠소이다.\"",
+      "choices": [
+        {
+          "text": "도움을 받는다",
+          "resultText": "정파 무사들이 정성껏 치료해준다. 몸 상태가 회복되었다!",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 5,
+              "value": 25,
+              "stringValue": ""
+            },
+            {
+              "type": 9,
+              "value": 5,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "정중히 거절한다",
+          "resultText": "\"괜찮습니다. 혼자 할 수 있습니다.\" 무사들은 존중하며 물러난다.",
+          "requirements": [],
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "event_trade_caravan",
+      "title": "2지역: 상단 호위",
+      "description": "거상이 당신에게 상단 호위를 부탁한다.\n\n\"험한 길을 지나야 하오. 호위해주시면 후한 사례를 하겠소이다.\"",
+      "choices": [
+        {
+          "text": "호위를 맡는다",
+          "resultText": "상단을 무사히 호위했다. 거상이 약속대로 후한 보상을 준다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 0,
+              "value": 120,
+              "stringValue": ""
+            },
+            {
+              "type": 4,
+              "value": 0,
+              "stringValue": "relic_merchant_token"
+            }
+          ]
+        },
+        {
+          "text": "거절한다",
+          "resultText": "\"죄송하지만 바쁜 길이라...\" 거상은 아쉬워하며 다른 호위를 찾아 떠난다.",
+          "requirements": [],
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "event_desert_oasis",
+      "title": "3지역: 사막의 오아시스",
+      "description": "끝없는 사막을 헤매다 오아시스를 발견한다. 하지만 이상한 기운이 감돈다...",
+      "choices": [
+        {
+          "text": "물을 마신다 (50% 행운)",
+          "resultText": "신비한 샘물이다! 체력이 완전히 회복되고 최대 체력도 증가했다.",
+          "requirements": [
+            {
+              "type": 4,
+              "value": 50,
+              "stringValue": ""
+            }
+          ],
+          "outcomes": [
+            {
+              "type": 5,
+              "value": 999,
+              "stringValue": ""
+            },
+            {
+              "type": 9,
+              "value": 10,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "물을 마신다 (불운)",
+          "resultText": "물에 독이 있었다! 심하게 아프다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 6,
+              "value": 20,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "조심스럽게 물병에 담는다",
+          "resultText": "나중을 위해 물을 보관했다. 현명한 선택이다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 4,
+              "value": 0,
+              "stringValue": "relic_water_bottle"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "event_demonic_cultist",
+      "title": "3지역: 마교 도인",
+      "description": "검은 도포를 입은 마교 도인이 나타난다.\n\n\"오호, 강한 내공이 느껴지는구나. 우리 마교에 가입할 생각은 없나?\"",
+      "choices": [
+        {
+          "text": "가입을 고려한다",
+          "resultText": "마교 도인이 강력한 마공을 전수한다. 위험하지만 강력하다!",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 2,
+              "value": 0,
+              "stringValue": "card_rare_demonic_art"
+            },
+            {
+              "type": 6,
+              "value": 10,
+              "stringValue": ""
+            },
+            {
+              "type": 0,
+              "value": 100,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "단칼에 거절한다",
+          "resultText": "\"마도는 제 길이 아닙니다!\" 마교 도인이 분노하여 공격해온다!",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 8,
+              "value": 0,
+              "stringValue": "enemy_demon_cultist"
+            }
+          ]
+        },
+        {
+          "text": "정중히 거절한다",
+          "resultText": "\"감사하지만 사양하겠습니다.\" 마교 도인은 아쉬워하며 떠난다.",
+          "requirements": [],
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "event_sandstorm",
+      "title": "3지역: 모래 폭풍",
+      "description": "갑자기 거대한 모래 폭풍이 몰아친다! 대피할 곳을 찾아야 한다.",
+      "choices": [
+        {
+          "text": "내공으로 버틴다 (화경 이상)",
+          "resultText": "강력한 내공으로 모래 폭풍을 견뎌냈다. 폭풍 속에서 유물을 발견했다!",
+          "requirements": [
+            {
+              "type": 6,
+              "value": 3,
+              "stringValue": ""
+            }
+          ],
+          "outcomes": [
+            {
+              "type": 4,
+              "value": 0,
+              "stringValue": "relic_desert_artifact"
+            }
+          ]
+        },
+        {
+          "text": "무리해서 버틴다",
+          "resultText": "내공이 부족한 상태에서 버티려다 부상을 입었다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 6,
+              "value": 25,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "대피처를 찾는다",
+          "resultText": "근처 동굴로 대피했다. 폭풍이 지나갈 때까지 기다렸다.",
+          "requirements": [],
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "event_cursed_treasure",
+      "title": "3지역: 저주받은 보물",
+      "description": "사막 폐허에서 황금빛 보물상자를 발견한다. 하지만 불길한 기운이 감돈다...",
+      "choices": [
+        {
+          "text": "상자를 연다 (탐욕)",
+          "resultText": "보물을 손에 넣었다! 하지만 저주를 받아 체력이 감소했다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 0,
+              "value": 200,
+              "stringValue": ""
+            },
+            {
+              "type": 4,
+              "value": 0,
+              "stringValue": "relic_cursed_gold"
+            },
+            {
+              "type": 9,
+              "value": -5,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "조심스럽게 조사한다",
+          "resultText": "상자의 저주를 해제하는 방법을 찾았다. 안전하게 보물을 얻었다!",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 0,
+              "value": 150,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "무시하고 지나간다",
+          "resultText": "탐욕은 화를 부른다. 현명한 선택이다.",
+          "requirements": [],
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "event_trade_with_nomads",
+      "title": "3지역: 유목민과의 거래",
+      "description": "사막 유목민이 진귀한 물건을 팔고 있다.\n\n\"이 부적은 사막의 신비한 힘이 깃들어 있소. 100냥에 드리겠소.\"",
+      "choices": [
+        {
+          "text": "부적을 산다 (골드 100)",
+          "resultText": "유목민이 감사하며 부적을 건넨다. 신비한 기운이 느껴진다.",
+          "requirements": [
+            {
+              "type": 1,
+              "value": 100,
+              "stringValue": ""
+            }
+          ],
+          "outcomes": [
+            {
+              "type": 1,
+              "value": 100,
+              "stringValue": ""
+            },
+            {
+              "type": 4,
+              "value": 0,
+              "stringValue": "relic_nomad_charm"
+            }
+          ]
+        },
+        {
+          "text": "거절한다",
+          "resultText": "유목민은 아쉬워하며 다른 손님을 찾아 간다.",
+          "requirements": [],
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "event_frozen_lake",
+      "title": "4지역: 얼어붙은 호수",
+      "description": "얼음으로 뒤덮인 호수 아래로 무언가 반짝이는 것이 보인다.",
+      "choices": [
+        {
+          "text": "얼음을 깬다 (권법 대성 이상)",
+          "resultText": "강력한 권력으로 얼음을 깼다! 호수 속에서 고대 유물을 발견했다.",
+          "requirements": [
+            {
+              "type": 5,
+              "value": 2,
+              "stringValue": "Fist"
+            }
+          ],
+          "outcomes": [
+            {
+              "type": 4,
+              "value": 0,
+              "stringValue": "relic_frozen_artifact"
+            }
+          ]
+        },
+        {
+          "text": "조심스럽게 얼음을 녹인다",
+          "resultText": "내공으로 천천히 얼음을 녹였다. 안에서 골드를 발견했다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 0,
+              "value": 80,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "포기한다",
+          "resultText": "너무 위험해 보인다. 다음 기회를 기약한다.",
+          "requirements": [],
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "event_ice_palace_elder",
+      "title": "4지역: 빙궁 장로",
+      "description": "빙궁의 장로가 당신의 실력을 시험하고자 한다.\n\n\"북해에 온 이상, 빙궁의 시험을 통과해야 하느니라.\"",
+      "choices": [
+        {
+          "text": "시험에 응한다",
+          "resultText": "빙궁 장로와의 대결에서 승리한다. 장로가 빙속성 비급을 전수한다!",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 8,
+              "value": 0,
+              "stringValue": "enemy_ice_palace_elder"
+            },
+            {
+              "type": 2,
+              "value": 0,
+              "stringValue": "card_rare_ice_technique"
+            }
+          ]
+        },
+        {
+          "text": "거절한다",
+          "resultText": "장로는 불쾌한 표정을 짓지만, 강요하지는 않는다.",
+          "requirements": [],
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "event_snowstorm_shelter",
+      "title": "4지역: 눈보라 대피소",
+      "description": "맹렬한 눈보라가 몰아친다. 근처에 오두막이 보이지만, 안에서 이상한 소리가 들린다.",
+      "choices": [
+        {
+          "text": "오두막에 들어간다",
+          "resultText": "오두막 안에는 부상당한 여행자가 있었다. 치료해주자 감사의 표시로 유물을 준다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 5,
+              "value": 15,
+              "stringValue": ""
+            },
+            {
+              "type": 4,
+              "value": 0,
+              "stringValue": "relic_travelers_gift"
+            }
+          ]
+        },
+        {
+          "text": "내공으로 버틴다 (최대 체력)",
+          "resultText": "강인한 체력으로 눈보라를 견뎌냈다. 정신력이 더욱 강해졌다!",
+          "requirements": [
+            {
+              "type": 3,
+              "value": 0,
+              "stringValue": ""
+            }
+          ],
+          "outcomes": [
+            {
+              "type": 9,
+              "value": 5,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "무리해서 버틴다",
+          "resultText": "체력이 약한 상태에서 버티려다 동상을 입었다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 6,
+              "value": 20,
+              "stringValue": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "event_aurora_meditation",
+      "title": "4지역: 극광 수련",
+      "description": "밤하늘에 아름다운 극광이 펼쳐진다. 이 장관 앞에서 수련하면 큰 깨달음을 얻을 수 있을 것 같다.",
+      "choices": [
+        {
+          "text": "명상에 잠긴다",
+          "resultText": "극광의 신비로운 기운 속에서 깊은 명상에 들어간다. 내공이 크게 증가했다!",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 9,
+              "value": 15,
+              "stringValue": ""
+            },
+            {
+              "type": 5,
+              "value": 10,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "그냥 감상한다",
+          "resultText": "아름다운 극광을 감상하며 마음의 평화를 얻었다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 5,
+              "value": 15,
+              "stringValue": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "event_ice_beast",
+      "title": "4지역: 빙수의 습격",
+      "description": "거대한 빙수(氷獸)가 나타났다! 전설 속에서만 들었던 북해의 괴물이다.",
+      "choices": [
+        {
+          "text": "맞서 싸운다 (고난이도)",
+          "resultText": "치열한 전투 끝에 빙수를 물리쳤다! 전설적인 보물을 얻었다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 8,
+              "value": 0,
+              "stringValue": "enemy_ice_beast"
+            },
+            {
+              "type": 4,
+              "value": 0,
+              "stringValue": "relic_beast_fang"
+            },
+            {
+              "type": 0,
+              "value": 200,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "도망친다",
+          "resultText": "빙수를 피해 황급히 도망쳤다. 무사하지만 약간의 상처를 입었다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 6,
+              "value": 15,
+              "stringValue": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "event_final_test",
+      "title": "5지역: 최종 시험",
+      "description": "천하제일인을 만나기 전, 마지막 시험이 당신을 기다린다.\n\n\"진정한 고수라면, 모든 무기술에 통달했을 것이다.\"",
+      "choices": [
+        {
+          "text": "시험에 응한다 (3개 무기술 대성 이상)",
+          "resultText": "당신의 실력이 인정받았다! 천하제일인과 대결할 자격을 얻었다.",
+          "requirements": [
+            {
+              "type": 5,
+              "value": 2,
+              "stringValue": "Sword"
+            },
+            {
+              "type": 5,
+              "value": 2,
+              "stringValue": "Palm"
+            }
+          ],
+          "outcomes": [
+            {
+              "type": 4,
+              "value": 0,
+              "stringValue": "relic_master_seal"
+            },
+            {
+              "type": 9,
+              "value": 10,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "실력을 갈고 닦은 후 돌아온다",
+          "resultText": "\"아직 준비가 부족합니다.\" 시험관은 고개를 끄덕인다.",
+          "requirements": [],
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "event_chain_merchant_1",
+      "title": "연쇄: 신비한 상인 (1부)",
+      "description": "수상한 옷차림의 상인이 당신에게 다가온다.\n\n\"손님, 진귀한 물건이 있소. 하지만... 대가가 필요하오.\"",
+      "choices": [
+        {
+          "text": "골드 100을 지불한다",
+          "resultText": "상인은 골드를 받고 신비한 지도를 건넨다. \"이 지도를 따라가시오. 보물이 있을 것이오.\"",
+          "requirements": [
+            {
+              "type": 1,
+              "value": 100,
+              "stringValue": ""
+            }
+          ],
+          "outcomes": [
+            {
+              "type": 1,
+              "value": 100,
+              "stringValue": ""
+            },
+            {
+              "type": 10,
+              "value": 0,
+              "stringValue": "event_chain_merchant_2"
+            }
+          ]
+        },
+        {
+          "text": "거절한다",
+          "resultText": "상인은 실망한 표정으로 사라진다.",
+          "requirements": [],
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "event_chain_merchant_2",
+      "title": "연쇄: 신비한 상인 (2부)",
+      "description": "지도를 따라 숨겨진 장소에 도착했다. 오래된 상자가 놓여있다.",
+      "choices": [
+        {
+          "text": "상자를 연다",
+          "resultText": "상자 안에는 전설적인 유물과 골드가 가득하다! 상인의 정보가 정확했다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 4,
+              "value": 0,
+              "stringValue": "relic_ancient_scroll"
+            },
+            {
+              "type": 0,
+              "value": 150,
+              "stringValue": ""
+            },
+            {
+              "type": 2,
+              "value": 0,
+              "stringValue": "card_rare_palm_technique"
+            }
+          ]
+        },
+        {
+          "text": "함정이 있을 수 있다. 조심스럽게 조사한다",
+          "resultText": "신중하게 함정을 해제하고 상자를 열었다. 안전하게 보물을 얻었다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 4,
+              "value": 0,
+              "stringValue": "relic_ancient_scroll"
+            },
+            {
+              "type": 0,
+              "value": 100,
+              "stringValue": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "event_chain_bandit_1",
+      "title": "연쇄: 도적단 추격 (1부)",
+      "description": "마을 사람들이 도적단에게 약탈당했다고 호소한다.\n\n\"도적들이 서쪽으로 도망쳤습니다! 도와주십시오!\"",
+      "choices": [
+        {
+          "text": "도적단을 추격한다",
+          "resultText": "도적들의 흔적을 따라 숲 속으로 들어간다. 앞에서 웃음소리가 들린다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 10,
+              "value": 0,
+              "stringValue": "event_chain_bandit_2"
+            }
+          ]
+        },
+        {
+          "text": "마을 사람들을 치료한다",
+          "resultText": "부상자들을 돌보며 마을 사람들에게 감사를 받는다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 0,
+              "value": 50,
+              "stringValue": ""
+            },
+            {
+              "type": 5,
+              "value": 20,
+              "stringValue": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "event_chain_bandit_2",
+      "title": "연쇄: 도적단의 소굴 (2부)",
+      "description": "도적들의 소굴을 발견했다. 여러 명의 도적이 보이고, 약탈한 물건들이 쌓여있다.",
+      "choices": [
+        {
+          "text": "기습 공격한다",
+          "resultText": "전투가 벌어진다! 도적들을 물리쳤지만 두목은 도망쳤다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 8,
+              "value": 0,
+              "stringValue": "enemy_bandit_group"
+            },
+            {
+              "type": 0,
+              "value": 120,
+              "stringValue": ""
+            },
+            {
+              "type": 10,
+              "value": 0,
+              "stringValue": "event_chain_bandit_3"
+            }
+          ]
+        },
+        {
+          "text": "물건만 가져가고 떠난다 (50골드)",
+          "resultText": "조용히 물건을 챙겨 떠났다. 도적들은 눈치채지 못했다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 0,
+              "value": 80,
+              "stringValue": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "event_chain_bandit_3",
+      "title": "연쇄: 도적단 두목 (3부)",
+      "description": "도망친 도적 두목이 복수를 위해 나타났다!\n\n\"감히 우리 소굴을 습격하다니! 죽여주마!\"",
+      "choices": [
+        {
+          "text": "결투를 벌인다",
+          "resultText": "치열한 전투 끝에 두목을 물리쳤다. 두목이 가진 진귀한 유물을 얻었다!",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 8,
+              "value": 0,
+              "stringValue": "enemy_bandit_boss"
+            },
+            {
+              "type": 4,
+              "value": 0,
+              "stringValue": "relic_bandit_mask"
+            },
+            {
+              "type": 0,
+              "value": 200,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "설득을 시도한다 (체력 70% 이상)",
+          "resultText": "강력한 기세로 두목을 압도했다. 두목은 항복하며 재물을 바친다.",
+          "requirements": [
+            {
+              "type": 0,
+              "value": 70,
+              "stringValue": ""
+            }
+          ],
+          "outcomes": [
+            {
+              "type": 0,
+              "value": 250,
+              "stringValue": ""
+            },
+            {
+              "type": 2,
+              "value": 0,
+              "stringValue": "card_uncommon_saber"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "event_chain_poison_1",
+      "title": "연쇄: 독초 발견 (1부)",
+      "description": "길을 가던 중 독초 밭을 발견했다. 당문의 제자라면 이것으로 독약을 만들 수 있을 것이다.",
+      "choices": [
+        {
+          "text": "독초를 채집한다 (기문병기 소성 이상)",
+          "resultText": "신중하게 독초를 채집했다. 이것으로 무엇을 만들 수 있을까?",
+          "requirements": [
+            {
+              "type": 5,
+              "value": 1,
+              "stringValue": "ExoticWeapon"
+            }
+          ],
+          "outcomes": [
+            {
+              "type": 10,
+              "value": 0,
+              "stringValue": "event_chain_poison_2"
+            }
+          ]
+        },
+        {
+          "text": "위험하니 지나간다",
+          "resultText": "독초는 너무 위험하다. 그냥 지나친다.",
+          "requirements": [],
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "event_chain_poison_2",
+      "title": "연쇄: 독약 제조 (2부)",
+      "description": "채집한 독초로 독약을 만들 수 있다. 어떤 것을 만들까?",
+      "choices": [
+        {
+          "text": "맹독을 제조한다 (골드 50)",
+          "resultText": "강력한 맹독을 만들었다. 적에게 큰 피해를 줄 수 있을 것이다!",
+          "requirements": [
+            {
+              "type": 1,
+              "value": 50,
+              "stringValue": ""
+            }
+          ],
+          "outcomes": [
+            {
+              "type": 1,
+              "value": 50,
+              "stringValue": ""
+            },
+            {
+              "type": 2,
+              "value": 0,
+              "stringValue": "card_rare_poison_dart"
+            },
+            {
+              "type": 4,
+              "value": 0,
+              "stringValue": "relic_poison_vial"
+            }
+          ]
+        },
+        {
+          "text": "해독제를 제조한다",
+          "resultText": "독초로 오히려 해독제를 만들었다. 체력이 회복되고 최대 체력이 증가한다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 5,
+              "value": 30,
+              "stringValue": ""
+            },
+            {
+              "type": 9,
+              "value": 5,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "높은 가격에 판다",
+          "resultText": "독초를 수집가에게 비싼 값에 팔았다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 0,
+              "value": 150,
+              "stringValue": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "event_chain_alliance_1",
+      "title": "연쇄: 무림맹 추천 (1부)",
+      "description": "무림맹 사자가 당신의 무공을 보고 감탄한다.\n\n\"당신 같은 고수가 무림맹에 가입하지 않다니! 추천장을 드리겠소.\"",
+      "choices": [
+        {
+          "text": "추천장을 받는다 (3개 무기술 소성 이상)",
+          "resultText": "무림맹 추천장을 받았다. 무림맹 본부에서 시험을 볼 수 있다.",
+          "requirements": [
+            {
+              "type": 8,
+              "value": 3,
+              "stringValue": ""
+            }
+          ],
+          "outcomes": [
+            {
+              "type": 10,
+              "value": 0,
+              "stringValue": "event_chain_alliance_2"
+            }
+          ]
+        },
+        {
+          "text": "정중히 거절한다",
+          "resultText": "\"무림맹의 제약을 받고 싶지 않습니다.\" 사자는 아쉬워하며 물러간다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 0,
+              "value": 30,
+              "stringValue": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "event_chain_alliance_2",
+      "title": "연쇄: 무림맹 가입 (2부)",
+      "description": "무림맹 본부에 도착했다. 가입 시험이 진행된다.\n\n\"실력을 보여주시오!\"",
+      "choices": [
+        {
+          "text": "시험에 응한다",
+          "resultText": "시험관들과의 대련에서 승리했다! 무림맹의 정식 일원이 되었다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 8,
+              "value": 0,
+              "stringValue": "enemy_alliance_examiner"
+            },
+            {
+              "type": 4,
+              "value": 0,
+              "stringValue": "relic_alliance_badge"
+            },
+            {
+              "type": 9,
+              "value": 8,
+              "stringValue": ""
+            },
+            {
+              "type": 0,
+              "value": 100,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "마음이 바뀌었다. 떠난다",
+          "resultText": "시험을 포기하고 떠났다.",
+          "requirements": [],
+          "outcomes": []
+        }
+      ]
+    },
+    {
+      "id": "event_complex_reward_1",
+      "title": "복합결과: 은인의 보답",
+      "description": "예전에 구해준 노인이 당신을 찾아왔다.\n\n\"은혜를 갚고자 합니다. 제 모든 재산과 비급을 드리겠습니다!\"",
+      "choices": [
+        {
+          "text": "감사히 받는다",
+          "resultText": "노인은 엄청난 재물과 비급, 그리고 신비한 유물까지 남긴다. 정말 큰 보답이다!",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 0,
+              "value": 200,
+              "stringValue": ""
+            },
+            {
+              "type": 2,
+              "value": 0,
+              "stringValue": "card_epic_ultimate_technique"
+            },
+            {
+              "type": 4,
+              "value": 0,
+              "stringValue": "relic_elders_gift"
+            },
+            {
+              "type": 5,
+              "value": 40,
+              "stringValue": ""
+            },
+            {
+              "type": 9,
+              "value": 10,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "재물은 거절하고 비급만 받는다",
+          "resultText": "노인은 당신의 인품에 더욱 감탄하며 최고급 비급과 유물을 준다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 2,
+              "value": 0,
+              "stringValue": "card_legendary_master_technique"
+            },
+            {
+              "type": 4,
+              "value": 0,
+              "stringValue": "relic_noble_heart"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "event_complex_risk_1",
+      "title": "복합결과: 악마의 거래",
+      "description": "마교 고수가 제안한다.\n\n\"강력한 힘을 주겠다. 하지만... 대가를 치러야 한다.\"",
+      "choices": [
+        {
+          "text": "힘을 받아들인다",
+          "resultText": "강력한 마공을 얻었지만, 체력의 일부를 잃고 마교의 저주를 받았다.",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 2,
+              "value": 0,
+              "stringValue": "card_rare_demonic_art"
+            },
+            {
+              "type": 2,
+              "value": 0,
+              "stringValue": "card_rare_blood_ritual"
+            },
+            {
+              "type": 4,
+              "value": 0,
+              "stringValue": "relic_demonic_orb"
+            },
+            {
+              "type": 6,
+              "value": 30,
+              "stringValue": ""
+            },
+            {
+              "type": 9,
+              "value": -5,
+              "stringValue": ""
+            }
+          ]
+        },
+        {
+          "text": "단호히 거절한다",
+          "resultText": "마교 고수는 분노하며 공격한다!",
+          "requirements": [],
+          "outcomes": [
+            {
+              "type": 8,
+              "value": 0,
+              "stringValue": "enemy_demonic_master"
+            }
+          ]
+        }
+      ]
     }
   ]
 }

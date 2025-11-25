@@ -1,0 +1,26 @@
+{
+  "id": "faction_beggars",
+  "name": "개방",
+  "description": "장법의 대가. 타구봉을 휘두르며 적을 제압하고, 전투에서 얻은 전리품으로 부를 축적한다.",
+  "startingDeck": [
+    "card_strike",
+    "card_strike",
+    "card_strike",
+    "card_palm_strike",
+    "card_palm_thrust",
+    "card_eighteen_palms",
+    "card_defend",
+    "card_defend",
+    "card_defend",
+    "card_palm_deflect",
+    "card_dragon_subduing_palm",
+    "card_staff_sweep"
+  ],
+  "startingRelic": "relic_begging_stick",
+  "passive": {
+    "type": 3,
+    "value": 1,
+    "description": "장법 카드 사용 시 골드 1 획득"
+  },
+  "primaryWeapon": 4
+}

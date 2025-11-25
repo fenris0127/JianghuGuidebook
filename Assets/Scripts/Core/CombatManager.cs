@@ -92,6 +92,11 @@ namespace JianghuGuidebook.Core
                 }
             }
             player.Initialize();
+            
+            // Achievement: Reset combat trackers
+            damageTakenInCombat = 0;
+            player.OnDamageTaken -= OnPlayerDamageTaken; // Prevent double subscription
+            player.OnDamageTaken += OnPlayerDamageTaken;
 
             // 테스트용 적 생성 (씬에 적이 없으면)
             if (enemies.Count == 0)
@@ -160,6 +165,19 @@ namespace JianghuGuidebook.Core
             }
 
             // TODO: 실제 카드 효과 적용 (CardEffectManager 등을 통해)
+
+            // Achievement: Combo
+            cardsPlayedThisTurn++;
+            if (cardsPlayedThisTurn >= 10)
+            {
+                JianghuGuidebook.Achievement.AchievementManager.Instance?.UnlockAchievement("ach_combat_combo");
+            }
+
+            // Achievement: One Shot (Check base damage for now, ideally check actual damage dealt)
+            if (card.Data.baseDamage >= 50)
+            {
+                JianghuGuidebook.Achievement.AchievementManager.Instance?.UnlockAchievement("ach_combat_one_shot");
+            }
         }
 
         /// <summary>
@@ -179,6 +197,9 @@ namespace JianghuGuidebook.Core
             {
                 player.OnTurnStart();
             }
+
+            // Achievement: Reset turn counters
+            cardsPlayedThisTurn = 0;
 
             // TODO: 카드 드로우 (DeckManager 구현 후)
         }
@@ -293,6 +314,12 @@ namespace JianghuGuidebook.Core
         private void OnEnemyDeath(Enemy enemy)
         {
             Debug.Log($"적 사망 처리: {enemy.EnemyData?.name}");
+
+            // Achievement: Elite Hunter
+            // Assuming we can check if enemy is elite. For now, just increment.
+            // TODO: Add IsElite check
+            JianghuGuidebook.Achievement.AchievementManager.Instance?.IncrementProgress("ach_combat_elite_hunter", 1);
+
             // 전투 중이면 승리 조건 체크
             if (currentState == CombatState.PlayerTurn || currentState == CombatState.EnemyTurn)
             {
@@ -317,6 +344,18 @@ namespace JianghuGuidebook.Core
 
             // TODO: 승리 UI 표시
             // TODO: 보상 화면으로 전환
+
+            // Achievement: Flawless
+            if (damageTakenInCombat == 0)
+            {
+                // Check if it was a boss battle (TODO: Add boss check)
+                // For now, unlock if no damage taken in ANY battle, or check if any enemy was a boss
+                bool isBossBattle = enemies.Any(e => e.EnemyData != null && e.EnemyData.isBoss);
+                if (isBossBattle)
+                {
+                    JianghuGuidebook.Achievement.AchievementManager.Instance?.UnlockAchievement("ach_combat_flawless");
+                }
+            }
         }
 
         /// <summary>
@@ -352,5 +391,17 @@ namespace JianghuGuidebook.Core
 
             Debug.Log($"전투 상태 변경: {oldState} -> {newState}");
         }
+
+        // --- Achievement Tracking ---
+        private int cardsPlayedThisTurn = 0;
+        private int damageTakenInCombat = 0;
+
+        private void OnPlayerDamageTaken(int amount)
+        {
+            damageTakenInCombat += amount;
+        }
+
+        // Hook into StartPlayerTurn to reset turn counters
+        // (Already in StartPlayerTurn, adding logic there)
     }
 }

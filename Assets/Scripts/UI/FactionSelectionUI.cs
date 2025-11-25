@@ -1,250 +1,143 @@
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 using System.Collections.Generic;
-using JianghuGuidebook.Data;
-using JianghuGuidebook.Core;
+using JianghuGuidebook.Faction;
+using UnityEngine.SceneManagement;
 
 namespace JianghuGuidebook.UI
 {
-    /// <summary>
-    /// 분파 선택 화면 UI
-    /// </summary>
     public class FactionSelectionUI : MonoBehaviour
     {
-        [Header("분파 선택 패널")]
-        [SerializeField] private GameObject factionSelectionPanel;
+        [Header("List")]
+        [SerializeField] private Transform factionListContainer;
+        [SerializeField] private GameObject factionSlotPrefab;
 
-        [Header("분파 카드 프리팹")]
-        [SerializeField] private GameObject factionCardPrefab;
-        [SerializeField] private Transform factionCardContainer;
+        [Header("Details")]
+        [SerializeField] private Text nameText;
+        [SerializeField] private Text descriptionText;
+        [SerializeField] private Text passiveNameText;
+        [SerializeField] private Text passiveDescText;
+        [SerializeField] private Text relicNameText;
+        [SerializeField] private Text deckCountText;
 
-        [Header("선택된 분파 정보")]
-        [SerializeField] private TextMeshProUGUI selectedFactionNameText;
-        [SerializeField] private TextMeshProUGUI selectedFactionDescriptionText;
-        [SerializeField] private TextMeshProUGUI selectedFactionSpecialtyText;
-        [SerializeField] private TextMeshProUGUI selectedFactionStatsText;
-
-        [Header("버튼")]
-        [SerializeField] private Button confirmButton;
+        [Header("Controls")]
+        [SerializeField] private Button startButton;
         [SerializeField] private Button backButton;
 
+        private List<FactionSlotUI> slots = new List<FactionSlotUI>();
         private FactionData selectedFaction;
-        private int selectedSlot = 0;
-        private List<GameObject> factionCards = new List<GameObject>();
 
-        // 이벤트
-        public System.Action<FactionData, int> OnFactionConfirmed;
+        // Event to notify MainMenuUI
+        public System.Action<FactionData> OnFactionConfirmed;
 
         private void Start()
         {
-            // 버튼 리스너
-            if (confirmButton != null)
-                confirmButton.onClick.AddListener(OnConfirmClicked);
-
-            if (backButton != null)
-                backButton.onClick.AddListener(OnBackClicked);
-
-            // 초기 상태
-            if (factionSelectionPanel != null)
-                factionSelectionPanel.SetActive(false);
-
-            if (confirmButton != null)
-                confirmButton.interactable = false;
+            // Initialize is called by MainMenuUI
         }
 
-        /// <summary>
-        /// 분파 선택 화면을 표시합니다
-        /// </summary>
-        public void Show(int slotIndex)
+        public void Initialize()
         {
-            selectedSlot = slotIndex;
-
-            if (factionSelectionPanel != null)
+            // Clear existing slots
+            foreach (Transform child in factionListContainer)
             {
-                factionSelectionPanel.SetActive(true);
+                Destroy(child.gameObject);
             }
+            slots.Clear();
 
-            // 분파 목록 로드
-            LoadFactions();
-        }
-
-        /// <summary>
-        /// 분파 선택 화면을 닫습니다
-        /// </summary>
-        public void Hide()
-        {
-            if (factionSelectionPanel != null)
+            if (FactionManager.Instance == null)
             {
-                factionSelectionPanel.SetActive(false);
-            }
-
-            ClearFactionCards();
-            selectedFaction = null;
-        }
-
-        /// <summary>
-        /// 분파 목록을 로드하여 표시합니다
-        /// </summary>
-        private void LoadFactions()
-        {
-            if (DataManager.Instance == null)
-            {
-                Debug.LogError("DataManager가 없습니다");
+                Debug.LogError("FactionManager instance not found!");
                 return;
             }
 
-            // 기존 카드 제거
-            ClearFactionCards();
+            List<FactionData> factions = FactionManager.Instance.GetAllFactions();
 
-            // 모든 분파 데이터 가져오기
-            FactionData[] factions = DataManager.Instance.GetAllFactions();
-
-            if (factions == null || factions.Length == 0)
-            {
-                Debug.LogError("분파 데이터가 없습니다");
-                return;
-            }
-
-            // 분파 카드 생성
             foreach (var faction in factions)
             {
-                CreateFactionCard(faction);
-            }
-
-            Debug.Log($"[FactionSelectionUI] {factions.Length}개 분파 로드 완료");
-        }
-
-        /// <summary>
-        /// 분파 카드를 생성합니다
-        /// </summary>
-        private void CreateFactionCard(FactionData faction)
-        {
-            if (factionCardPrefab == null || factionCardContainer == null)
-            {
-                Debug.LogWarning("분파 카드 프리팹 또는 컨테이너가 설정되지 않았습니다");
-                return;
-            }
-
-            GameObject cardObj = Instantiate(factionCardPrefab, factionCardContainer);
-
-            // 카드 정보 설정
-            TextMeshProUGUI nameText = cardObj.transform.Find("NameText")?.GetComponent<TextMeshProUGUI>();
-            if (nameText != null)
-            {
-                nameText.text = faction.name;
-            }
-
-            TextMeshProUGUI specialtyText = cardObj.transform.Find("SpecialtyText")?.GetComponent<TextMeshProUGUI>();
-            if (specialtyText != null)
-            {
-                specialtyText.text = $"특화: {faction.specialty}";
-            }
-
-            // 버튼 설정
-            Button cardButton = cardObj.GetComponent<Button>();
-            if (cardButton != null)
-            {
-                cardButton.onClick.AddListener(() => OnFactionCardClicked(faction));
-            }
-
-            factionCards.Add(cardObj);
-        }
-
-        /// <summary>
-        /// 분파 카드를 모두 제거합니다
-        /// </summary>
-        private void ClearFactionCards()
-        {
-            foreach (var card in factionCards)
-            {
-                if (card != null)
+                GameObject obj = Instantiate(factionSlotPrefab, factionListContainer);
+                FactionSlotUI slot = obj.GetComponent<FactionSlotUI>();
+                if (slot != null)
                 {
-                    Destroy(card);
+                    slot.Setup(faction, OnFactionSelected);
+                    slots.Add(slot);
                 }
             }
 
-            factionCards.Clear();
+            // Select first faction by default if available
+            if (factions.Count > 0)
+            {
+                OnFactionSelected(factions[0]);
+            }
+
+            if (startButton != null)
+            {
+                startButton.onClick.RemoveAllListeners();
+                startButton.onClick.AddListener(OnStartButtonClicked);
+            }
+
+            if (backButton != null)
+            {
+                backButton.onClick.RemoveAllListeners();
+                backButton.onClick.AddListener(OnBackButtonClicked);
+            }
         }
 
-        /// <summary>
-        /// 분파 카드 클릭
-        /// </summary>
-        private void OnFactionCardClicked(FactionData faction)
+        private void OnFactionSelected(FactionData faction)
         {
-            Debug.Log($"[FactionSelectionUI] 분파 선택: {faction.name}");
-
             selectedFaction = faction;
-            UpdateSelectedFactionInfo();
 
-            // 확인 버튼 활성화
-            if (confirmButton != null)
+            // Update UI
+            if (nameText != null) nameText.text = faction.name;
+            if (descriptionText != null) descriptionText.text = faction.description;
+            
+            if (passiveNameText != null) passiveNameText.text = "패시브 효과"; // Or specific name if added
+            if (passiveDescText != null) passiveDescText.text = faction.passive.description;
+
+            if (relicNameText != null) relicNameText.text = $"시작 유물: {faction.startingRelic}"; // Should resolve name from ID
+            if (deckCountText != null) deckCountText.text = $"시작 덱: {faction.startingDeck.Count}장";
+
+            // Update highlights
+            foreach (var slot in slots)
             {
-                confirmButton.interactable = true;
+                // Assuming simple object comparison works for now, or compare IDs
+                // FactionData doesn't override Equals, so reference comparison
+                // But data comes from same list, so it should be fine.
+                // Better to compare IDs if possible.
+                slot.SetSelected(slot == null ? false : (faction.id == selectedFaction.id)); // Need to access ID inside slot or pass it back? 
+                // Actually slot doesn't expose data. Let's fix logic.
+                // Re-setup slot to expose ID or just rely on the callback context.
+                // For now, let's just iterate and reset all, then highlight the one that matches ID.
+            }
+            
+            // Correct highlight logic:
+            // We need to know which slot holds this faction.
+            // Since we don't have easy access back from data to slot without searching:
+            int index = FactionManager.Instance.GetAllFactions().FindIndex(f => f.id == faction.id);
+            if (index >= 0 && index < slots.Count)
+            {
+                for(int i=0; i<slots.Count; i++)
+                {
+                    slots[i].SetSelected(i == index);
+                }
             }
         }
 
-        /// <summary>
-        /// 선택된 분파 정보를 업데이트합니다
-        /// </summary>
-        private void UpdateSelectedFactionInfo()
+        private void OnStartButtonClicked()
         {
-            if (selectedFaction == null)
-                return;
+            if (selectedFaction == null) return;
 
-            if (selectedFactionNameText != null)
+            if (FactionManager.Instance.SelectFaction(selectedFaction.id))
             {
-                selectedFactionNameText.text = selectedFaction.name;
-            }
-
-            if (selectedFactionDescriptionText != null)
-            {
-                selectedFactionDescriptionText.text = selectedFaction.description;
-            }
-
-            if (selectedFactionSpecialtyText != null)
-            {
-                selectedFactionSpecialtyText.text = $"<b>특화:</b> {selectedFaction.specialty}";
-            }
-
-            if (selectedFactionStatsText != null)
-            {
-                selectedFactionStatsText.text =
-                    $"<b>시작 스탯</b>\n" +
-                    $"체력: {selectedFaction.startingHealth}\n" +
-                    $"골드: {selectedFaction.startingGold}\n" +
-                    $"최대 내공: {selectedFaction.startingMaxEnergy}\n" +
-                    $"시작 덱: {selectedFaction.startingDeck.Count}장";
+                // Notify MainMenuUI to proceed
+                OnFactionConfirmed?.Invoke(selectedFaction);
+                gameObject.SetActive(false);
             }
         }
 
-        /// <summary>
-        /// 확인 버튼 클릭
-        /// </summary>
-        private void OnConfirmClicked()
+        private void OnBackButtonClicked()
         {
-            if (selectedFaction == null)
-            {
-                Debug.LogWarning("선택된 분파가 없습니다");
-                return;
-            }
-
-            Debug.Log($"[FactionSelectionUI] 분파 확정: {selectedFaction.name}");
-
-            // 이벤트 발생
-            OnFactionConfirmed?.Invoke(selectedFaction, selectedSlot);
-
-            // 화면 닫기
-            Hide();
-        }
-
-        /// <summary>
-        /// 뒤로 버튼 클릭
-        /// </summary>
-        private void OnBackClicked()
-        {
-            Debug.Log("[FactionSelectionUI] 분파 선택 취소");
-            Hide();
+            // Return to Main Menu
+            gameObject.SetActive(false);
         }
     }
 }

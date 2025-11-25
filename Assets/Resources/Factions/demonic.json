@@ -1,0 +1,26 @@
+{
+  "id": "faction_demonic",
+  "name": "혈마신교",
+  "description": "마공의 정수. 자신의 체력을 희생하여 강력한 힘을 얻고, 적의 생명력을 흡수하여 전투를 이어간다.",
+  "startingDeck": [
+    "card_strike",
+    "card_strike",
+    "card_strike",
+    "card_blood_strike",
+    "card_life_drain",
+    "card_sacrifice",
+    "card_defend",
+    "card_defend",
+    "card_defend",
+    "card_blood_barrier",
+    "card_demonic_power",
+    "card_soul_reaper"
+  ],
+  "startingRelic": "relic_blood_orb",
+  "passive": {
+    "type": 5,
+    "value": 1,
+    "description": "체력 손실 시 내공 1 회복"
+  },
+  "primaryWeapon": 1
+}

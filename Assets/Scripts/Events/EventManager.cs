@@ -35,12 +35,14 @@ namespace JianghuGuidebook.Events
 
         private EventData currentEvent;
         private EventChoice lastChoice;
+        private Queue<string> chainEventQueue = new Queue<string>();
 
         // Events
         public System.Action<EventData> OnEventStarted;
         public System.Action<EventChoice> OnChoiceSelected;
         public System.Action<List<EventOutcome>> OnOutcomesApplied;
         public System.Action OnEventCompleted;
+        public System.Action<string> OnChainEventTriggered;  // 연쇄 이벤트 트리거 시
 
         // 특수 결과 이벤트 (UI가 처리해야 함)
         public System.Action<int> OnCardRemovalRequested;      // 제거할 카드 수
@@ -287,10 +289,39 @@ namespace JianghuGuidebook.Events
                     }
                     break;
 
+                case OutcomeType.ChainEvent:
+                    QueueChainEvent(outcome.stringValue);
+                    break;
+
                 default:
                     Debug.LogWarning($"처리되지 않은 결과 타입: {outcome.type}");
                     break;
             }
+        }
+
+        /// <summary>
+        /// 연쇄 이벤트를 큐에 추가합니다
+        /// </summary>
+        private void QueueChainEvent(string eventId)
+        {
+            if (string.IsNullOrEmpty(eventId))
+            {
+                Debug.LogWarning("[이벤트] 연쇄 이벤트 ID가 비어있습니다");
+                return;
+            }
+
+            // 이벤트 존재 여부 확인
+            EventData chainEvent = DataManager.Instance?.GetEventById(eventId);
+            if (chainEvent == null)
+            {
+                Debug.LogError($"[이벤트] 연쇄 이벤트를 찾을 수 없습니다: {eventId}");
+                return;
+            }
+
+            chainEventQueue.Enqueue(eventId);
+            Debug.Log($"[이벤트] 연쇄 이벤트 대기열 추가: {eventId} ({chainEvent.title})");
+
+            OnChainEventTriggered?.Invoke(eventId);
         }
 
         /// <summary>
@@ -425,12 +456,49 @@ namespace JianghuGuidebook.Events
         /// </summary>
         public void CompleteEvent()
         {
-            Debug.Log($"이벤트 완료: {currentEvent.title}");
+            Debug.Log($"이벤트 완료: {currentEvent?.title}");
 
             OnEventCompleted?.Invoke();
 
             currentEvent = null;
             lastChoice = null;
+
+            // 연쇄 이벤트가 있으면 자동 시작
+            ProcessNextChainEvent();
+        }
+
+        /// <summary>
+        /// 다음 연쇄 이벤트를 처리합니다
+        /// </summary>
+        private void ProcessNextChainEvent()
+        {
+            if (chainEventQueue.Count > 0)
+            {
+                string nextEventId = chainEventQueue.Dequeue();
+                Debug.Log($"[이벤트] 연쇄 이벤트 자동 시작: {nextEventId}");
+                StartEvent(nextEventId);
+            }
+            else
+            {
+                Debug.Log("[이벤트] 연쇄 이벤트 없음, 이벤트 종료");
+            }
+        }
+
+        /// <summary>
+        /// 대기 중인 연쇄 이벤트가 있는지 확인합니다
+        /// </summary>
+        public bool HasChainEventPending()
+        {
+            return chainEventQueue.Count > 0;
+        }
+
+        /// <summary>
+        /// 연쇄 이벤트 큐를 초기화합니다
+        /// </summary>
+        public void ClearChainEventQueue()
+        {
+            chainEventQueue.Clear();
+            Debug.Log("[이벤트] 연쇄 이벤트 큐 초기화");
         }
 
         /// <summary>
@@ -440,6 +508,7 @@ namespace JianghuGuidebook.Events
         {
             currentEvent = null;
             lastChoice = null;
+            chainEventQueue.Clear();
             Debug.Log("이벤트 시스템 리셋 완료");
         }
 

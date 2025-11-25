@@ -7,6 +7,7 @@ using JianghuGuidebook.Combat;
 using JianghuGuidebook.Economy;
 using JianghuGuidebook.Relics;
 using JianghuGuidebook.Data;
+using JianghuGuidebook.Achievement;
 
 namespace JianghuGuidebook.Core
 {
@@ -321,6 +322,9 @@ namespace JianghuGuidebook.Core
             // 메타 통계 업데이트
             UpdateMetaStatistics(completedRun, victory);
 
+            // 업적 체크
+            CheckRunAchievements(completedRun, victory);
+
             // 메타 데이터 저장
             if (SaveManager.Instance != null)
             {
@@ -334,6 +338,47 @@ namespace JianghuGuidebook.Core
             OnRunCompleted?.Invoke();
 
             Debug.Log("[GameManager] 런 완료 처리 완료");
+        }
+
+        private void CheckRunAchievements(RunData runData, bool victory)
+        {
+            if (AchievementManager.Instance == null) return;
+
+            // 1. 전투 관련
+            if (victory)
+            {
+                AchievementManager.Instance.UnlockAchievement("ach_combat_first_blood"); // 첫 승리 (단순화: 승리하면 무조건 달성)
+                
+                if (runData.currentHealth == 1)
+                {
+                    AchievementManager.Instance.UnlockAchievement("ach_combat_survival");
+                }
+            }
+
+            // 2. 수집 관련
+            if (runData.relicIds.Count >= 40)
+            {
+                AchievementManager.Instance.UnlockAchievement("ach_col_relic_hunter");
+            }
+
+            if (runData.currentGold >= 1000)
+            {
+                AchievementManager.Instance.UnlockAchievement("ach_col_rich");
+            }
+
+            if (runData.deckCardIds.Count >= 30)
+            {
+                AchievementManager.Instance.UnlockAchievement("ach_col_deck_master");
+            }
+
+            // 3. 특수
+            if (victory)
+            {
+                if (runData.deckCardIds.Count <= 20)
+                {
+                    AchievementManager.Instance.UnlockAchievement("ach_spec_minimalist");
+                }
+            }
         }
 
         /// <summary>

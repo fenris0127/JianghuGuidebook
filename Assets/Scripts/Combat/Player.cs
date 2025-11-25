@@ -37,6 +37,7 @@ namespace JianghuGuidebook.Combat
         public System.Action<int, int> OnEnergyChanged;  // (current, max)
         public System.Action<int> OnBlockChanged;
         public System.Action OnDeath;
+        public System.Action<int> OnDamageTaken; // (amount)
 
         private void Start()
         {
@@ -107,8 +108,11 @@ namespace JianghuGuidebook.Combat
             currentHealth -= amount;
             if (currentHealth < 0) currentHealth = 0;
 
-            Debug.Log($"플레이어: {amount} 피해 받음 (현재 체력: {currentHealth}/{maxHealth})");
+            Debug.Log($"플레이어: {amount} 피해 받음 (남은 체력: {currentHealth})");
             OnHealthChanged?.Invoke(currentHealth, maxHealth);
+            
+            // 피해 입음 이벤트 발생 (업적용)
+            OnDamageTaken?.Invoke(amount);
 
             // 사망 체크
             if (currentHealth <= 0)

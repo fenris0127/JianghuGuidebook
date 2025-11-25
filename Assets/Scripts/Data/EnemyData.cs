@@ -40,6 +40,7 @@ namespace JianghuGuidebook.Data
     {
         public string id;               // 고유 ID (예: "enemy_bandit")
         public string name;             // 적 이름 (예: "산적")
+        public string description;      // 적 설명
         public int maxHealth;           // 최대 체력
         public EnemyAction[] actions;   // 행동 패턴 목록
 

@@ -16,7 +16,8 @@ namespace JianghuGuidebook.Events
         TakeDamage,         // 체력 손실
         UpgradeCard,        // 카드 업그레이드
         StartCombat,        // 전투 발생
-        GainMaxHealth       // 최대 체력 증가
+        GainMaxHealth,      // 최대 체력 증가
+        ChainEvent          // 연쇄 이벤트 (다음 이벤트 트리거)
     }
 
     /// <summary>
@@ -60,6 +61,8 @@ namespace JianghuGuidebook.Events
                     return $"전투 발생: {stringValue}";
                 case OutcomeType.GainMaxHealth:
                     return $"최대 체력 +{value}";
+                case OutcomeType.ChainEvent:
+                    return $"후속 이벤트 발생: {stringValue}";
                 default:
                     return "";
             }
@@ -75,7 +78,13 @@ namespace JianghuGuidebook.Events
         MinGold,            // 최소 골드
         HasRelic,           // 특정 유물 보유
         MaxHealth,          // 최대 체력 이상
-        Random              // 확률 기반 (성공률)
+        Random,             // 확률 기반 (성공률)
+        HasWeaponMastery,   // 무기술 경지 조건 (stringValue: WeaponType, value: MasteryTier)
+        HasInnerRealm,      // 내공 경지 조건 (value: InnerEnergyRealm)
+        MinCardsInDeck,     // 최소 덱 카드 수
+        HasCardInDeck,      // 특정 카드 보유 (stringValue: CardId)
+        MinDeckSize,        // 덱 크기 최소
+        MaxDeckSize         // 덱 크기 최대
     }
 
     /// <summary>
@@ -109,6 +118,18 @@ namespace JianghuGuidebook.Events
                     return "최대 체력 필요";
                 case RequirementType.Random:
                     return $"성공률 {value}%";
+                case RequirementType.HasWeaponMastery:
+                    return $"{stringValue} 경지 {value} 이상 필요";
+                case RequirementType.HasInnerRealm:
+                    return $"내공 경지 {value} 이상 필요";
+                case RequirementType.MinCardsInDeck:
+                    return $"덱에 카드 {value}장 이상 필요";
+                case RequirementType.HasCardInDeck:
+                    return $"카드 '{stringValue}' 보유 필요";
+                case RequirementType.MinDeckSize:
+                    return $"덱 크기 {value} 이상 필요";
+                case RequirementType.MaxDeckSize:
+                    return $"덱 크기 {value} 이하 필요";
                 default:
                     return "";
             }

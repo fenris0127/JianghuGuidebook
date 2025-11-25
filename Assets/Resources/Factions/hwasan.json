@@ -1,0 +1,26 @@
+{
+  "id": "faction_hwasan",
+  "name": "화산파",
+  "description": "검술의 명가. 자주검을 휘두르는 화산의 검객들은 강력한 검기로 적을 제압한다.",
+  "startingDeck": [
+    "card_strike",
+    "card_strike",
+    "card_strike",
+    "card_strike",
+    "card_sword_slash",
+    "card_sword_thrust",
+    "card_defend",
+    "card_defend",
+    "card_defend",
+    "card_sword_block",
+    "card_sword_flow",
+    "card_plum_blossom_sword"
+  ],
+  "startingRelic": "relic_purple_sword",
+  "passive": {
+    "type": 1,
+    "value": 10,
+    "description": "검술 카드 피해 +10%"
+  },
+  "primaryWeapon": 1
+}

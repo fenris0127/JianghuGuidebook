@@ -3,6 +3,7 @@
     {
       "id": "enemy_bandit",
       "name": "산적",
+      "description": "강호를 떠도는 흔한 산적입니다. 약탈을 일삼습니다.",
       "maxHealth": 45,
       "actions": [
         {
@@ -20,6 +21,7 @@
     {
       "id": "enemy_dark_cultivator",
       "name": "마도수련자",
+      "description": "금지된 마공을 익힌 수련자입니다. 위험한 기운을 내뿜습니다.",
       "maxHealth": 30,
       "actions": [
         {
@@ -42,6 +44,7 @@
     {
       "id": "enemy_armored_guard",
       "name": "철갑위병",
+      "description": "단단한 갑옷으로 무장한 위병입니다. 방어력이 높습니다.",
       "maxHealth": 60,
       "actions": [
         {

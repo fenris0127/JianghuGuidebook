@@ -1,68 +1,508 @@
 {
-    "masteries": [
-        {
-            "weaponType": 1,
-            "stage": 1,
-            "name": "검기상인",
-            "damageBonus": 1,
-            "effectDescription": "검 공격력 +1",
-            "requiredXP": 10
-        },
-        {
-            "weaponType": 1,
-            "stage": 2,
-            "name": "검기종횡",
-            "damageBonus": 2,
-            "effectDescription": "검 공격력 +2",
-            "requiredXP": 30
-        },
-        {
-            "weaponType": 2,
-            "stage": 1,
-            "name": "도법입문",
-            "damageBonus": 1,
-            "effectDescription": "도 공격력 +1",
-            "requiredXP": 10
-        },
-        {
-            "weaponType": 2,
-            "stage": 2,
-            "name": "광도",
-            "damageBonus": 2,
-            "effectDescription": "도 공격력 +2",
-            "requiredXP": 30
-        },
-        {
-            "weaponType": 3,
-            "stage": 1,
-            "name": "창술입문",
-            "damageBonus": 1,
-            "effectDescription": "창 공격력 +1",
-            "requiredXP": 10
-        },
-        {
-            "weaponType": 4,
-            "stage": 1,
-            "name": "장법입문",
-            "damageBonus": 1,
-            "effectDescription": "장 공격력 +1",
-            "requiredXP": 10
-        },
-        {
-            "weaponType": 5,
-            "stage": 1,
-            "name": "권법입문",
-            "damageBonus": 1,
-            "effectDescription": "권 공격력 +1",
-            "requiredXP": 10
-        },
-        {
-            "weaponType": 6,
-            "stage": 1,
-            "name": "암기입문",
-            "damageBonus": 1,
-            "effectDescription": "암기 공격력 +1",
-            "requiredXP": 10
-        }
-    ]
+  "masteries": [
+    {
+      "id": "mastery_sword_minor",
+      "weaponType": 1,
+      "tier": 1,
+      "displayName": "소성",
+      "description": "검술의 기본을 깨우쳐 작은 성취를 이루었습니다.",
+      "condition": {
+        "type": 0,
+        "requiredCardCount": 15,
+        "requiredDamageDealt": 0,
+        "requirePureBuild": false,
+        "requiredSecretSkillsUsed": 0
+      },
+      "reward": {
+        "description": "검술 카드 피해 +5%",
+        "damageBonus": 5.0,
+        "costReduction": 0,
+        "specialEffect": "",
+        "unlockedCardIds": []
+      }
+    },
+    {
+      "id": "mastery_sword_major",
+      "weaponType": 1,
+      "tier": 2,
+      "displayName": "대성",
+      "description": "검술의 정수를 이해하며 큰 성취를 이루었습니다.",
+      "condition": {
+        "type": 1,
+        "requiredCardCount": 0,
+        "requiredDamageDealt": 300,
+        "requirePureBuild": false,
+        "requiredSecretSkillsUsed": 0
+      },
+      "reward": {
+        "description": "검술 카드 피해 +10%",
+        "damageBonus": 10.0,
+        "costReduction": 0,
+        "specialEffect": "",
+        "unlockedCardIds": []
+      }
+    },
+    {
+      "id": "mastery_sword_transcendent",
+      "weaponType": 1,
+      "tier": 3,
+      "displayName": "화경",
+      "description": "검술이 승화의 경지에 이르렀습니다.",
+      "condition": {
+        "type": 2,
+        "requiredCardCount": 0,
+        "requiredDamageDealt": 0,
+        "requirePureBuild": true,
+        "requiredSecretSkillsUsed": 0
+      },
+      "reward": {
+        "description": "검술 카드 피해 +15%, 비용 -1",
+        "damageBonus": 15.0,
+        "costReduction": 1,
+        "specialEffect": "",
+        "unlockedCardIds": []
+      }
+    },
+    {
+      "id": "mastery_sword_master",
+      "weaponType": 1,
+      "tier": 4,
+      "displayName": "검심통명",
+      "description": "검의 마음이 통달하여 최고의 경지에 도달했습니다.",
+      "condition": {
+        "type": 3,
+        "requiredCardCount": 0,
+        "requiredDamageDealt": 0,
+        "requirePureBuild": false,
+        "requiredSecretSkillsUsed": 5
+      },
+      "reward": {
+        "description": "검술 카드 피해 +25%, 검술 비기 사용 시 카드 1장 드로우",
+        "damageBonus": 25.0,
+        "costReduction": 0,
+        "specialEffect": "검술 비기 사용 시 카드 1장 드로우",
+        "unlockedCardIds": ["card_sword_ultimate"]
+      }
+    },
+    {
+      "id": "mastery_saber_minor",
+      "weaponType": 2,
+      "tier": 1,
+      "displayName": "소성",
+      "description": "도법의 기본을 깨우쳐 작은 성취를 이루었습니다.",
+      "condition": {
+        "type": 0,
+        "requiredCardCount": 15,
+        "requiredDamageDealt": 0,
+        "requirePureBuild": false,
+        "requiredSecretSkillsUsed": 0
+      },
+      "reward": {
+        "description": "도법 카드 피해 +5%",
+        "damageBonus": 5.0,
+        "costReduction": 0,
+        "specialEffect": "",
+        "unlockedCardIds": []
+      }
+    },
+    {
+      "id": "mastery_saber_major",
+      "weaponType": 2,
+      "tier": 2,
+      "displayName": "대성",
+      "description": "도법의 정수를 이해하며 큰 성취를 이루었습니다.",
+      "condition": {
+        "type": 1,
+        "requiredCardCount": 0,
+        "requiredDamageDealt": 300,
+        "requirePureBuild": false,
+        "requiredSecretSkillsUsed": 0
+      },
+      "reward": {
+        "description": "도법 카드 피해 +10%",
+        "damageBonus": 10.0,
+        "costReduction": 0,
+        "specialEffect": "",
+        "unlockedCardIds": []
+      }
+    },
+    {
+      "id": "mastery_saber_transcendent",
+      "weaponType": 2,
+      "tier": 3,
+      "displayName": "화경",
+      "description": "도법이 승화의 경지에 이르렀습니다.",
+      "condition": {
+        "type": 2,
+        "requiredCardCount": 0,
+        "requiredDamageDealt": 0,
+        "requirePureBuild": true,
+        "requiredSecretSkillsUsed": 0
+      },
+      "reward": {
+        "description": "도법 카드 피해 +15%, 비용 -1",
+        "damageBonus": 15.0,
+        "costReduction": 1,
+        "specialEffect": "",
+        "unlockedCardIds": []
+      }
+    },
+    {
+      "id": "mastery_saber_master",
+      "weaponType": 2,
+      "tier": 4,
+      "displayName": "도의",
+      "description": "도의 뜻을 깨우쳐 최고의 경지에 도달했습니다.",
+      "condition": {
+        "type": 3,
+        "requiredCardCount": 0,
+        "requiredDamageDealt": 0,
+        "requirePureBuild": false,
+        "requiredSecretSkillsUsed": 5
+      },
+      "reward": {
+        "description": "도법 카드 피해 +25%, 도법 공격 시 출혈 부여",
+        "damageBonus": 25.0,
+        "costReduction": 0,
+        "specialEffect": "도법 공격 시 출혈 2 부여",
+        "unlockedCardIds": ["card_saber_ultimate"]
+      }
+    },
+    {
+      "id": "mastery_spear_minor",
+      "weaponType": 3,
+      "tier": 1,
+      "displayName": "소성",
+      "description": "창술의 기본을 깨우쳐 작은 성취를 이루었습니다.",
+      "condition": {
+        "type": 0,
+        "requiredCardCount": 15,
+        "requiredDamageDealt": 0,
+        "requirePureBuild": false,
+        "requiredSecretSkillsUsed": 0
+      },
+      "reward": {
+        "description": "창술 카드 피해 +5%",
+        "damageBonus": 5.0,
+        "costReduction": 0,
+        "specialEffect": "",
+        "unlockedCardIds": []
+      }
+    },
+    {
+      "id": "mastery_spear_major",
+      "weaponType": 3,
+      "tier": 2,
+      "displayName": "대성",
+      "description": "창술의 정수를 이해하며 큰 성취를 이루었습니다.",
+      "condition": {
+        "type": 1,
+        "requiredCardCount": 0,
+        "requiredDamageDealt": 300,
+        "requirePureBuild": false,
+        "requiredSecretSkillsUsed": 0
+      },
+      "reward": {
+        "description": "창술 카드 피해 +10%",
+        "damageBonus": 10.0,
+        "costReduction": 0,
+        "specialEffect": "",
+        "unlockedCardIds": []
+      }
+    },
+    {
+      "id": "mastery_spear_transcendent",
+      "weaponType": 3,
+      "tier": 3,
+      "displayName": "화경",
+      "description": "창술이 승화의 경지에 이르렀습니다.",
+      "condition": {
+        "type": 2,
+        "requiredCardCount": 0,
+        "requiredDamageDealt": 0,
+        "requirePureBuild": true,
+        "requiredSecretSkillsUsed": 0
+      },
+      "reward": {
+        "description": "창술 카드 피해 +15%, 비용 -1",
+        "damageBonus": 15.0,
+        "costReduction": 1,
+        "specialEffect": "",
+        "unlockedCardIds": []
+      }
+    },
+    {
+      "id": "mastery_spear_master",
+      "weaponType": 3,
+      "tier": 4,
+      "displayName": "창신",
+      "description": "창의 신에 이르러 최고의 경지에 도달했습니다.",
+      "condition": {
+        "type": 3,
+        "requiredCardCount": 0,
+        "requiredDamageDealt": 0,
+        "requirePureBuild": false,
+        "requiredSecretSkillsUsed": 5
+      },
+      "reward": {
+        "description": "창술 카드 피해 +25%, 창술 공격 시 관통 효과",
+        "damageBonus": 25.0,
+        "costReduction": 0,
+        "specialEffect": "창술 공격이 방어도를 무시",
+        "unlockedCardIds": ["card_spear_ultimate"]
+      }
+    },
+    {
+      "id": "mastery_palm_minor",
+      "weaponType": 4,
+      "tier": 1,
+      "displayName": "소성",
+      "description": "장법의 기본을 깨우쳐 작은 성취를 이루었습니다.",
+      "condition": {
+        "type": 0,
+        "requiredCardCount": 15,
+        "requiredDamageDealt": 0,
+        "requirePureBuild": false,
+        "requiredSecretSkillsUsed": 0
+      },
+      "reward": {
+        "description": "장법 카드 피해 +5%",
+        "damageBonus": 5.0,
+        "costReduction": 0,
+        "specialEffect": "",
+        "unlockedCardIds": []
+      }
+    },
+    {
+      "id": "mastery_palm_major",
+      "weaponType": 4,
+      "tier": 2,
+      "displayName": "대성",
+      "description": "장법의 정수를 이해하며 큰 성취를 이루었습니다.",
+      "condition": {
+        "type": 1,
+        "requiredCardCount": 0,
+        "requiredDamageDealt": 300,
+        "requirePureBuild": false,
+        "requiredSecretSkillsUsed": 0
+      },
+      "reward": {
+        "description": "장법 카드 피해 +10%",
+        "damageBonus": 10.0,
+        "costReduction": 0,
+        "specialEffect": "",
+        "unlockedCardIds": []
+      }
+    },
+    {
+      "id": "mastery_palm_transcendent",
+      "weaponType": 4,
+      "tier": 3,
+      "displayName": "화경",
+      "description": "장법이 승화의 경지에 이르렀습니다.",
+      "condition": {
+        "type": 2,
+        "requiredCardCount": 0,
+        "requiredDamageDealt": 0,
+        "requirePureBuild": true,
+        "requiredSecretSkillsUsed": 0
+      },
+      "reward": {
+        "description": "장법 카드 피해 +15%, 비용 -1",
+        "damageBonus": 15.0,
+        "costReduction": 1,
+        "specialEffect": "",
+        "unlockedCardIds": []
+      }
+    },
+    {
+      "id": "mastery_palm_master",
+      "weaponType": 4,
+      "tier": 4,
+      "displayName": "장화경",
+      "description": "장법의 화경에 이르러 최고의 경지에 도달했습니다.",
+      "condition": {
+        "type": 3,
+        "requiredCardCount": 0,
+        "requiredDamageDealt": 0,
+        "requirePureBuild": false,
+        "requiredSecretSkillsUsed": 5
+      },
+      "reward": {
+        "description": "장법 카드 피해 +25%, 장법 공격 시 기절 확률",
+        "damageBonus": 25.0,
+        "costReduction": 0,
+        "specialEffect": "장법 공격 시 30% 확률로 기절 1턴",
+        "unlockedCardIds": ["card_palm_ultimate"]
+      }
+    },
+    {
+      "id": "mastery_fist_minor",
+      "weaponType": 5,
+      "tier": 1,
+      "displayName": "소성",
+      "description": "권법의 기본을 깨우쳐 작은 성취를 이루었습니다.",
+      "condition": {
+        "type": 0,
+        "requiredCardCount": 15,
+        "requiredDamageDealt": 0,
+        "requirePureBuild": false,
+        "requiredSecretSkillsUsed": 0
+      },
+      "reward": {
+        "description": "권법 카드 피해 +5%",
+        "damageBonus": 5.0,
+        "costReduction": 0,
+        "specialEffect": "",
+        "unlockedCardIds": []
+      }
+    },
+    {
+      "id": "mastery_fist_major",
+      "weaponType": 5,
+      "tier": 2,
+      "displayName": "대성",
+      "description": "권법의 정수를 이해하며 큰 성취를 이루었습니다.",
+      "condition": {
+        "type": 1,
+        "requiredCardCount": 0,
+        "requiredDamageDealt": 300,
+        "requirePureBuild": false,
+        "requiredSecretSkillsUsed": 0
+      },
+      "reward": {
+        "description": "권법 카드 피해 +10%",
+        "damageBonus": 10.0,
+        "costReduction": 0,
+        "specialEffect": "",
+        "unlockedCardIds": []
+      }
+    },
+    {
+      "id": "mastery_fist_transcendent",
+      "weaponType": 5,
+      "tier": 3,
+      "displayName": "화경",
+      "description": "권법이 승화의 경지에 이르렀습니다.",
+      "condition": {
+        "type": 2,
+        "requiredCardCount": 0,
+        "requiredDamageDealt": 0,
+        "requirePureBuild": true,
+        "requiredSecretSkillsUsed": 0
+      },
+      "reward": {
+        "description": "권법 카드 피해 +15%, 비용 -1",
+        "damageBonus": 15.0,
+        "costReduction": 1,
+        "specialEffect": "",
+        "unlockedCardIds": []
+      }
+    },
+    {
+      "id": "mastery_fist_master",
+      "weaponType": 5,
+      "tier": 4,
+      "displayName": "권제",
+      "description": "권법의 제왕에 이르러 최고의 경지에 도달했습니다.",
+      "condition": {
+        "type": 3,
+        "requiredCardCount": 0,
+        "requiredDamageDealt": 0,
+        "requirePureBuild": false,
+        "requiredSecretSkillsUsed": 5
+      },
+      "reward": {
+        "description": "권법 카드 피해 +25%, 권법 공격 시 연타 효과",
+        "damageBonus": 25.0,
+        "costReduction": 0,
+        "specialEffect": "권법 공격 시 20% 추가 타격",
+        "unlockedCardIds": ["card_fist_ultimate"]
+      }
+    },
+    {
+      "id": "mastery_exotic_minor",
+      "weaponType": 6,
+      "tier": 1,
+      "displayName": "소성",
+      "description": "기문병기의 기본을 깨우쳐 작은 성취를 이루었습니다.",
+      "condition": {
+        "type": 0,
+        "requiredCardCount": 15,
+        "requiredDamageDealt": 0,
+        "requirePureBuild": false,
+        "requiredSecretSkillsUsed": 0
+      },
+      "reward": {
+        "description": "기문병기 카드 피해 +5%",
+        "damageBonus": 5.0,
+        "costReduction": 0,
+        "specialEffect": "",
+        "unlockedCardIds": []
+      }
+    },
+    {
+      "id": "mastery_exotic_major",
+      "weaponType": 6,
+      "tier": 2,
+      "displayName": "대성",
+      "description": "기문병기의 정수를 이해하며 큰 성취를 이루었습니다.",
+      "condition": {
+        "type": 1,
+        "requiredCardCount": 0,
+        "requiredDamageDealt": 300,
+        "requirePureBuild": false,
+        "requiredSecretSkillsUsed": 0
+      },
+      "reward": {
+        "description": "기문병기 카드 피해 +10%",
+        "damageBonus": 10.0,
+        "costReduction": 0,
+        "specialEffect": "",
+        "unlockedCardIds": []
+      }
+    },
+    {
+      "id": "mastery_exotic_transcendent",
+      "weaponType": 6,
+      "tier": 3,
+      "displayName": "화경",
+      "description": "기문병기가 승화의 경지에 이르렀습니다.",
+      "condition": {
+        "type": 2,
+        "requiredCardCount": 0,
+        "requiredDamageDealt": 0,
+        "requirePureBuild": true,
+        "requiredSecretSkillsUsed": 0
+      },
+      "reward": {
+        "description": "기문병기 카드 피해 +15%, 비용 -1",
+        "damageBonus": 15.0,
+        "costReduction": 1,
+        "specialEffect": "",
+        "unlockedCardIds": []
+      }
+    },
+    {
+      "id": "mastery_exotic_master",
+      "weaponType": 6,
+      "tier": 4,
+      "displayName": "기문대가",
+      "description": "기문의 대가에 이르러 최고의 경지에 도달했습니다.",
+      "condition": {
+        "type": 3,
+        "requiredCardCount": 0,
+        "requiredDamageDealt": 0,
+        "requirePureBuild": false,
+        "requiredSecretSkillsUsed": 5
+      },
+      "reward": {
+        "description": "기문병기 카드 피해 +25%, 기문병기 사용 시 독 부여",
+        "damageBonus": 25.0,
+        "costReduction": 0,
+        "specialEffect": "기문병기 공격 시 독 3 부여",
+        "unlockedCardIds": ["card_exotic_ultimate"]
+      }
+    }
+  ]
 }

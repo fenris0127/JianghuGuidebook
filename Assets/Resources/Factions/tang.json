@@ -1,0 +1,26 @@
+{
+  "id": "faction_tang",
+  "name": "당문",
+  "description": "암기와 독의 명가. 치명적인 독으로 적을 서서히 약화시키고, 온갖 기문병기를 자유자재로 다룬다.",
+  "startingDeck": [
+    "card_strike",
+    "card_strike",
+    "card_strike",
+    "card_poison_dart",
+    "card_poison_needle",
+    "card_hidden_weapon",
+    "card_defend",
+    "card_defend",
+    "card_defend",
+    "card_smoke_bomb",
+    "card_venom_strike",
+    "card_toxic_mist"
+  ],
+  "startingRelic": "relic_poison_pouch",
+  "passive": {
+    "type": 4,
+    "value": 2,
+    "description": "적에게 중독 부여 시 2배 효과"
+  },
+  "primaryWeapon": 6
+}
