@@ -32,9 +32,17 @@ namespace JianghuGuidebook.Core
         [SerializeField] private Player player;
         [SerializeField] private List<Enemy> enemies = new List<Enemy>();
 
+        [Header("전투 시스템 확장")]
+        private ComboSystem comboSystem;
+        private CombatLogSystem combatLog;
+        private CombatSpeedSettings speedSettings;
+
         public CombatState CurrentState => currentState;
         public Player Player => player;
         public List<Enemy> Enemies => enemies;
+        public ComboSystem ComboSystem => comboSystem;
+        public CombatLogSystem CombatLog => combatLog;
+        public CombatSpeedSettings SpeedSettings => speedSettings;
 
         private void Awake()
         {
@@ -45,6 +53,14 @@ namespace JianghuGuidebook.Core
             }
 
             _instance = this;
+
+            // 시스템 초기화
+            comboSystem = new ComboSystem();
+            combatLog = new CombatLogSystem();
+            speedSettings = new CombatSpeedSettings();
+
+            // 기본 연계 초기화
+            comboSystem.InitializeDefaultCombos();
         }
 
         private void Start()
@@ -144,13 +160,42 @@ namespace JianghuGuidebook.Core
         }
 
         /// <summary>
-        /// 카드를 사용합니다
+        /// 카드를 사용합니다 (단일 타겟)
         /// </summary>
         public void PlayCard(Cards.Card card, Enemy target)
         {
             if (card == null) return;
 
             Debug.Log($"카드 사용: {card.Name}");
+
+            // 전투 로그 추가
+            combatLog?.AddLog(CombatLogType.PlayerAction, $"{card.Name} 사용");
+
+            // 타겟 리스트 가져오기
+            List<Enemy> targets = CombatEnhancements.GetTargets(card.Data.targetType, target, enemies);
+
+            // 범위 공격 배율 계산
+            float aoeDamageMultiplier = CombatEnhancements.GetAOEDamageMultiplier(targets.Count);
+
+            // 각 타겟에게 카드 효과 적용
+            foreach (Enemy enemy in targets)
+            {
+                ApplyCardEffect(card, enemy, aoeDamageMultiplier);
+            }
+
+            // 연계 시스템에 카드 사용 기록
+            comboSystem?.OnCardPlayed(card.Data.id);
+
+            // 연계 체크
+            var activatedCombos = comboSystem?.CheckActivatedCombos();
+            if (activatedCombos != null && activatedCombos.Count > 0)
+            {
+                foreach (var combo in activatedCombos)
+                {
+                    combatLog?.AddLog(CombatLogType.Combo, $"연계 발동: {combo.comboName}!");
+                    ApplyComboEffect(combo.effect, target);
+                }
+            }
 
             // 무기술 경지 경험치 획득
             if (Progression.WeaponMasteryManager.Instance != null)
@@ -164,8 +209,6 @@ namespace JianghuGuidebook.Core
                 Progression.RealmManager.Instance.UpdateProgress(Progression.RealmConditionType.UseEnergyCard, 1);
             }
 
-            // TODO: 실제 카드 효과 적용 (CardEffectManager 등을 통해)
-
             // Achievement: Combo
             cardsPlayedThisTurn++;
             if (cardsPlayedThisTurn >= 10)
@@ -177,6 +220,56 @@ namespace JianghuGuidebook.Core
             if (card.Data.baseDamage >= 50)
             {
                 JianghuGuidebook.Achievement.AchievementManager.Instance?.UnlockAchievement("ach_combat_one_shot");
+            }
+        }
+
+        /// <summary>
+        /// 단일 타겟에게 카드 효과 적용
+        /// </summary>
+        private void ApplyCardEffect(Cards.Card card, Enemy target, float damageMultiplier = 1.0f)
+        {
+            // 피해 적용
+            if (card.Data.baseDamage > 0)
+            {
+                int damage = Mathf.RoundToInt(card.Data.baseDamage * damageMultiplier);
+                target.TakeDamage(damage);
+                combatLog?.AddLog(CombatLogType.Damage, $"{target.name}에게 {damage} 피해!");
+            }
+
+            // TODO: 기타 카드 효과 적용 (방어도, 상태 효과 등)
+        }
+
+        /// <summary>
+        /// 연계 효과 적용
+        /// </summary>
+        private void ApplyComboEffect(ComboEffect effect, Enemy target)
+        {
+            // 추가 피해
+            if (effect.bonusDamage > 0 && target != null)
+            {
+                target.TakeDamage(effect.bonusDamage);
+                combatLog?.AddLog(CombatLogType.Combo, $"연계 추가 피해: {effect.bonusDamage}!");
+            }
+
+            // 추가 방어도
+            if (effect.bonusBlock > 0 && player != null)
+            {
+                player.GainBlock(effect.bonusBlock);
+                combatLog?.AddLog(CombatLogType.Block, $"연계 방어도 획득: {effect.bonusBlock}");
+            }
+
+            // 카드 드로우
+            if (effect.drawCards > 0)
+            {
+                // TODO: DeckManager와 연동하여 카드 드로우
+                combatLog?.AddLog(CombatLogType.System, $"{effect.drawCards}장의 카드를 뽑습니다");
+            }
+
+            // 내공 획득
+            if (effect.gainEnergy > 0 && player != null)
+            {
+                // TODO: 플레이어 내공 증가 로직
+                combatLog?.AddLog(CombatLogType.System, $"내공 {effect.gainEnergy} 회복!");
             }
         }
 
@@ -211,11 +304,17 @@ namespace JianghuGuidebook.Core
         {
             Debug.Log("--- 플레이어 턴 종료 ---");
 
+            // 전투 로그 추가
+            combatLog?.AddLog(CombatLogType.System, "플레이어 턴 종료");
+
             // 플레이어 턴 종료 처리
             if (player != null)
             {
                 player.OnTurnEnd();
             }
+
+            // 연계 시스템 리셋
+            comboSystem?.OnTurnEnd();
 
             // TODO: 손패 버리기 (DeckManager 구현 후)
 

@@ -41,6 +41,18 @@ namespace JianghuGuidebook.Data
     }
 
     /// <summary>
+    /// 카드 타겟 타입 열거형
+    /// </summary>
+    public enum TargetType
+    {
+        SingleEnemy,    // 단일 적
+        AllEnemies,     // 모든 적
+        RandomEnemy,    // 랜덤 적
+        Self,           // 자신
+        None            // 타겟 없음
+    }
+
+    /// <summary>
     /// 카드 데이터 클래스
     /// JSON에서 로드될 카드 정보를 저장합니다
     /// </summary>
@@ -53,6 +65,7 @@ namespace JianghuGuidebook.Data
         public CardType type;           // 카드 타입
         public WeaponType weaponType;   // 무기 타입 (추가됨)
         public CardRarity rarity;       // 희귀도
+        public TargetType targetType;   // 타겟 타입 (단일/범위)
         public int baseDamage;          // 기본 피해량 (공격 카드용)
         public int baseBlock;           // 기본 방어도 (방어 카드용)
         public string description;      // 카드 설명
