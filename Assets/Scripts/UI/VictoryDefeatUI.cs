@@ -15,6 +15,7 @@ namespace JianghuGuidebook.UI
         [Header("UI Panels")]
         [SerializeField] private GameObject victoryPanel;
         [SerializeField] private GameObject defeatPanel;
+        [SerializeField] private GameObject endingPanel;
 
         [Header("Victory UI")]
         [SerializeField] private TextMeshProUGUI victoryTitleText;
@@ -39,9 +40,17 @@ namespace JianghuGuidebook.UI
         [SerializeField] private TextMeshProUGUI dialogueText;
         [SerializeField] private Button dialogueContinueButton;
 
+        [Header("Ending UI")]
+        [SerializeField] private TextMeshProUGUI endingTitleText;
+        [SerializeField] private TextMeshProUGUI endingStoryText;
+        [SerializeField] private TextMeshProUGUI endingStatsText;
+        [SerializeField] private TextMeshProUGUI endingEssenceText;
+        [SerializeField] private Button endingMenuButton;
+
         [Header("Audio")]
         [SerializeField] private AudioClip victorySound;
         [SerializeField] private AudioClip defeatSound;
+        [SerializeField] private AudioClip endingSound;
 
         private CanvasGroup victoryCanvasGroup;
         private CanvasGroup defeatCanvasGroup;
@@ -96,6 +105,12 @@ namespace JianghuGuidebook.UI
                 // combatManager.OnVictory += ShowVictory;
                 // combatManager.OnDefeat += ShowDefeat;
             }
+
+            // GameFlowManager 이벤트 구독 (엔딩용)
+            if (GameFlowManager.Instance != null)
+            {
+                GameFlowManager.Instance.OnGameCleared += ShowEnding;
+            }
         }
 
         /// <summary>
@@ -126,6 +141,11 @@ namespace JianghuGuidebook.UI
             if (dialogueContinueButton != null)
             {
                 dialogueContinueButton.onClick.AddListener(OnDialogueContinueClicked);
+            }
+
+            if (endingMenuButton != null)
+            {
+                endingMenuButton.onClick.AddListener(OnMainMenuClicked);
             }
         }
 
@@ -346,6 +366,113 @@ namespace JianghuGuidebook.UI
             {
                 dialoguePanel.SetActive(false);
             }
+
+            if (endingPanel != null)
+            {
+                endingPanel.SetActive(false);
+            }
+        }
+
+        /// <summary>
+        /// 엔딩 화면 표시 (게임 클리어)
+        /// </summary>
+        public void ShowEnding()
+        {
+            StartCoroutine(ShowEndingCoroutine());
+        }
+
+        private System.Collections.IEnumerator ShowEndingCoroutine()
+        {
+            Debug.Log("[VictoryDefeatUI] 엔딩 화면 표시");
+
+            // 지연
+            yield return new WaitForSeconds(delayBeforeShow);
+
+            // 엔딩 사운드 재생
+            if (endingSound != null && audioSource != null)
+            {
+                audioSource.PlayOneShot(endingSound);
+            }
+            else if (victorySound != null && audioSource != null)
+            {
+                // 엔딩 사운드 없으면 승리 사운드 재생
+                audioSource.PlayOneShot(victorySound);
+            }
+
+            // 런 완료 처리는 GameFlowManager에서 이미 호출됨
+            // 무공 정수 획득량
+            int essenceEarned = 0;
+            if (GameManager.Instance != null)
+            {
+                essenceEarned = GameManager.Instance.GetEstimatedEssence(true);
+            }
+
+            // 패널 활성화
+            if (endingPanel != null)
+            {
+                endingPanel.SetActive(true);
+
+                // 엔딩 타이틀
+                if (endingTitleText != null)
+                {
+                    endingTitleText.text = "강호 평정!";
+                }
+
+                // 엔딩 스토리
+                if (endingStoryText != null)
+                {
+                    endingStoryText.text = GetEndingStoryText();
+                }
+
+                // 최종 통계 표시
+                if (endingStatsText != null)
+                {
+                    RunData runData = SaveManager.Instance?.CurrentSaveData?.currentRun;
+                    if (runData != null)
+                    {
+                        string stats = "=== 무림 여정 기록 ===\n\n";
+                        stats += $"⚔️ 처치한 적: {runData.enemiesKilled}명\n";
+                        stats += $"👑 격파한 보스: {runData.bossesDefeated}명\n";
+                        stats += $"🗺️ 평정한 지역: {runData.regionsCompleted}개\n";
+                        stats += $"🃏 수집한 카드: {runData.deckCardIds.Count}장\n";
+                        stats += $"💎 획득한 유물: {runData.relicIds.Count}개\n";
+                        stats += $"⏱️ 플레이 시간: {runData.GetFormattedPlayTime()}\n";
+                        stats += $"🎯 총 턴 수: {runData.turnsPlayed}턴\n";
+                        stats += $"💥 준 피해: {runData.damageDealt}\n";
+                        stats += $"🛡️ 받은 피해: {runData.damageTaken}\n";
+
+                        endingStatsText.text = stats;
+                    }
+                }
+
+                // 무공 정수
+                if (endingEssenceText != null)
+                {
+                    endingEssenceText.text = $"<b>획득 무공 정수</b>\n" +
+                                            $"<color=#FFD700>{essenceEarned}</color> 정수";
+                }
+
+                // TODO: 페이드 인 애니메이션 (필요시)
+            }
+        }
+
+        /// <summary>
+        /// 엔딩 스토리 텍스트 반환
+        /// </summary>
+        private string GetEndingStoryText()
+        {
+            string story = "이름 없는 낭인으로 시작한 그대는\n";
+            story += "무수한 시련을 극복하고\n";
+            story += "강호의 패업을 이루었다.\n\n";
+
+            story += "검과 내공을 갈고 닦으며\n";
+            story += "수많은 적수들을 물리쳤고,\n";
+            story += "마침내 천하제일인의 자리에 올랐다.\n\n";
+
+            story += "그대의 이름은 영원히\n";
+            story += "강호의 전설로 남을 것이다.";
+
+            return story;
         }
 
         /// <summary>

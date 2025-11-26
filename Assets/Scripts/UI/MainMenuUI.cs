@@ -39,6 +39,7 @@ namespace JianghuGuidebook.UI
         [SerializeField] private FactionSelectionUI factionSelectionUI;
         [SerializeField] private AchievementUI achievementUI;
         [SerializeField] private CodexUI codexUI;
+        [SerializeField] private DifficultyUI difficultyUI;
 
         [Header("씬 설정")]
         [SerializeField] private string mapSceneName = "MapScene";
@@ -249,6 +250,22 @@ namespace JianghuGuidebook.UI
         }
 
         /// <summary>
+        /// 무림지 버튼 클릭
+        /// </summary>
+        private void OnCodexClicked()
+        {
+            Debug.Log("[MainMenuUI] 무림지 버튼 클릭");
+            if (codexUI != null)
+            {
+                codexUI.Open();
+            }
+            else
+            {
+                Debug.LogWarning("CodexUI가 설정되지 않았습니다");
+            }
+        }
+
+        /// <summary>
         /// 종료 버튼 클릭
         /// </summary>
         private void OnQuitClicked()
@@ -393,7 +410,28 @@ namespace JianghuGuidebook.UI
         private void OnFactionSelected(FactionData faction, int slotIndex)
         {
             Debug.Log($"[MainMenuUI] 분파 선택 완료: {faction.name}, 슬롯: {slotIndex}");
-            StartNewGameWithFaction(faction, slotIndex);
+            
+            // 분파 설정 (GameManager에 임시 저장하거나, StartNewGameWithFaction에서 처리)
+            // 여기서는 DifficultyUI를 띄우고, 거기서 최종 확인 시 게임 시작
+            
+            if (difficultyUI != null)
+            {
+                difficultyUI.gameObject.SetActive(true);
+                
+                // DifficultyUI 확인 콜백 설정
+                difficultyUI.OnDifficultyConfirmed = () => StartNewGameWithFaction(faction, slotIndex);
+                difficultyUI.OnBack = () => 
+                {
+                    // 뒤로가기 시 다시 분파 선택 화면으로? 아니면 메인으로?
+                    // 여기서는 분파 선택 화면을 다시 띄우는 것이 자연스러움
+                    if (factionSelectionUI != null) factionSelectionUI.gameObject.SetActive(true);
+                };
+            }
+            else
+            {
+                // DifficultyUI가 없으면 바로 시작 (기존 로직)
+                StartNewGameWithFaction(faction, slotIndex);
+            }
         }
 
         /// <summary>
