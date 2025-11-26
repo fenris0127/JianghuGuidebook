@@ -16,23 +16,38 @@ namespace JianghuGuidebook.Save
         // 업그레이드 해금 상태
         public List<UpgradeUnlockData> unlockedUpgrades;
 
+        // Phase 3 추가 해금 데이터
+        public List<string> unlockedFactions;
+        public List<int> unlockedDifficulties;
+        public List<string> unlockedAchievements;
+        public List<string> unlockedCodexEntries;
+
         // 통계
         public int totalRunsCompleted;
         public int totalVictories;
         public int totalDeaths;
         public int totalEnemiesKilled;
         public int totalBossesDefeated;
+        public float totalPlayTime; // 총 플레이 시간 (초 단위)
 
         public MetaSaveData()
         {
             totalEssence = 0;
             currentEssence = 0;
             unlockedUpgrades = new List<UpgradeUnlockData>();
+            
+            unlockedFactions = new List<string>();
+            unlockedDifficulties = new List<int>();
+            unlockedAchievements = new List<string>();
+            unlockedCodexEntries = new List<string>();
+
             totalRunsCompleted = 0;
             totalVictories = 0;
             totalDeaths = 0;
             totalEnemiesKilled = 0;
+            totalEnemiesKilled = 0;
             totalBossesDefeated = 0;
+            totalPlayTime = 0f;
         }
 
         /// <summary>

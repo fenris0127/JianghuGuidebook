@@ -254,6 +254,17 @@ namespace JianghuGuidebook.Save
                 Debug.Log($"게임 로드 완료: {filePath}");
                 Debug.Log($"SaveData: {currentSaveData}");
 
+                // 마이그레이션 체크 및 실행
+                if (currentSaveData.NeedsMigration())
+                {
+                    Debug.LogWarning($"세이브 파일 마이그레이션 필요: {currentSaveData.version} -> {SaveData.CURRENT_VERSION}");
+                    MigrateSaveData(currentSaveData);
+
+                    // 마이그레이션 후 저장
+                    SaveGame(slotIndex);
+                    Debug.Log("마이그레이션 완료 및 저장 완료");
+                }
+
                 // 메타 데이터 적용
                 ApplyMetaData();
 
@@ -929,6 +940,153 @@ namespace JianghuGuidebook.Save
             {
                 Debug.LogError($"손상된 파일 이동 실패: {e.Message}");
             }
+        }
+
+        // ===== 세이브 파일 마이그레이션 =====
+
+        /// <summary>
+        /// 세이브 데이터를 최신 버전으로 마이그레이션합니다
+        /// </summary>
+        private void MigrateSaveData(SaveData saveData)
+        {
+            if (saveData == null)
+            {
+                Debug.LogError("MigrateSaveData: saveData가 null입니다");
+                return;
+            }
+
+            Debug.Log($"=== 세이브 파일 마이그레이션 시작 ===");
+            Debug.Log($"현재 버전: {saveData.version}");
+            Debug.Log($"목표 버전: {SaveData.CURRENT_VERSION}");
+
+            // Phase 1 -> Phase 2
+            if (saveData.IsOlderThan(SaveData.PHASE2_VERSION))
+            {
+                Debug.Log("Phase 1 -> Phase 2 마이그레이션 실행");
+                MigratePhase1ToPhase2(saveData);
+            }
+
+            // Phase 2 -> Phase 3
+            if (saveData.IsOlderThan(SaveData.CURRENT_VERSION))
+            {
+                Debug.Log("Phase 2 -> Phase 3 마이그레이션 실행");
+                MigratePhase2ToPhase3(saveData);
+            }
+
+            // 버전 업데이트
+            saveData.UpdateVersion();
+
+            Debug.Log($"=== 마이그레이션 완료: v{saveData.version} ===");
+        }
+
+        /// <summary>
+        /// Phase 1 -> Phase 2 마이그레이션
+        /// </summary>
+        private void MigratePhase1ToPhase2(SaveData saveData)
+        {
+            Debug.Log("[Migration] Phase 1 -> Phase 2");
+
+            // Phase 2에서 추가된 필드 초기화
+            if (saveData.currentRun != null)
+            {
+                // RunData에 Phase 2 필드가 없으면 기본값 설정
+                if (saveData.currentRun.visitedNodeIds == null)
+                {
+                    saveData.currentRun.visitedNodeIds = new System.Collections.Generic.List<string>();
+                }
+
+                if (saveData.currentRun.relicIds == null)
+                {
+                    saveData.currentRun.relicIds = new System.Collections.Generic.List<string>();
+                }
+            }
+
+            // MetaData에 Phase 2 필드가 없으면 기본값 설정
+            if (saveData.metaData != null)
+            {
+                if (saveData.metaData.unlockedUpgrades == null)
+                {
+                    saveData.metaData.unlockedUpgrades = new System.Collections.Generic.List<UpgradeUnlockData>();
+                }
+            }
+
+            Debug.Log("[Migration] Phase 1 -> Phase 2 완료");
+        }
+
+        /// <summary>
+        /// Phase 2 -> Phase 3 마이그레이션
+        /// </summary>
+        private void MigratePhase2ToPhase3(SaveData saveData)
+        {
+            Debug.Log("[Migration] Phase 2 -> Phase 3");
+
+            // RunData 마이그레이션
+            if (saveData.currentRun != null)
+            {
+                // 분파 정보 초기화
+                if (string.IsNullOrEmpty(saveData.currentRun.factionId))
+                {
+                    saveData.currentRun.factionId = "faction_hwasan"; // 기본값: 화산파
+                    Debug.Log("[Migration] 기본 분파 설정: 화산파");
+                }
+
+                // 내공 경지 진행도 초기화
+                if (saveData.currentRun.innerEnergyProgress == null)
+                {
+                    saveData.currentRun.innerEnergyProgress = new InnerEnergyProgress();
+                    Debug.Log("[Migration] 내공 경지 진행도 초기화");
+                }
+
+                // 무기술 경지 진행도 초기화
+                if (saveData.currentRun.weaponMasteryProgress == null)
+                {
+                    saveData.currentRun.weaponMasteryProgress = new System.Collections.Generic.List<WeaponMasteryProgress>();
+                    Debug.Log("[Migration] 무기술 경지 진행도 초기화");
+                }
+
+                // 지역 정보 초기화
+                if (string.IsNullOrEmpty(saveData.currentRun.currentRegionId))
+                {
+                    saveData.currentRun.currentRegionId = "region_1"; // 기본값: 강남
+                    Debug.Log("[Migration] 기본 지역 설정: 강남");
+                }
+            }
+
+            // MetaData 마이그레이션
+            if (saveData.metaData != null)
+            {
+                // 해금된 분파 초기화
+                if (saveData.metaData.unlockedFactions == null)
+                {
+                    saveData.metaData.unlockedFactions = new System.Collections.Generic.List<string>();
+                    saveData.metaData.unlockedFactions.Add("faction_hwasan"); // 기본적으로 화산파 해금
+                    Debug.Log("[Migration] 해금된 분파 초기화: 화산파");
+                }
+
+                // 해금된 난이도 초기화
+                if (saveData.metaData.unlockedDifficulties == null)
+                {
+                    saveData.metaData.unlockedDifficulties = new System.Collections.Generic.List<int>();
+                    saveData.metaData.unlockedDifficulties.Add(0); // 기본 난이도 해금
+                    Debug.Log("[Migration] 해금된 난이도 초기화: 입문");
+                }
+
+                // 업적 달성 내역 초기화
+                if (saveData.metaData.unlockedAchievements == null)
+                {
+                    saveData.metaData.unlockedAchievements = new System.Collections.Generic.List<string>();
+                    Debug.Log("[Migration] 업적 달성 내역 초기화");
+                }
+
+                // 도감 수집 내역 초기화
+                if (saveData.metaData.unlockedCodexEntries == null)
+                {
+                    saveData.metaData.unlockedCodexEntries = new System.Collections.Generic.List<string>();
+                    Debug.Log("[Migration] 도감 수집 내역 초기화");
+                }
+            }
+
+            Debug.Log("[Migration] Phase 2 -> Phase 3 완료");
         }
     }
 }

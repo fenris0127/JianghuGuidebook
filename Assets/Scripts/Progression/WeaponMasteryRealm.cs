@@ -259,7 +259,7 @@ namespace JianghuGuidebook.Progression
         public int cardsOwned;                          // 보유한 해당 무기술 카드 수
         public int totalDamageDealt;                    // 누적 피해
         public int pureBuildVictories;                  // 순수 빌드 승리 횟수
-        public HashSet<string> secretSkillsUsed;        // 사용한 비기 ID
+        public List<string> secretSkillsUsed;           // 사용한 비기 ID (List로 변경 - 직렬화 지원)
 
         // 전투별 추적 (순수 빌드 체크용)
         [NonSerialized] public bool usedOnlyThisWeaponInCombat;
@@ -272,7 +272,22 @@ namespace JianghuGuidebook.Progression
             cardsOwned = 0;
             totalDamageDealt = 0;
             pureBuildVictories = 0;
-            secretSkillsUsed = new HashSet<string>();
+            secretSkillsUsed = new List<string>();
+            usedOnlyThisWeaponInCombat = true;
+            damageDealtThisCombat = 0;
+        }
+
+        /// <summary>
+        /// 기본 생성자 (직렬화용)
+        /// </summary>
+        public WeaponMasteryProgress()
+        {
+            weaponType = WeaponType.Sword;
+            currentTier = MasteryTier.Beginner;
+            cardsOwned = 0;
+            totalDamageDealt = 0;
+            pureBuildVictories = 0;
+            secretSkillsUsed = new List<string>();
             usedOnlyThisWeaponInCombat = true;
             damageDealtThisCombat = 0;
         }
@@ -294,8 +309,8 @@ namespace JianghuGuidebook.Progression
                 totalDamageDealt += damage;
                 damageDealtThisCombat += damage;
 
-                // 비기라면 기록
-                if (isSecretSkill)
+                // 비기라면 기록 (중복 체크)
+                if (isSecretSkill && !secretSkillsUsed.Contains(cardId))
                 {
                     secretSkillsUsed.Add(cardId);
                 }

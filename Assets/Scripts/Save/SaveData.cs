@@ -7,6 +7,11 @@ namespace JianghuGuidebook.Save
     [System.Serializable]
     public class SaveData
     {
+        // 버전 상수
+        public const string CURRENT_VERSION = "3.0.0";          // Phase 3 버전
+        public const string PHASE2_VERSION = "2.0.0";           // Phase 2 버전
+        public const string PHASE1_VERSION = "1.0.0";           // Phase 1 버전
+
         public string version;              // 세이브 파일 버전
         public long saveTimestamp;          // 저장 시간
         public string checksum;             // 무결성 검증용 체크섬
@@ -16,7 +21,7 @@ namespace JianghuGuidebook.Save
 
         public SaveData()
         {
-            version = "1.0.0";
+            version = CURRENT_VERSION;
             saveTimestamp = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             checksum = "";
             currentRun = null;
@@ -119,6 +124,64 @@ namespace JianghuGuidebook.Save
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// 마이그레이션이 필요한지 확인합니다
+        /// </summary>
+        public bool NeedsMigration()
+        {
+            return version != CURRENT_VERSION;
+        }
+
+        /// <summary>
+        /// 버전을 최신으로 업데이트합니다
+        /// </summary>
+        public void UpdateVersion()
+        {
+            version = CURRENT_VERSION;
+        }
+
+        /// <summary>
+        /// 특정 버전인지 확인합니다
+        /// </summary>
+        public bool IsVersion(string targetVersion)
+        {
+            return version == targetVersion;
+        }
+
+        /// <summary>
+        /// 버전 비교 (현재 버전이 목표 버전보다 낮으면 true)
+        /// </summary>
+        public bool IsOlderThan(string targetVersion)
+        {
+            return CompareVersions(version, targetVersion) < 0;
+        }
+
+        /// <summary>
+        /// 버전 문자열 비교 (v1 < v2: -1, v1 == v2: 0, v1 > v2: 1)
+        /// </summary>
+        private int CompareVersions(string v1, string v2)
+        {
+            if (string.IsNullOrEmpty(v1) || string.IsNullOrEmpty(v2))
+            {
+                UnityEngine.Debug.LogWarning($"SaveData: 유효하지 않은 버전 비교 (v1: {v1}, v2: {v2})");
+                return 0;
+            }
+
+            string[] parts1 = v1.Split('.');
+            string[] parts2 = v2.Split('.');
+
+            for (int i = 0; i < System.Math.Max(parts1.Length, parts2.Length); i++)
+            {
+                int num1 = i < parts1.Length && int.TryParse(parts1[i], out int n1) ? n1 : 0;
+                int num2 = i < parts2.Length && int.TryParse(parts2[i], out int n2) ? n2 : 0;
+
+                if (num1 < num2) return -1;
+                if (num1 > num2) return 1;
+            }
+
+            return 0;
         }
 
         public override string ToString()

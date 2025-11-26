@@ -1,7 +1,31 @@
 using System.Collections.Generic;
+using JianghuGuidebook.Core;
+using JianghuGuidebook.Progression;
 
 namespace JianghuGuidebook.Save
 {
+    /// <summary>
+    /// 내공 경지 진행도 데이터
+    /// </summary>
+    [System.Serializable]
+    public class InnerEnergyProgress
+    {
+        public int currentStage;                    // 현재 경지 단계 (RealmStage의 int 값)
+        public int innerEnergyCardsUsed;            // 내공 카드 사용 횟수
+        public int totalEnergySpent;                // 누적 내공 소모량
+        public int maxEnergySpentInOneCombat;       // 한 전투에서 최대 내공 소모량
+        public List<string> secretSkillsUsed;       // 사용한 내공 비기 ID
+
+        public InnerEnergyProgress()
+        {
+            currentStage = 0; // Hucheon
+            innerEnergyCardsUsed = 0;
+            totalEnergySpent = 0;
+            maxEnergySpentInOneCombat = 0;
+            secretSkillsUsed = new List<string>();
+        }
+    }
+
     /// <summary>
     /// 현재 런의 진행 상태를 저장하는 데이터 클래스
     /// </summary>
@@ -13,6 +37,7 @@ namespace JianghuGuidebook.Save
         public long startTimestamp;             // 시작 시간 (Unix timestamp)
         public long lastSaveTimestamp;          // 마지막 저장 시간
         public int seed;                        // 맵 생성 시드
+        public DifficultyLevel difficultyLevel; // 난이도
 
         // 플레이어 상태
         public int currentHealth;
@@ -24,6 +49,7 @@ namespace JianghuGuidebook.Save
         public string currentNodeId;            // 현재 노드 ID
         public List<string> visitedNodeIds;     // 방문한 노드 ID 리스트
         public int regionsCompleted;            // 완료한 지역 수
+        public string currentRegionId;          // 현재 지역 ID
 
         // 덱
         public List<string> deckCardIds;        // 덱의 카드 ID 리스트
@@ -43,12 +69,18 @@ namespace JianghuGuidebook.Save
         public int damageDealt;
         public int damageTaken;
 
+        // Phase 3 추가 필드
+        public string factionId;                                  // 선택한 분파 ID
+        public InnerEnergyProgress innerEnergyProgress;           // 내공 경지 진행도
+        public List<WeaponMasteryProgress> weaponMasteryProgress; // 무기술 경지 진행도
+
         public RunData()
         {
             runId = System.Guid.NewGuid().ToString();
             startTimestamp = GetCurrentTimestamp();
             lastSaveTimestamp = startTimestamp;
             seed = UnityEngine.Random.Range(0, int.MaxValue);
+            difficultyLevel = DifficultyLevel.Intro;
 
             currentHealth = 70;
             maxHealth = 70;
@@ -57,10 +89,14 @@ namespace JianghuGuidebook.Save
             currentLayer = 0;
             currentNodeId = "";
             visitedNodeIds = new List<string>();
-            regionsCompleted = 0;
-
+            currentRegionId = "region_1";
+            
             deckCardIds = new List<string>();
             relicIds = new List<string>();
+
+            factionId = "";
+            innerEnergyProgress = new InnerEnergyProgress();
+            weaponMasteryProgress = new List<WeaponMasteryProgress>();
 
             enemiesKilled = 0;
             bossesDefeated = 0;
