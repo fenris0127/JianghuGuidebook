@@ -63,6 +63,29 @@ namespace JianghuGuidebook.UI
             }
 
             UpdatePurchaseButtonState();
+            UpdateLockedState();
+        }
+
+        private void UpdateLockedState()
+        {
+            if (upgrade == null) return;
+
+            bool isMet = upgrade.IsPrerequisiteMet();
+            
+            if (!isMet)
+            {
+                // 잠김 상태 표시
+                if (purchaseButton != null) purchaseButton.interactable = false;
+                
+                // 선행 조건 이름 가져오기
+                var prereq = MetaProgressionManager.Instance.GetUpgradeById(upgrade.prerequisiteId);
+                string prereqName = prereq != null ? prereq.name : "선행 조건";
+
+                if (descriptionText != null)
+                {
+                    descriptionText.text = $"<color=red>[잠김] 선행 조건: {prereqName}</color>\n{upgrade.description}";
+                }
+            }
         }
 
         private void UpdatePurchaseButtonState()
@@ -71,8 +94,9 @@ namespace JianghuGuidebook.UI
 
             bool canAfford = MugongEssence.Instance.HasEnoughEssence(upgrade.GetCurrentCost());
             bool canPurchaseMore = upgrade.CanPurchaseMore();
+            bool isPrerequisiteMet = upgrade.IsPrerequisiteMet();
 
-            purchaseButton.interactable = canAfford && canPurchaseMore;
+            purchaseButton.interactable = canAfford && canPurchaseMore && isPrerequisiteMet;
 
             // 버튼 텍스트 변경 (옵션)
             var buttonText = purchaseButton.GetComponentInChildren<TextMeshProUGUI>();
@@ -80,6 +104,8 @@ namespace JianghuGuidebook.UI
             {
                 if (!canPurchaseMore)
                     buttonText.text = "완료";
+                else if (!isPrerequisiteMet)
+                    buttonText.text = "잠김";
                 else if (!canAfford)
                     buttonText.text = "부족";
                 else

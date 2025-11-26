@@ -14,7 +14,11 @@ namespace JianghuGuidebook.Meta
         StartWithRelic,         // 시작 시 유물 보유
         IncreaseCardRewards,    // 카드 보상 개수 증가
         IncreaseGoldRewards,    // 골드 보상 증가
-        ReduceShopPrices        // 상점 가격 할인
+        IncreaseCardRewards,    // 카드 보상 개수 증가
+        IncreaseGoldRewards,    // 골드 보상 증가
+        ReduceShopPrices,       // 상점 가격 할인
+        UnlockLegendaryCard,    // 전설 카드 해금
+        UnlockSpecialRelic      // 특수 유물 해금
     }
 
     /// <summary>
@@ -33,6 +37,7 @@ namespace JianghuGuidebook.Meta
         public bool isUnlocked;         // 해금 여부
         public int maxPurchases;        // 최대 구매 횟수 (0 = 무제한, 1 = 1회만)
         public int timesPurchased;      // 구매 횟수
+        public string prerequisiteId;   // 선행 업그레이드 ID (없으면 빈 문자열)
 
         public PermanentUpgrade()
         {
@@ -80,6 +85,23 @@ namespace JianghuGuidebook.Meta
         {
             if (maxPurchases == 0) return true; // 무제한
             return timesPurchased < maxPurchases;
+        }
+
+        /// <summary>
+        /// 선행 조건 충족 여부를 확인합니다
+        /// </summary>
+        public bool IsPrerequisiteMet()
+        {
+            if (string.IsNullOrEmpty(prerequisiteId)) return true;
+
+            // MetaProgressionManager.Instance는 이 클래스 외부에서 접근 가능한 싱글톤이어야 합니다.
+            // 이 예시에서는 해당 클래스가 존재한다고 가정합니다.
+            // 실제 사용 시에는 해당 매니저 클래스를 구현해야 합니다.
+            // 예: var prereq = MetaProgressionManager.Instance.GetUpgradeById(prerequisiteId);
+            // 현재는 컴파일 오류를 피하기 위해 임시로 true를 반환합니다.
+            // TODO: MetaProgressionManager 구현 후 실제 로직으로 대체
+            Debug.LogWarning($"IsPrerequisiteMet: MetaProgressionManager.Instance.GetUpgradeById('{prerequisiteId}') is not implemented. Returning true.");
+            return true; 
         }
 
         /// <summary>

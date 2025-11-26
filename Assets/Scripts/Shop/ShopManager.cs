@@ -79,6 +79,17 @@ namespace JianghuGuidebook.Shop
                 if (card != null)
                 {
                     int price = CalculateCardPrice(card);
+                    
+                    // 상점 할인 적용
+                    if (Meta.MetaProgressionManager.Instance != null)
+                    {
+                        int discountPercent = Meta.MetaProgressionManager.Instance.GetTotalUpgradeValue(Meta.UpgradeType.ReduceShopPrices);
+                        if (discountPercent > 0)
+                        {
+                            price = Mathf.RoundToInt(price * (1 - discountPercent / 100f));
+                        }
+                    }
+
                     currentShopItems.Add(ShopItem.CreateCardItem(card, price));
                 }
             }
@@ -198,6 +209,31 @@ namespace JianghuGuidebook.Shop
         /// </summary>
         private CardData GetRandomCard()
         {
+            // DataManager에서 랜덤 카드 가져오기
+            CardData[] allCards = DataManager.Instance.GetAllCards();
+            if (allCards.Length == 0) return null;
+
+            // 메타 진행도에 따른 해금 여부 확인
+            List<CardData> validCards = new List<CardData>();
+            if (Meta.MetaProgressionManager.Instance != null)
+            {
+                foreach (var card in allCards)
+                {
+                    if (Meta.MetaProgressionManager.Instance.IsCardUnlocked(card.id))
+                    {
+                        validCards.Add(card);
+                    }
+                }
+            }
+            else
+            {
+                validCards.AddRange(allCards);
+            }
+
+            if (validCards.Count == 0) return null;
+
+            return validCards[Random.Range(0, validCards.Count)];
+        }
             CardData[] allCards = DataManager.Instance.GetAllCards();
             if (allCards.Length == 0)
             {

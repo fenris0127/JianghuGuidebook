@@ -99,6 +99,13 @@ namespace JianghuGuidebook.Meta
                 return false;
             }
 
+            // 선행 조건 확인
+            if (!upgrade.IsPrerequisiteMet())
+            {
+                Debug.LogWarning($"{upgrade.name}의 선행 조건이 충족되지 않았습니다");
+                return false;
+            }
+
             // 무공 정수 확인
             int cost = upgrade.GetCurrentCost();
             if (!MugongEssence.Instance.HasEnoughEssence(cost))
@@ -240,7 +247,19 @@ namespace JianghuGuidebook.Meta
 
                 case UpgradeType.ReduceShopPrices:
                     // 상점 가격 할인 (ShopManager에서 처리)
+                case UpgradeType.ReduceShopPrices:
+                    // 상점 가격 할인 (ShopManager에서 처리)
                     Debug.Log($"업그레이드 적용: 상점 가격 -{upgrade.value}% (ShopManager에서 참조)");
+                    break;
+
+                case UpgradeType.UnlockLegendaryCard:
+                    // 전설 카드 해금 (RewardManager/ShopManager에서 참조)
+                    Debug.Log($"업그레이드 적용: 전설 카드 해금 ({upgrade.stringValue})");
+                    break;
+
+                case UpgradeType.UnlockSpecialRelic:
+                    // 특수 유물 해금 (RewardManager/ShopManager에서 참조)
+                    Debug.Log($"업그레이드 적용: 특수 유물 해금 ({upgrade.stringValue})");
                     break;
             }
         }
@@ -309,6 +328,38 @@ namespace JianghuGuidebook.Meta
             {
                 Debug.Log($"  - {upgrade}");
             }
+        }
+        /// <summary>
+        /// 특정 카드가 해금되었는지 확인합니다
+        /// </summary>
+        public bool IsCardUnlocked(string cardId)
+        {
+            // 기본적으로 모든 카드가 해금되어 있다고 가정할 수도 있고,
+            // 특정 카드(전설 등)는 업그레이드를 통해야만 나온다고 할 수도 있음.
+            // 여기서는 "업그레이드로 해금해야 하는 카드" 목록에 있는지 확인하고,
+            // 있다면 해금 여부를 반환. 없다면 기본 해금으로 간주.
+            
+            var upgrade = allUpgrades.FirstOrDefault(u => u.type == UpgradeType.UnlockLegendaryCard && u.stringValue == cardId);
+            if (upgrade != null)
+            {
+                return upgrade.isUnlocked;
+            }
+            
+            // 업그레이드와 관련 없는 카드는 기본 해금
+            return true;
+        }
+
+        /// <summary>
+        /// 특정 유물이 해금되었는지 확인합니다
+        /// </summary>
+        public bool IsRelicUnlocked(string relicId)
+        {
+            var upgrade = allUpgrades.FirstOrDefault(u => u.type == UpgradeType.UnlockSpecialRelic && u.stringValue == relicId);
+            if (upgrade != null)
+            {
+                return upgrade.isUnlocked;
+            }
+            return true;
         }
     }
 }

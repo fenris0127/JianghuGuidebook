@@ -88,6 +88,13 @@ namespace JianghuGuidebook.Core
 
             // 1. 새로운 RunData 생성
             RunData newRun = new RunData();
+            
+            // 난이도 설정
+            if (DifficultyManager.Instance != null)
+            {
+                newRun.difficultyLevel = DifficultyManager.Instance.SelectedDifficulty;
+                Debug.Log($"난이도 적용: {newRun.difficultyLevel}");
+            }
 
             // 2. 선택한 분파 적용 (있으면)
             ApplyFactionToRun(newRun);
@@ -378,6 +385,30 @@ namespace JianghuGuidebook.Core
                 {
                     AchievementManager.Instance.UnlockAchievement("ach_spec_minimalist");
                 }
+
+                // 4. 난이도 관련
+                if (runData.difficultyLevel >= DifficultyLevel.Master)
+                {
+                    AchievementManager.Instance.UnlockAchievement("ach_diff_master");
+                }
+                if (runData.difficultyLevel >= DifficultyLevel.Grandmaster)
+                {
+                    AchievementManager.Instance.UnlockAchievement("ach_diff_grandmaster");
+                }
+                if (runData.difficultyLevel >= DifficultyLevel.Supreme)
+                {
+                    AchievementManager.Instance.UnlockAchievement("ach_diff_supreme");
+                }
+
+                // 다음 난이도 해금
+                if (DifficultyManager.Instance != null)
+                {
+                    DifficultyLevel nextLevel = runData.difficultyLevel + 1;
+                    if (nextLevel <= DifficultyLevel.Supreme)
+                    {
+                        DifficultyManager.Instance.UnlockDifficulty(nextLevel);
+                    }
+                }
             }
         }
 
@@ -463,10 +494,13 @@ namespace JianghuGuidebook.Core
             }
 
             meta.totalEnemiesKilled += runData.enemiesKilled;
+            meta.totalEnemiesKilled += runData.enemiesKilled;
             meta.totalBossesDefeated += runData.bossesDefeated;
+            meta.totalPlayTime += runData.playTime;
 
             Debug.Log($"[메타 통계] 완료: {meta.totalRunsCompleted}, 승리: {meta.totalVictories}, " +
-                     $"사망: {meta.totalDeaths}, 적: {meta.totalEnemiesKilled}, 보스: {meta.totalBossesDefeated}");
+                     $"사망: {meta.totalDeaths}, 적: {meta.totalEnemiesKilled}, 보스: {meta.totalBossesDefeated}, " +
+                     $"시간: {meta.totalPlayTime:F1}초");
         }
 
         /// <summary>

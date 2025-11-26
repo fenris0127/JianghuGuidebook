@@ -267,7 +267,26 @@ namespace JianghuGuidebook.Rewards
                 return allCards[Random.Range(0, allCards.Length)];
             }
 
-            return filteredCards[Random.Range(0, filteredCards.Length)];
+            // 메타 진행도에 따른 해금 여부 확인
+            List<CardData> validCards = new List<CardData>();
+            if (Meta.MetaProgressionManager.Instance != null)
+            {
+                foreach (var card in filteredCards)
+                {
+                    if (Meta.MetaProgressionManager.Instance.IsCardUnlocked(card.id))
+                    {
+                        validCards.Add(card);
+                    }
+                }
+            }
+            else
+            {
+                validCards.AddRange(filteredCards);
+            }
+
+            if (validCards.Count == 0) return null;
+
+            return validCards[Random.Range(0, validCards.Count)];
         }
 
         /// <summary>
@@ -342,6 +361,9 @@ namespace JianghuGuidebook.Rewards
             // 지금은 임시로 생성
 
             RelicRarity rarity = DetermineRelicRarity(combatType);
+
+            // TODO: 실제 유물 데이터베이스에서 가져오기 및 해금 확인
+            // if (Meta.MetaProgressionManager.Instance != null && !Meta.MetaProgressionManager.Instance.IsRelicUnlocked(relicId)) continue;
 
             Relic relic = new Relic(
                 $"relic_{Random.Range(1000, 9999)}",

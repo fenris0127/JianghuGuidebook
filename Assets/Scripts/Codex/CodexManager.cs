@@ -5,6 +5,8 @@ using System.Linq;
 using JianghuGuidebook.Cards;
 using JianghuGuidebook.Relics;
 using JianghuGuidebook.Data;
+using JianghuGuidebook.Combat;
+using JianghuGuidebook.Events;
 
 namespace JianghuGuidebook.Codex
 {
@@ -68,6 +70,7 @@ namespace JianghuGuidebook.Codex
                             CodexEntry entry = new CodexEntry(card.id, CodexCategory.Card);
                             entry.name = card.name;
                             entry.description = card.description;
+                            entry.acquisitionHint = "전투 보상, 상점, 또는 이벤트를 통해 획득 가능합니다.";
                             // entry.iconPath = ... 
                             codexDict.Add(card.id, entry);
                         }
@@ -89,6 +92,7 @@ namespace JianghuGuidebook.Codex
                             CodexEntry entry = new CodexEntry(relic.id, CodexCategory.Relic);
                             entry.name = relic.name;
                             entry.description = relic.description;
+                            entry.acquisitionHint = "보물 상자, 엘리트 전투, 또는 이벤트를 통해 획득 가능합니다.";
                             codexDict.Add(relic.id, entry);
                         }
                     }
@@ -109,7 +113,50 @@ namespace JianghuGuidebook.Codex
                             CodexEntry entry = new CodexEntry(enemy.id, CodexCategory.Enemy);
                             entry.name = enemy.name;
                             entry.description = enemy.description;
+                            entry.acquisitionHint = "강호를 여행하며 마주칠 수 있습니다.";
                             codexDict.Add(enemy.id, entry);
+                        }
+                    }
+                }
+            }
+
+            // 4. Load Bosses
+            TextAsset bossJson = Resources.Load<TextAsset>("BossDatabase");
+            if (bossJson != null)
+            {
+                BossDatabase db = JsonUtility.FromJson<BossDatabase>(bossJson.text);
+                if (db != null && db.bosses != null)
+                {
+                    foreach (var boss in db.bosses)
+                    {
+                        if (!codexDict.ContainsKey(boss.id))
+                        {
+                            CodexEntry entry = new CodexEntry(boss.id, CodexCategory.Boss);
+                            entry.name = boss.enemyData.name;
+                            entry.description = boss.enemyData.description;
+                            entry.acquisitionHint = "각 지역의 마지막 관문에서 등장합니다.";
+                            codexDict.Add(boss.id, entry);
+                        }
+                    }
+                }
+            }
+
+            // 5. Load Events
+            TextAsset eventJson = Resources.Load<TextAsset>("EventDatabase");
+            if (eventJson != null)
+            {
+                EventDatabase db = JsonUtility.FromJson<EventDatabase>(eventJson.text);
+                if (db != null && db.events != null)
+                {
+                    foreach (var evt in db.events)
+                    {
+                        if (!codexDict.ContainsKey(evt.id))
+                        {
+                            CodexEntry entry = new CodexEntry(evt.id, CodexCategory.Event);
+                            entry.name = evt.title; // Use title as name
+                            entry.description = evt.description;
+                            entry.acquisitionHint = "여행 중 우연히 마주칠 수 있습니다.";
+                            codexDict.Add(evt.id, entry);
                         }
                     }
                 }

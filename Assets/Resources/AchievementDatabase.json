@@ -265,6 +265,228 @@
             "id": "ach_spec_conqueror",
             "name": "강호 평정",
             "description": "최고 난이도로 게임을 클리어하세요.",
+            "rewardValue": "50"
+        },
+        {
+            "id": "ach_combat_poison_master",
+            "name": "독왕",
+            "description": "적에게 중독 50 중첩을 부여하세요.",
+            "type": 0,
+            "isHidden": false,
+            "rewardType": 1,
+            "rewardValue": "30"
+        },
+        {
+            "id": "ach_combat_iron_wall",
+            "name": "철벽",
+            "description": "방어도 50 이상을 얻으세요.",
+            "type": 0,
+            "isHidden": false,
+            "rewardType": 1,
+            "rewardValue": "30"
+        },
+        {
+            "id": "ach_col_collector",
+            "name": "수집가",
+            "description": "100종의 카드를 획득하세요.",
+            "type": 1,
+            "isHidden": false,
+            "rewardType": 1,
+            "rewardValue": "100"
+        },
+        {
+            "id": "ach_col_relic_hunter",
+            "name": "유물 사냥꾼",
+            "description": "40개 이상의 유물을 수집하세요.",
+            "type": 1,
+            "isHidden": false,
+            "rewardType": 1,
+            "rewardValue": "100"
+        },
+        {
+            "id": "ach_col_legendary",
+            "name": "전설의 수집",
+            "description": "전설 등급 카드를 10장 획득하세요.",
+            "type": 1,
+            "isHidden": false,
+            "rewardType": 1,
+            "rewardValue": "50"
+        },
+        {
+            "id": "ach_col_codex",
+            "name": "무림지 완성",
+            "description": "모든 적의 정보를 수집하세요.",
+            "type": 1,
+            "isHidden": false,
+            "rewardType": 1,
+            "rewardValue": "200"
+        },
+        {
+            "id": "ach_col_rich",
+            "name": "풍요",
+            "description": "한 번의 런에서 골드 1000 이상을 보유하세요.",
+            "type": 1,
+            "isHidden": false,
+            "rewardType": 1,
+            "rewardValue": "50"
+        },
+        {
+            "id": "ach_col_deck_master",
+            "name": "덱 마스터",
+            "description": "30장 이상의 덱을 구성하세요.",
+            "type": 1,
+            "isHidden": false,
+            "rewardType": 1,
+            "rewardValue": "30"
+        },
+        {
+            "id": "ach_col_all_factions",
+            "name": "팔방미인",
+            "description": "모든 분파로 게임을 클리어하세요.",
+            "type": 1,
+            "isHidden": false,
+            "rewardType": 1,
+            "rewardValue": "300"
+        },
+        {
+            "id": "ach_col_event_master",
+            "name": "기연",
+            "description": "모든 이벤트를 경험하세요.",
+            "type": 1,
+            "isHidden": false,
+            "rewardType": 1,
+            "rewardValue": "100"
+        },
+        {
+            "id": "ach_col_shop_vip",
+            "name": "단골 손님",
+            "description": "상점에서 5000 골드 이상을 사용하세요.",
+            "type": 1,
+            "isHidden": false,
+            "rewardType": 1,
+            "rewardValue": "50"
+        },
+        {
+            "id": "ach_col_upgrade",
+            "name": "대장장이",
+            "description": "카드를 50회 강화하세요.",
+            "type": 1,
+            "isHidden": false,
+            "rewardType": 1,
+            "rewardValue": "50"
+        },
+        {
+            "id": "ach_realm_heaven",
+            "name": "천인합일",
+            "description": "내공 경지 '천인합일'에 도달하세요.",
+            "type": 2,
+            "isHidden": false,
+            "rewardType": 1,
+            "rewardValue": "100"
+        },
+        {
+            "id": "ach_realm_sword_god",
+            "name": "검신",
+            "description": "검술 경지 '검심통명'에 도달하세요.",
+            "type": 2,
+            "isHidden": false,
+            "rewardType": 1,
+            "rewardValue": "100"
+        },
+        {
+            "id": "ach_realm_master_all",
+            "name": "백전백승",
+            "description": "모든 무기술 경지에서 '대성' 이상을 달성하세요.",
+            "type": 2,
+            "isHidden": false,
+            "rewardType": 1,
+            "rewardValue": "200"
+        },
+        {
+            "id": "ach_realm_legend",
+            "name": "전설의 고수",
+            "description": "3개 이상의 무기술에서 최고 경지를 달성하세요.",
+            "type": 2,
+            "isHidden": false,
+            "rewardType": 1,
+            "rewardValue": "300"
+        },
+        {
+            "id": "ach_realm_first_step",
+            "name": "첫 걸음",
+            "description": "아무 무기술이나 '소성' 단계에 도달하세요.",
+            "type": 2,
+            "isHidden": false,
+            "rewardType": 1,
+            "rewardValue": "10"
+        },
+        {
+            "id": "ach_spec_minimalist",
+            "name": "카드 미니멀리스트",
+            "description": "20장 이하의 덱으로 게임을 클리어하세요.",
+            "type": 3,
+            "isHidden": false,
+            "rewardType": 1,
+            "rewardValue": "50"
+        },
+        {
+            "id": "ach_spec_bare_hands",
+            "name": "빈손의 달인",
+            "description": "유물을 획득하지 않고 1지역을 클리어하세요.",
+            "type": 3,
+            "isHidden": false,
+            "rewardType": 1,
+            "rewardValue": "100"
+        },
+        {
+            "id": "ach_spec_spender",
+            "name": "부자 플레이",
+            "description": "상점에서 100회 이상 구매하세요.",
+            "type": 3,
+            "isHidden": false,
+            "rewardType": 1,
+            "rewardValue": "50"
+        },
+        {
+            "id": "ach_spec_ascetic",
+            "name": "고행",
+            "description": "휴식 노드를 사용하지 않고 게임을 클리어하세요.",
+            "type": 3,
+            "isHidden": false,
+            "rewardType": 1,
+            "rewardValue": "100"
+        },
+        {
+            "id": "ach_spec_conqueror",
+            "name": "강호 평정",
+            "description": "최고 난이도로 게임을 클리어하세요.",
+            "type": 3,
+            "isHidden": false,
+            "rewardType": 1,
+            "rewardValue": "300"
+        },
+        {
+            "id": "ach_diff_master",
+            "name": "고수",
+            "description": "고수 난이도로 게임을 클리어하세요.",
+            "type": 3,
+            "isHidden": false,
+            "rewardType": 1,
+            "rewardValue": "100"
+        },
+        {
+            "id": "ach_diff_grandmaster",
+            "name": "초고수",
+            "description": "초고수 난이도로 게임을 클리어하세요.",
+            "type": 3,
+            "isHidden": false,
+            "rewardType": 1,
+            "rewardValue": "200"
+        },
+        {
+            "id": "ach_diff_supreme",
+            "name": "절정고수",
+            "description": "절정고수 난이도로 게임을 클리어하세요.",
             "type": 3,
             "isHidden": false,
             "rewardType": 1,

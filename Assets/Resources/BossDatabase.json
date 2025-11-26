@@ -1,9 +1,11 @@
 {
   "bosses": [
     {
+      "id": "boss_blood_wolf",
       "enemyData": {
         "id": "boss_blood_wolf",
         "name": "혈랑왕",
+        "description": "피에 굶주린 늑대들의 왕입니다. 광폭화하면 더욱 강력해집니다.",
         "maxHealth": 150,
         "intents": []
       },
@@ -19,9 +21,11 @@
       "defeatDialogue": "크윽... 강하구나..."
     },
     {
+      "id": "boss_iron_master",
       "enemyData": {
         "id": "boss_iron_master",
         "name": "철장문주",
+        "description": "철장문의 문주로, 강력한 방어력을 자랑합니다.",
         "maxHealth": 300,
         "intents": []
       },
@@ -37,9 +41,11 @@
       "defeatDialogue": "내 철장이... 깨지다니..."
     },
     {
+      "id": "boss_demonic_guardian",
       "enemyData": {
         "id": "boss_demonic_guardian",
         "name": "마교 호법",
+        "description": "마교를 수호하는 호법입니다. 생명력을 흡수하는 사악한 무공을 사용합니다.",
         "maxHealth": 350,
         "intents": []
       },
@@ -55,9 +61,11 @@
       "defeatDialogue": "마교의... 부활은... 멈출 수 없다..."
     },
     {
+      "id": "boss_ice_elder",
       "enemyData": {
         "id": "boss_ice_elder",
         "name": "빙궁장로",
+        "description": "북해빙궁의 장로입니다. 모든 것을 얼어붙게 만드는 빙공을 사용합니다.",
         "maxHealth": 400,
         "intents": []
       },
@@ -73,9 +81,11 @@
       "defeatDialogue": "차가운... 죽음이여..."
     },
     {
+      "id": "boss_supreme_master",
       "enemyData": {
         "id": "boss_supreme_master",
         "name": "천하제일인",
+        "description": "강호의 정점에 선 고수입니다. 모든 무공에 통달해 있습니다.",
         "maxHealth": 600,
         "intents": []
       },

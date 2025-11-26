@@ -47,7 +47,16 @@ namespace JianghuGuidebook.Combat
         public void Initialize(EnemyData data)
         {
             enemyData = data;
-            maxHealth = data.maxHealth;
+            enemyData = data;
+            
+            // 난이도 적용
+            float hpMult = 1.0f;
+            if (DifficultyManager.Instance != null)
+            {
+                hpMult = DifficultyManager.Instance.GetCurrentModifier().enemyHealthMultiplier;
+            }
+
+            maxHealth = Mathf.RoundToInt(data.maxHealth * hpMult);
             currentHealth = maxHealth;
             block = 0;
             statusEffects.Clear();
@@ -178,7 +187,12 @@ namespace JianghuGuidebook.Combat
             {
                 case EnemyActionType.Attack:
                     // 플레이어 공격
-                    player.TakeDamage(currentIntent.value);
+                    int damage = currentIntent.value;
+                    if (DifficultyManager.Instance != null)
+                    {
+                        damage = Mathf.RoundToInt(damage * DifficultyManager.Instance.GetCurrentModifier().enemyDamageMultiplier);
+                    }
+                    player.TakeDamage(damage);
                     break;
 
                 case EnemyActionType.Defend:

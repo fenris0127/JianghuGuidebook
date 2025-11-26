@@ -24,6 +24,7 @@ namespace JianghuGuidebook.Codex
         public string name;
         public string description;
         public string iconPath; // or Sprite reference
+        public string acquisitionHint; // 획득 힌트
         
         public CodexEntry(string id, CodexCategory category)
         {
